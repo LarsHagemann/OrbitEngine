@@ -13,5 +13,135 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Headerdateien\components">
+      <UniqueIdentifier>{36ba77d3-7996-43e0-bf3f-e0670fab5171}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\objects">
+      <UniqueIdentifier>{c1d18a21-5101-4169-8411-92a0f12727d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\misc">
+      <UniqueIdentifier>{3868c08e-8a71-4c19-af83-1f1aca53f5ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\engine">
+      <UniqueIdentifier>{da4a4b2f-6279-475a-9697-ada9a95c8523}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\components">
+      <UniqueIdentifier>{e82a7405-33aa-4a2b-8cf2-6598439d3f50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\misc">
+      <UniqueIdentifier>{a02a3f23-8182-48df-aa20-092fce898f8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\objects">
+      <UniqueIdentifier>{c5719582-fc9b-4c62-8bac-8674ca2cb278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\engine">
+      <UniqueIdentifier>{517c630d-b781-4283-82c3-2d4a045e91d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\rendering">
+      <UniqueIdentifier>{d8b458f8-8052-475d-8fe1-272c98e48c0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\cameras">
+      <UniqueIdentifier>{7bf3cd6d-de16-4291-a454-3e1f61b1f3e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\cameras">
+      <UniqueIdentifier>{d6ea72a8-aebb-453b-b09d-724aa0601113}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\rendering">
+      <UniqueIdentifier>{fe05b653-57c0-4ee4-9ec8-62eb4db783a2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="component.hpp">
+      <Filter>Headerdateien\components</Filter>
+    </ClInclude>
+    <ClInclude Include="renderable.hpp">
+      <Filter>Headerdateien\components</Filter>
+    </ClInclude>
+    <ClInclude Include="object.hpp">
+      <Filter>Headerdateien\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="time.hpp">
+      <Filter>Headerdateien\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="exception.hpp">
+      <Filter>Headerdateien\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="helper.hpp">
+      <Filter>Headerdateien\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="resource_manager.hpp">
+      <Filter>Headerdateien\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="engine.hpp">
+      <Filter>Headerdateien\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="transform.hpp">
+      <Filter>Headerdateien\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="batch_component.hpp">
+      <Filter>Headerdateien\components</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.hpp">
+      <Filter>Headerdateien\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="material.hpp">
+      <Filter>Headerdateien\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.hpp">
+      <Filter>Headerdateien\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="light.hpp">
+      <Filter>Headerdateien\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="base_camera.hpp">
+      <Filter>Headerdateien\cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="third_person_camera.hpp">
+      <Filter>Headerdateien\cameras</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="component.cpp">
+      <Filter>Quelldateien\components</Filter>
+    </ClCompile>
+    <ClCompile Include="exception.cpp">
+      <Filter>Quelldateien\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="helper.cpp">
+      <Filter>Quelldateien\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="time.cpp">
+      <Filter>Quelldateien\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>Quelldateien\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="base_camera.cpp">
+      <Filter>Quelldateien\cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="batch_component.cpp">
+      <Filter>Quelldateien\components</Filter>
+    </ClCompile>
+    <ClCompile Include="light.cpp">
+      <Filter>Quelldateien\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="material.cpp">
+      <Filter>Quelldateien\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>Quelldateien\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>Quelldateien\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="transform.cpp">
+      <Filter>Quelldateien\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="third_person_camera.cpp">
+      <Filter>Quelldateien\cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="engine.cpp">
+      <Filter>Quelldateien\engine</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
