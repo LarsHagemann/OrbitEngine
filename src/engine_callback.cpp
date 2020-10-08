@@ -57,8 +57,8 @@ namespace orbit
 			// WM_SIZE is sent when the user resizes the window.  
 		case WM_SIZE:
 			// Save the new client area dimensions.
-			_state._dimensions.x = LOWORD(lParam);
-			_state._dimensions.y = HIWORD(lParam);
+			_state._dimensions.x() = LOWORD(lParam);
+			_state._dimensions.y() = HIWORD(lParam);
 			if (_device)
 			{
 				if (wParam == SIZE_MINIMIZED)

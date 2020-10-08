@@ -1,4 +1,2 @@
-/Debug/
-/Eigen/
-/Release/
-/.vs/
+/dep/
+/build/
