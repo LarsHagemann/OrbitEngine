@@ -3,12 +3,13 @@
 
 #include <wrl/client.h>
 #include <d3d12.h>
-#include <dxgi.h>
+#include <d3dx12.h>
+#include <dxgi1_6.h>
 #include <d3dcompiler.h>
 #include <dinput.h>
 #include <DirectXMath.h>
 
-#include <Eigen/Dense>
+#include "Eigen/Dense"
 
 #define IID_PPV_ARGS(ppType) __uuidof(**(ppType)), IID_PPV_ARGS_Helper(ppType)
 
@@ -72,13 +73,44 @@ namespace orbit
 	// @param nearZ: the distance of the near plane
 	// @param farZ: the distance of the far plane
 	// @note: for best results (farZ - nearZ) should be kept as low as possible
-	Matrix4f PerspectiveFovLH(float vFOV, float aspectRatio, float nearZ, float farZ);
+	extern Matrix4f PerspectiveFovLH(float vFOV, float aspectRatio, float nearZ, float farZ);
 
 	// @brief: calculates a view matrix looking from eye to target
 	// @param eye: the eye position of the camera
 	// @param target: the target to look at
 	// @param up: camera up vector (most likely [0,1,0])
 	// @return: the view matrix
-	Matrix4f LookAt(const Vector3f& eye, const Vector3f& target, const Vector3f& up);
+	extern Matrix4f LookAt(const Vector3f& eye, const Vector3f& target, const Vector3f& up);
+
+	// @brief: enumerates a list of all the graphics adapters
+	//	(hardware and software)
+	// @return: list of all the video adapters (graphics cards and software adapters)
+	extern std::vector<Ptr<IDXGIAdapter4>> GetAdapters();
+
+	// @brief: returns the WARP (Windows Advanced Rasterization Processor) adapter
+	extern Ptr<IDXGIAdapter4> GetWARPAdapter();
+
+	// @brief: returns the graphics adapter with the most video memory
+	//	it is expected to be the most powerful graphics adapter
+	// @return: most favored graphics adapter
+	extern Ptr<IDXGIAdapter4> GetFavoredAdapter();
+
+	// @brief: returns the graphics adapter with the most video memory
+	//	it is expected to be the most powerful graphics adapter
+	// @param adapters: list of adapters to choose from
+	// @return: most favored graphics adapter
+	extern Ptr<IDXGIAdapter4> GetFavoredAdapter(
+		const std::vector<Ptr<IDXGIAdapter4>> adapters
+	);
+
+	// @brief: checks whether the graphics output supports
+	//	tearing (or vsync-off or G-Sync or FreeSync)
+	extern bool CheckTearingSupport();
+
+	extern Ptr<ID3D12DescriptorHeap> CreateDescriptorHeap(
+		Ptr<ID3D12Device6> device,
+		D3D12_DESCRIPTOR_HEAP_TYPE type,
+		uint32_t numDescriptors
+	);
 
 }

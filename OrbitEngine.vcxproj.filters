@@ -49,6 +49,9 @@
     <Filter Include="Quelldateien\rendering">
       <UniqueIdentifier>{fe05b653-57c0-4ee4-9ec8-62eb4db783a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\rendering\shader">
+      <UniqueIdentifier>{79ead21c-72e4-4f83-8170-fec414b0043c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="component.hpp">
@@ -99,6 +102,24 @@
     <ClInclude Include="third_person_camera.hpp">
       <Filter>Headerdateien\cameras</Filter>
     </ClInclude>
+    <ClInclude Include="event_driven.hpp">
+      <Filter>Headerdateien\components</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard_component.hpp">
+      <Filter>Headerdateien\components</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse_component.hpp">
+      <Filter>Headerdateien\components</Filter>
+    </ClInclude>
+    <ClInclude Include="pixel_shader.hpp">
+      <Filter>Headerdateien\rendering\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="engine_initialization.hpp">
+      <Filter>Headerdateien\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine_callback.cpp">
+      <Filter>Quelldateien\engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="component.cpp">
@@ -142,6 +163,18 @@
     </ClCompile>
     <ClCompile Include="engine.cpp">
       <Filter>Quelldateien\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="resource_manager.cpp">
+      <Filter>Quelldateien\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="keyboard_component.cpp">
+      <Filter>Quelldateien\components</Filter>
+    </ClCompile>
+    <ClCompile Include="engine_initialization.cpp">
+      <Filter>Quelldateien\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="mouse_component.cpp">
+      <Filter>Quelldateien\components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

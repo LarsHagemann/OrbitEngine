@@ -29,14 +29,14 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -79,11 +79,12 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <PreprocessorDefinitions>DIRECTINPUT_VERSION=0x0800;_ENABLE_EXTENDED_ALIGNED_STORAGE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DIRECTINPUT_VERSION=0x0800;_ENABLE_EXTENDED_ALIGNED_STORAGE;NOMINMAX;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
+    <Lib />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -107,7 +108,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <PreprocessorDefinitions>DIRECTINPUT_VERSION=0x0800;_ENABLE_EXTENDED_ALIGNED_STORAGE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DIRECTINPUT_VERSION=0x0800;_ENABLE_EXTENDED_ALIGNED_STORAGE;NOMINMAX;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,12 +136,18 @@
     <ClInclude Include="batch_component.hpp" />
     <ClInclude Include="component.hpp" />
     <ClInclude Include="engine.hpp" />
+    <ClInclude Include="engine_callback.cpp" />
+    <ClInclude Include="engine_initialization.hpp" />
+    <ClInclude Include="event_driven.hpp" />
     <ClInclude Include="exception.hpp" />
     <ClInclude Include="helper.hpp" />
+    <ClInclude Include="keyboard_component.hpp" />
     <ClInclude Include="light.hpp" />
     <ClInclude Include="material.hpp" />
     <ClInclude Include="mesh.hpp" />
+    <ClInclude Include="mouse_component.hpp" />
     <ClInclude Include="object.hpp" />
+    <ClInclude Include="pixel_shader.hpp" />
     <ClInclude Include="renderable.hpp" />
     <ClInclude Include="resource_manager.hpp" />
     <ClInclude Include="scene.hpp" />
@@ -153,12 +160,16 @@
     <ClCompile Include="batch_component.cpp" />
     <ClCompile Include="component.cpp" />
     <ClCompile Include="engine.cpp" />
+    <ClCompile Include="engine_initialization.cpp" />
     <ClCompile Include="exception.cpp" />
     <ClCompile Include="helper.cpp" />
+    <ClCompile Include="keyboard_component.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="mouse_component.cpp" />
     <ClCompile Include="object.cpp" />
+    <ClCompile Include="resource_manager.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="third_person_camera.cpp" />
     <ClCompile Include="time.cpp" />

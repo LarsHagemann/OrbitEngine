@@ -7,7 +7,12 @@ namespace orbit
 	{
 	}
 
-	void Mesh::LoadSubMesh(std::vector<Vertex>&& vertices, std::vector<uint32_t>&& indices, std::string_view materialId, bool recalculateNormals)
+	void Mesh::LoadSubMesh(
+		std::vector<Vertex>&& vertices, 
+		std::vector<uint32_t>&& indices, 
+		std::string_view materialId, 
+		std::string_view pipelineStateId,
+		bool recalculateNormals)
 	{
 		const auto preVertexCount = _vertices.size();
 		const auto preIndexCount = _indices.size();
@@ -57,6 +62,7 @@ namespace orbit
 		m.startIndex = preIndexCount;
 		m.indexCount = _indices.size();
 		m.material = materialId;
+		m.pipelineState = pipelineStateId;
 		
 		_submeshes.emplace_back(std::move(m));
 		ReloadBuffer();

@@ -15,6 +15,7 @@ namespace orbit
 	class Scene
 	{
 	protected:
+		friend class Engine;
 		// @member: the objects in the scene (the player, enemies, terrain, etc...)
 		std::unordered_map<std::string, ObjectPtr> _objects;
 		// @member: the lights in the scene

@@ -18,7 +18,7 @@ namespace orbit
 		_matrix = m.transpose();
 	}
 
-	Matrix4f Transform::LocalToWorldMatrix() const
+	const Matrix4f& Transform::LocalToWorldMatrix() const
 	{
 		if (_isDirty) RecalculateMatrix();
 		return _matrix;

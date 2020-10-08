@@ -23,6 +23,7 @@ namespace orbit
 		unsigned vertexCount = 0u;
 		unsigned startIndex = 0u;
 		unsigned indexCount = 0u;
+		std::string pipelineState;
 		std::string material;
 	};
 
@@ -44,8 +45,21 @@ namespace orbit
 		// @brief: loads a submesh
 		// @param vertices: vertices of the submesh
 		// @param indices: indices of the submesh (might be empty)
+		// @param materialId: id of the material in the resource manager
+		// @param pipelineStateId: id of the pipeline state in the resource manager
 		// @param recalculateNormals: will recalculate the vertex normals if set to true
-		void LoadSubMesh(std::vector<Vertex>&& vertices, std::vector<uint32_t>&& indices, std::string_view materialId = "", bool recalculateNormals = false);
+		void LoadSubMesh(
+			std::vector<Vertex>&& vertices, 
+			std::vector<uint32_t>&& indices, 
+			std::string_view materialId = "", 
+			std::string_view pipelineStateId = "",
+			bool recalculateNormals = false);
+		// @brief: returns the list of submeshes
+		// @return: the list of submeshes
+		const std::vector<SubMesh>& GetSubmeshes() const { return _submeshes; }
+		// @brief: returns the list of indices
+		// @return: the list of indices
+		const std::vector<uint32_t>& GetIndices() const { return _indices; }
 	};
 
 }

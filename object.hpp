@@ -14,6 +14,7 @@ namespace orbit
 	class Object : public std::enable_shared_from_this<Object>
 	{
 	protected:
+		friend class Engine;
 		// @member: hashtable of components
 		//	the player class would for example would have a BatchComponent, a RenderComponent,
 		//	a MouseComponent and a KeyboardComponent

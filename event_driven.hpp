@@ -1,5 +1,6 @@
 #pragma once
 #include "helper.hpp"
+#include "time.hpp"
 
 namespace orbit
 {
@@ -8,11 +9,11 @@ namespace orbit
 	//	can be rendered to the screen by calling the draw
 	//	function. Such components will automatically be detected
 	//	by the Engine. 
-	class Renderable
+	class EventDriven
 	{
 	public:
-		// Override this method to implement rendering
-		virtual void Draw(Ptr<ID3D12GraphicsCommandList> renderTo) const = 0;
+		// Override this method to implement event handling / updating
+		virtual void Update(Time dt) = 0;
 	};
 
 }

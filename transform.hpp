@@ -34,7 +34,7 @@ namespace orbit
 	public:
 		// @method: returns a transformation matrix
 		// @return: returns the affine transformation from local space to world space
-		Matrix4f LocalToWorldMatrix() const;
+		const Matrix4f& LocalToWorldMatrix() const;
 		// @method: returns a transformation matrix
 		// @return: returns the affine transformation from world space to local space
 		Matrix4f WorldToLocalMatrix() const;
