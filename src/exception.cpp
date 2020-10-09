@@ -12,9 +12,13 @@ namespace orbit
 		localtime_s(&now, &t);
 
 		std::ostringstream ss;
-		ss << "[" << (now.tm_year + 1900) << '-'
+		ss << '[' << (now.tm_year + 1900) << '-'
 			<< (now.tm_mon + 1) << '-'
-			<< now.tm_mday << "] ";
+			<< now.tm_mday 
+			<< "  " << now.tm_hour 
+			<< ':' << now.tm_min
+			<< ':' << now.tm_sec
+			<< "] ";
 
 		stream
 			<< ss.str()
@@ -71,7 +75,7 @@ namespace orbit
 	{
 		auto msg = std::string(message);
 		auto resMsg = std::system_category().message(result);
-		msg += "{ " + resMsg + " }";
+		msg += " {" + std::to_string(result) + "}{" + resMsg + "}";
 		print(severity, msg, function, line);
 	}
 

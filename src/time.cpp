@@ -3,6 +3,11 @@
 namespace orbit
 {
 
+	Time::Time(int64_t micros) : 
+		_micros(micros)
+	{
+	}
+
 	int64_t Time::asMicroseconds()
 	{
 		return _micros;

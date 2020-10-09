@@ -103,7 +103,7 @@ namespace orbit
 						// done resizing the window and releases the resize bars, which 
 						// sends a WM_EXITSIZEMOVE message.
 					}
-					else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
+					else
 					{
 						OnResize();
 					}

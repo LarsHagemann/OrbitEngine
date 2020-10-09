@@ -26,7 +26,7 @@ namespace orbit
 		CameraPtr _camera;
 	public:
 		// @method: creates a new scene object
-		static std::shared_ptr<Scene> create();
+		static std::shared_ptr<Scene> Create();
 		// @method: adds an object to the scene
 		// @param id: the identifier for the object
 		// @param object: the object to be added

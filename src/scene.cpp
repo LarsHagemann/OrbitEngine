@@ -3,7 +3,7 @@
 namespace orbit
 {
 
-	std::shared_ptr<Scene> Scene::create()
+	std::shared_ptr<Scene> Scene::Create()
 	{
 		return std::make_shared<Scene>();
 	}

@@ -5,14 +5,14 @@ using DirectX 12
 - Finish translating the old DirectX 11 Orbit engine to DirectX 12
 - Write some sample code
 - Write a wiki
-
-- Release
+- Rewrite the README 
+- Publish
 
 ## Installation:
 Preperations:
 Orbit depends on Eigen for vector algebra. Luckily, Eigen is a header-only library, so everything you have
-to do is, copy the Eigen header files into the /dep/ directory. Your /dep/ directory should look like 
-this now:
+to do is, copy the Eigen header files into a /dep/ directory in the same directory as src and inc. 
+Your /dep/ directory should look like this now:
 dep/
 	Eigen/
 		<Eigen Source Code>

@@ -139,7 +139,7 @@ namespace orbit
 
 	void Engine::Display()
 	{
-		auto backbuffer = _backbuffers[_state._currentBackbuffer++];
+		auto backbuffer = _backbuffers[_state._currentBackbuffer];
 		auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 			backbuffer.Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET,
@@ -179,7 +179,7 @@ namespace orbit
 		ORBIT_INFO("Initializing the Window.");
 #ifdef _DEBUG
 		ORBIT_THROW_IF_FAILED(
-			D3D12GetDebugInterface(IID_PPV_ARGS(&_debug)),
+			D3D12GetDebugInterface(IID_PPV_ARGS(_debug.GetAddressOf())),
 			"Failed to get DX12 debug interface"
 		);
 		_debug->EnableDebugLayer();
@@ -188,6 +188,7 @@ namespace orbit
 		_commandAllocators.resize(_state._numBackbuffers);
 		_backbuffers.resize(_state._numBackbuffers);
 		_state._fences.resize(_state._numBackbuffers);
+		_state._clearColor = { 0.3f, 0.4f, 0.7f, 1.f };
 
 		WNDCLASSEX wndClass;
 		ZeroMemory(&wndClass, sizeof(WNDCLASSEX));
@@ -210,7 +211,8 @@ namespace orbit
 		RECT rc = { 0, 0, static_cast<LONG>(_state._dimensions.x()), static_cast<LONG>(_state._dimensions.y()) };
 		AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
-		_hWnd = CreateWindowW(
+		_hWnd = ::CreateWindowExW(
+			0L,
 			L"OrbitWindowClass",
 			desc->title.c_str(),
 			WS_OVERLAPPEDWINDOW,
@@ -225,7 +227,16 @@ namespace orbit
 		);
 
 		if (!_hWnd)
+		{
+			auto le = GetLastError();
+			ORBIT_ERR(FormatString(
+				"GetLastError: %d; %s\n",
+				le,
+				std::system_category().message(le).c_str()
+				)
+			);
 			ORBIT_THROW("Failed to create the render window");
+		}
 
 		ORBIT_INFO("Initializing DirectX 12.");
 
@@ -234,25 +245,6 @@ namespace orbit
 
 		auto width = dimensions.right - dimensions.left;
 		auto height = dimensions.bottom - dimensions.top;
-
-		D3D_DRIVER_TYPE driverTypes[] = {
-		D3D_DRIVER_TYPE_HARDWARE,
-		D3D_DRIVER_TYPE_WARP,
-		D3D_DRIVER_TYPE_SOFTWARE
-		};
-
-		auto totalDriverTypes = ARRAYSIZE(driverTypes);
-
-		D3D_FEATURE_LEVEL featureLevels[] = {
-			D3D_FEATURE_LEVEL_12_1,
-			D3D_FEATURE_LEVEL_12_0,
-			D3D_FEATURE_LEVEL_11_1,
-			D3D_FEATURE_LEVEL_11_0,
-			D3D_FEATURE_LEVEL_10_1,
-			D3D_FEATURE_LEVEL_10_0
-		};
-
-		auto totalFeatureLevels = ARRAYSIZE(featureLevels);
 
 		Ptr<IDXGIAdapter4> adapter = desc->adapter;
 		if (desc->useWARP)
@@ -332,14 +324,15 @@ namespace orbit
 		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-		swapChainDesc.Flags = CheckTearingSupport()
+		swapChainDesc.Flags = 
+			CheckTearingSupport()
 			? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
 			: 0;
 
 		Ptr<IDXGISwapChain1> swapChain;
 		ORBIT_THROW_IF_FAILED(
 			dxgiFactory4->CreateSwapChainForHwnd(
-				_device.Get(),
+				_cmdQueue.Get(),
 				_hWnd,
 				&swapChainDesc,
 				nullptr,
@@ -362,6 +355,7 @@ namespace orbit
 			D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
 			3
 		);
+		
 
 		UpdateRenderTargetViews();
 
@@ -394,6 +388,7 @@ namespace orbit
 		);
 
 		std::fill(_state._fences.begin(), _state._fences.end(), 0);
+		_state._RTVDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		_state._currentPipelineState = "default";
 		_state._fullscreen = desc->isFullscreen;
 		_state._nextFenceValue = 0;
@@ -454,6 +449,7 @@ namespace orbit
 			);
 			::WaitForSingleObject(eventHandle, INFINITE);
 		}
+		::CloseHandle(eventHandle);
 	}
 
 	void Engine::Flush()
@@ -464,17 +460,20 @@ namespace orbit
 
 	void Engine::Run()
 	{
-		ShowWindow(_hWnd, 10);
+		ORBIT_INFO("Running engine.");
+		ShowWindow(_hWnd, SW_SHOW);
 		_state._clock.Restart();
 		while (_state._open)
 		{
-			Clear();
 			UpdateAndDraw();
+			Clear();
 			Display();
 
 			//_physxScene->simulate(_dt);
 			//_physxScene->fetchResults(true);
 		}
+
+		Flush();
 	}
 
 	void Engine::SetFullscreen(bool fullscreen)

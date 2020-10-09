@@ -1,0 +1,3 @@
+add_executable(simpleWindow main.cpp)
+target_link_libraries(simpleWindow LINK_PUBLIC Orbit)
+add_compile_definitions(DIRECTINPUT_VERSION=0x0800 NOMINMAX)
