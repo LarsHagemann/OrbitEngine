@@ -48,6 +48,8 @@ target_include_directories(${PROJECT_NAME}
 )
 if (NOT "${EIGEN_ROOT_PATH}" STREQUAL "")
 	target_include_directories(${PROJECT_NAME} ${EIGEN_ROOT_PATH})
+endif()
+
 physx_dependency(${PROJECT_NAME})
 add_compile_definitions(DIRECTINPUT_VERSION=0x0800 NOMINMAX)
 add_definitions(-DUNICODE)
