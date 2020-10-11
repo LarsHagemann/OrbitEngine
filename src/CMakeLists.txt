@@ -24,14 +24,19 @@ set(ORBIT_SOURCE
 set(SOURCE ${ORBIT_SOURCE})
 
 if (WITH_DEAR_IMGUI)
+	if ("${IMGUI_ROOT_PATH}" STREQUAL "")
+		set(IMGUI_PREFIX "../dep/ImGui")
+	else()
+		set(IMGUI_PREFIX ${IMGUI_ROOT_PATH})
+	endif()
 	set(SOURCE
 		${ORBIT_SOURCE}
-		../dep/ImGui/imgui.cpp
-		../dep/ImGui/imgui_draw.cpp
-		../dep/ImGui/imgui_impl_dx12.cpp
-		../dep/ImGui/imgui_impl_win32.cpp
-		../dep/ImGui/imgui_widgets.cpp
-		../dep/ImGui/imgui_demo.cpp
+		${IMGUI_PREFIX}/imgui.cpp
+		${IMGUI_PREFIX}/imgui_draw.cpp
+		${IMGUI_PREFIX}/imgui_impl_dx12.cpp
+		${IMGUI_PREFIX}/imgui_impl_win32.cpp
+		${IMGUI_PREFIX}/imgui_widgets.cpp
+		${IMGUI_PREFIX}/imgui_demo.cpp
 	)
 endif()
 
@@ -41,6 +46,8 @@ target_include_directories(${PROJECT_NAME}
 		../inc/ 
 		../dep/
 )
+if (NOT "${EIGEN_ROOT_PATH}" STREQUAL "")
+	target_include_directories(${PROJECT_NAME} ${EIGEN_ROOT_PATH})
 physx_dependency(${PROJECT_NAME})
 add_compile_definitions(DIRECTINPUT_VERSION=0x0800 NOMINMAX)
 add_definitions(-DUNICODE)
