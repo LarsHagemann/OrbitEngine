@@ -1,0 +1,29 @@
+macro(set_option var default type docstring)
+    if(NOT DEFINED ${var})
+        set(${var} ${default})
+    endif()
+    set(${var} ${${var}} CACHE ${type} ${docstring} FORCE)
+endmacro()	
+
+macro(physx_dependency dependency)
+	target_include_directories(${dependency} 
+		PUBLIC
+		${PHYSX_ROOT_PATH}/physx/include/
+		${PHYSX_ROOT_PATH}/pxshared/include/
+	)
+	target_link_libraries(${dependency} LINK_PUBLIC 
+		debug "${PHYSX_LIBRARY_PATH}/debug/PhysXCommon_static_64.lib"
+		debug "${PHYSX_LIBRARY_PATH}/debug/PhysX_static_64.lib"
+		debug "${PHYSX_LIBRARY_PATH}/debug/PhysXFoundation_static_64.lib"
+		debug "${PHYSX_LIBRARY_PATH}/debug/PhysXCooking_static_64.lib"
+		debug "${PHYSX_LIBRARY_PATH}/debug/PhysXCharacterKinematic_static_64.lib"
+		debug "${PHYSX_LIBRARY_PATH}/debug/PhysXPvdSDK_static_64.lib"
+		debug "${PHYSX_LIBRARY_PATH}/debug/PhysXExtensions_static_64.lib"
+		optimized "${PHYSX_LIBRARY_PATH}/release/PhysX_static_64.lib"
+		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXFoundation_static_64.lib"
+		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXCooking_static_64.lib"
+		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXCharacterKinematic_static_64.lib"
+		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXPvdSDK_static_64.lib"
+		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXExtensions_static_64.lib"
+	)
+endmacro()

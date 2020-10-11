@@ -9,6 +9,7 @@
 #include "engine.hpp"
 #include "third_person_camera.hpp"
 #include "keyboard_component.hpp"
+#include "ImGui/imgui.h"
 
 using namespace orbit;
 
@@ -29,6 +30,8 @@ public:
 			_engine->CloseWindow();
 		if (_kHandler->keydownThisFrame(DIK_F11))
 			_engine->SetFullscreen(!_engine->GetFullscreen());
+
+		ImGui::ShowDemoWindow();
 	}
 };
 

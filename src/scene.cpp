@@ -43,6 +43,11 @@ namespace orbit
 		_lights.erase(_lights.find(id));
 	}
 
+	void Scene::SetAmbientLighting(Vector4f ambient)
+	{
+		_ambientLight = ambient;
+	}
+
 	void Scene::SetCamera(CameraPtr camera)
 	{
 		_camera = camera;
@@ -51,6 +56,34 @@ namespace orbit
 	CameraPtr Scene::GetCamera() const
 	{
 		return _camera;
+	}
+
+	void Scene::PrepareRendering(Ptr<ID3D12GraphicsCommandList5> cmdList)
+	{
+		auto cp = _camera->GetTransform()->GetCombinedTranslation();
+		ShaderFrameBuffer buffer;
+		buffer.scene.numLights = std::min(sMaxSceneLights, _lights.size());
+		buffer.scene.ambientLight = _ambientLight;
+		buffer.scene.cameraPosition = Vector4f{ cp.x(), cp.y(), cp.z(), 1.f };
+		buffer.projectionMatrix = _camera->GetProjectionMatrix();
+		buffer.viewMatrix = _camera->GetViewMatrix();
+		auto i = 0u;
+		for (const auto& light : _lights)
+		{
+			buffer.lights[i] = *light.second;
+			++i;
+			if (i == sMaxSceneLights)
+				break;
+		}
+
+		void* cpu_buffer;
+		//if (SUCCEEDED(_perFrameBuffer->Map(0, nullptr, &cpu_buffer)))
+		//{
+		//	memcpy_s(cpu_buffer, sizeof(ShaderFrameBuffer), &buffer, sizeof(ShaderFrameBuffer));
+		//	_perFrameBuffer->Unmap(0, nullptr);
+		//}
+
+
 	}
 
 }

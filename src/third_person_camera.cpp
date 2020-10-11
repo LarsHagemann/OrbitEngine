@@ -5,18 +5,25 @@ namespace orbit
 
 	Matrix4f ThirdPersonCamera::GetViewMatrix() const
 	{
-		auto rot = Quaternionf(AngleAxisf(_cachedTilt, _target->LocalLeft()));
-		Vector3f zoom = rot._transformVector(-_target->LocalForward() * _distanceToTarget);
+		auto left =
+			(_target) ? _target->LocalLeft() : Vector3f::UnitZ();
+		auto forward =
+			(_target) ? _target->LocalForward() : Vector3f::UnitX();
+		auto up =
+			(_target) ? _target->LocalUp() : Vector3f::UnitY();
 
-		auto target = _target->GetCombinedTranslation();
+		auto rot = Quaternionf(AngleAxisf(_cachedTilt, left));
+		Vector3f zoom = rot._transformVector(-forward * _distanceToTarget);
+
+		auto target =
+			(_target) ? _target->GetCombinedTranslation() : Vector3f::Zero();
 		
 		Vector3f offset =
-			_targetOffset.x() * _target->LocalForward() +
-			_targetOffset.y() * _target->LocalUp() +
-			_targetOffset.z() * _target->LocalLeft();
+			_targetOffset.x() * forward +
+			_targetOffset.y() * up +
+			_targetOffset.z() * left;
 
 		auto pos = target + zoom + offset;
-		auto up = _target->LocalUp();
 
 		_transform->SetTranslation(pos);
 		return LookAt(pos, target + offset, up);
@@ -27,6 +34,11 @@ namespace orbit
 		_distanceMinMax(Vector2f{ 2.f, 40.f }),
 		_cachedTilt(0.f)
 	{
+	}
+
+	std::shared_ptr<ThirdPersonCamera> ThirdPersonCamera::Create()
+	{
+		return std::make_shared<ThirdPersonCamera>();
 	}
 
 	void ThirdPersonCamera::SetDistanceMinMax(const Vector2f& dMinMax)

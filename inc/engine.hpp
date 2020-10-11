@@ -4,9 +4,14 @@
 #include "helper.hpp"
 #include "object.hpp"
 #include "scene.hpp"
+#include "command_queue.hpp"
+
+#include "PxPhysicsAPI.h"
 
 namespace orbit
 {
+
+	using namespace physx;
 
 	struct EngineState
 	{
@@ -14,8 +19,6 @@ namespace orbit
 		std::string _currentPipelineState;
 		// @member: the current index into the backbuffer array
 		unsigned _currentBackbuffer;
-		// @member: the next fence value to be used
-		uint64_t _nextFenceValue;
 		// @member: current fence values of the different frames
 		std::vector<uint64_t> _fences;
 		// @member: feature level for direct X
@@ -52,12 +55,18 @@ namespace orbit
 		bool _maximized;
 		// @member: is the window currently being resized?
 		bool _resizing;
+		// @member: the framerate limit for the renderer
+		int _framerateLimit;
+		// @member: elapsed time since the last frame
+		Time _frametime;
 	};
 
 	// @brief: this class is the heart piece of the Orbit Game Engine
 	class Engine : public ResourceManager
 	{
 	protected:
+		static PxDefaultErrorCallback gErrorCallback;
+		static PxDefaultAllocator gAllocator;
 		// @member: the DirectX 12 rendering device
 		Ptr<ID3D12Device6> _device;
 #ifdef _DEBUG
@@ -65,14 +74,15 @@ namespace orbit
 #endif
 		// @member: backbuffers for the swap chain
 		std::vector<Ptr<ID3D12Resource1>> _backbuffers;
-		// @member: command allocators for the command lists
-		std::vector<Ptr<ID3D12CommandAllocator>> _commandAllocators;
-		// @member: the DirectX 12 command list
-		Ptr<ID3D12CommandQueue> _cmdQueue;
-		// @member: TMP; the graphics command list to be used
-		Ptr<ID3D12GraphicsCommandList> _cmdList;
+		// @member: command queue wrapper. 
+		// @see: command_queue.hpp
+		std::shared_ptr<CommandQueue> _commandQueue;
+		// @member: the current graphics command list used for rendering
+		Ptr<ID3D12GraphicsCommandList5> _commandList;
 		// @member: descriptor heap for Render Target Views
 		Ptr<ID3D12DescriptorHeap> _RTVDescriptorHeap;
+		// @member: descriptor heap for CBV/SRV/UAVs
+		Ptr<ID3D12DescriptorHeap> _CBVDescriptorHeap;
 		// @member: the DXGI swap chain
 		Ptr<IDXGISwapChain4> _swapChain;
 		// @member: the syncronization fence
@@ -85,6 +95,18 @@ namespace orbit
 		EngineState _state;
 		// @member: scene to be rendered
 		std::shared_ptr<Scene> _scene;
+		// @member: NVIDIA foundation object
+		PxFoundation* _pxFoundation;
+		// @member: NVIDIA visual debugger object
+		PxPvd* _pxPvd;
+		// @member: NVIDIA physx object
+		PxPhysics* _pxPhysics;
+		// @member: NVIDIA cooking object
+		PxCooking* _pxCooking;
+		// @member: NVIDIA scene object
+		PxScene* _pxScene;
+		// @member: NVIDIA controller object
+		PxControllerManager* _pxControllerManager;
 	protected:
 		// @internal
 		void UpdateRenderTargetViews();
@@ -107,6 +129,9 @@ namespace orbit
 		// @internal
 		LRESULT CALLBACK window_callback(UINT, WPARAM, LPARAM);
 	public:
+		static constexpr float svFOV = XM_PIDIV4;
+		static constexpr float sNearZ = 0.5f;
+		static constexpr float sFarZ = 420.f;
 		// @brief: constructor. It's recommended to use Engine::Create(...) instead
 		Engine(EngineDesc* desc);
 		// @brief: engine desctructor
@@ -129,19 +154,23 @@ namespace orbit
 		// @method: sets the scene to be rendered
 		// @param scene: the scene to be rendered during the next frame
 		void SetScene(std::shared_ptr<Scene> scene);
-		// @method: signals the command queue with the current fence value
-		// @return: the fence value for the current Signal
-		uint64_t Signal();
-		// @method: stalls the CPU until a certain fence value has been reached
-		// @param value: fence value to wait for
-		void WaitForFenceValue(uint64_t value);
-		// @method: flushes the command queue. Use this function wisely it
-		//	will stall the CPU in the worst case
-		void Flush();
 		// @method: runs the game engine's update loop
 		void Run();
 		// @method: toggles the window's fullscreen mode
+		// @param fullscreen: should the window be in fullscreen mode?
 		void SetFullscreen(bool fullscreen);
+		// @method: returns the current fullscreen mode
+		bool GetFullscreen() const { return _state._fullscreen; }
+		// @method: sets a limit to the framerate
+		//	will enforce, that every frame takes at least 1/limit seconds to render
+		// @param limit: framerate limit (for example 60 for 60fps)
+		//	values <= 0 will disable the framerate limit
+		void SetFramerateLimit(int limit);
+		// @method: closes the window connected to the engine
+		void CloseWindow();
+		// @method: returns the current size of the window
+		// @return: window size
+		Vector2i WindowSize() const { return _state._dimensions; }
 	};
 
 }

@@ -9,6 +9,32 @@
 namespace orbit
 {
 
+	// @static: maximum number of lights per scene
+	//	(number of lights that will be send to the GPU
+	static constexpr size_t sMaxSceneLights = 100u;
+
+	struct ShaderSceneBuffer
+	{
+		// @member: the ambient light of the scene
+		Vector4f ambientLight;
+		// @member: position of the camera in the world
+		Vector4f cameraPosition;
+		// @member: number of lights in the current scene
+		uint32_t numLights;
+	};
+
+	struct ShaderFrameBuffer
+	{
+		// @member: view matrix of the current frame
+		Matrix4f viewMatrix;
+		// @member: camera's projection matrix
+		Matrix4f projectionMatrix;
+		// @see: ShaderSceneBuffer for more info
+		ShaderSceneBuffer scene;
+		// @member: list of lights in the scene
+		Light lights[sMaxSceneLights];
+	};
+
 	// @brief: A game (most likely) consists of several scenes
 	//	that you can imagine being seperate stage designs that can
 	//	be swapped fairly fast
@@ -24,6 +50,10 @@ namespace orbit
 		unsigned _cachedLightId = 0;
 		// @member: camera rendering the scene
 		CameraPtr _camera;
+		// @member: Constant Buffer for Per Frame data
+		Ptr<ID3D12Resource> _perFrameBuffer;
+		// @member: ambient light for the scene
+		Vector4f _ambientLight = Vector4f{ 0.4f, 0.4f, 0.4f, 1.f };
 	public:
 		// @method: creates a new scene object
 		static std::shared_ptr<Scene> Create();
@@ -51,11 +81,17 @@ namespace orbit
 		// @param id: the identifier of the light to be removed
 		// @note: expects the light to exist
 		void RemoveLight(unsigned id);
+		// @method: sets the ambient lighting for the scene
+		// @param ambient: ambient lighting in RGBA
+		void SetAmbientLighting(Vector4f ambient);
 		// @method: sets the scene's rendering camera
 		// @param camera: the new scene camera
 		void SetCamera(CameraPtr camera);
 		// @method: returns the scene's camera
 		CameraPtr GetCamera() const;
+		// @method: prepares the scene to be rendered
+		// @param cmdList: the command list to prepare
+		void PrepareRendering(Ptr<ID3D12GraphicsCommandList5> cmdList);
 	};
 
 	using ScenePtr = std::shared_ptr<Scene>;

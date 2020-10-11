@@ -12,6 +12,7 @@ namespace orbit
 		// @member: stored time in microseconds
 		int64_t _micros;
 	public:
+		Time() = default;
 		// expicit constructor
 		explicit Time(int64_t ms);
 		Time(const Time& other) = default;

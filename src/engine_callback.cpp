@@ -1,11 +1,21 @@
 #pragma once
 #include "engine.hpp"
 
+#ifdef ORBIT_WITH_IMGUI
+#include "../dep/ImGui/imgui_impl_win32.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
+
 namespace orbit
 {
 
 	LRESULT Engine::static_window_callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+#ifdef ORBIT_WITH_IMGUI
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+			return true;
+#endif
+
 		Engine* self = nullptr;
 		if (msg == WM_NCCREATE) {
 			// Setup the windows long ptr which will be used to

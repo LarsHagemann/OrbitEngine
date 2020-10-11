@@ -1,4 +1,5 @@
 #pragma once
+#include "PxConfig.h"
 #include <filesystem>
 
 #include <wrl/client.h>
@@ -110,7 +111,8 @@ namespace orbit
 	extern Ptr<ID3D12DescriptorHeap> CreateDescriptorHeap(
 		Ptr<ID3D12Device6> device,
 		D3D12_DESCRIPTOR_HEAP_TYPE type,
-		uint32_t numDescriptors
+		uint32_t numDescriptors,
+		D3D12_DESCRIPTOR_HEAP_FLAGS flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE
 	);
 
 }

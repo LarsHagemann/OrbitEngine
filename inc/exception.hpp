@@ -95,8 +95,8 @@ orbit::OrbitLogger::print(					\
 #define ORBIT_ERR(message) ORBIT_LOG(message, orbit::OrbitLogger::Severity::S_ERR)
 #define ORBIT_ERR_HR(message, hr) ORBIT_LOG_HR(message, orbit::OrbitLogger::Severity::S_ERR, hr)
 
-#define ORBIT_THROW(message) ORBIT_ERR(message); throw std::exception("See the error log for more information.");
-#define ORBIT_THROW_HR(message, hr) ORBIT_ERR_HR(message, hr); throw std::exception("See the error log for more information.");
+#define ORBIT_THROW(message) do { ORBIT_ERR(message); throw std::exception("See the error log for more information."); } while(false)
+#define ORBIT_THROW_HR(message, hr) do { ORBIT_ERR_HR(message, hr); throw std::exception("See the error log for more information."); } while(false)
 
 #define ORBIT_THROW_IF_FAILED(function_or_hr, message) \
 do { \

@@ -2,6 +2,30 @@
 #include "renderable.hpp"
 #include "event_driven.hpp"
 #include "exception.hpp"
+#ifdef ORBIT_WITH_IMGUI
+#include "../dep/ImGui/imgui_impl_win32.h"
+#include "../dep/ImGui/imgui.h"
+#include "../dep/ImGui/imgui_impl_dx12.h"
+#endif
+
+/*
+ID3D11Texture2D* pBuffer;
+ORBIT_THROW_IF_FAILED(_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D),
+	(void**)&pBuffer
+), "Failed to aquire swap chain buffer");
+
+if (!pBuffer)
+	ORBIT_LOG_ERROR_THROW("Failed to aquire swap chain buffer");
+
+D3D11_TEXTURE2D_DESC desc;
+pBuffer->GetDesc(&desc);
+
+ORBIT_THROW_IF_FAILED(_device->CreateRenderTargetView(pBuffer, NULL,
+	_backBufferTarget.ReleaseAndGetAddressOf()
+), "Rendertarget creation failed");
+
+pBuffer->Release();
+*/
 
 namespace orbit
 {
@@ -18,7 +42,7 @@ namespace orbit
 		{
 			Ptr<ID3D12Resource1> backBuffer;
 			ORBIT_THROW_IF_FAILED(
-				_swapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)),
+				_swapChain->GetBuffer(i, IID_PPV_ARGS(backBuffer.GetAddressOf())),
 				"Failed to access swap chain backbuffer"
 			);
 
@@ -35,40 +59,51 @@ namespace orbit
 		GetClientRect(_hWnd, &rect);
 		Vector2i size{ rect.right - rect.left, rect.bottom - rect.top };
 
-		// only resize if the size has actually changed
-		if (_state._dimensions.x() != size.x() || _state._dimensions.y() != size.y())
+		_state._dimensions.x() = std::max(1, size.x());
+		_state._dimensions.y() = std::max(1, size.y());
+
+		auto aspect = static_cast<float>(size.x()) / size.y();
+
+		// the aspect ratio changed. 
+		// recalculatre the projection matrix of the camera
+		if (_scene && _scene->GetCamera())
+			_scene->GetCamera()->RecalculateProjectionMatrix(svFOV, aspect, sNearZ, sFarZ);
+
+		_commandQueue->Flush();
+
+		for (auto i = 0u; i < _state._numBackbuffers; ++i)
 		{
-			_state._dimensions.x() = std::min(1, size.x());
-			_state._dimensions.y() = std::min(1, size.y());
-
-			Flush();
-
-			for (auto i = 0u; i < _state._numBackbuffers; ++i)
-			{
-				// Any references to the back buffers must be released
-				// before the swap chain can be resized.
-				_backbuffers[i].Reset();
-				_state._fences[i] = _state._fences[_state._currentBackbuffer];
-			}
-
-			DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-			ORBIT_THROW_IF_FAILED(
-				_swapChain->GetDesc(&swapChainDesc),
-				"Failed to access the swap chain's description."
-			);
-			ORBIT_THROW_IF_FAILED(
-				_swapChain->ResizeBuffers(
-					_state._numBackbuffers, 
-					_state._dimensions.x(), 
-					_state._dimensions.y(),
-					swapChainDesc.BufferDesc.Format, 
-					swapChainDesc.Flags),
-				"Failed to resize the swap chain's buffers."
-			);
-
-			_state._currentBackbuffer = _swapChain->GetCurrentBackBufferIndex();
-			UpdateRenderTargetViews();
+			// Any references to the back buffers must be released
+			// before the swap chain can be resized.
+			_backbuffers[i].Reset();
+			_state._fences[i] = _state._fences[_state._currentBackbuffer];
 		}
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
+		ORBIT_THROW_IF_FAILED(
+			_swapChain->GetDesc(&swapChainDesc),
+			"Failed to access the swap chain's description."
+		);
+
+#ifdef ORBIT_WITH_IMGUI
+		ImGui_ImplDX12_InvalidateDeviceObjects();
+#endif
+
+		ORBIT_THROW_IF_FAILED(
+			_swapChain->ResizeBuffers(
+				_state._numBackbuffers,
+				_state._dimensions.x(),
+				_state._dimensions.y(),
+				swapChainDesc.BufferDesc.Format,
+				swapChainDesc.Flags),
+			"Failed to resize the swap chain's buffers."
+		);
+
+		_state._currentBackbuffer = _swapChain->GetCurrentBackBufferIndex();
+		UpdateRenderTargetViews();
+#ifdef ORBIT_WITH_IMGUI
+		ImGui_ImplDX12_CreateDeviceObjects();
+#endif
 	}
 
 	void Engine::UpdateAndDraw()
@@ -80,27 +115,63 @@ namespace orbit
 			DispatchMessage(&_message);
 		}
 
-		auto commandAllocator = _commandAllocators[_state._currentBackbuffer];
-		commandAllocator->Reset();
-		_cmdList->Reset(commandAllocator.Get(), nullptr);
+		// get command list here
+		_commandList = _commandQueue->GetCommandList();
+		_scene->PrepareRendering(_commandList);
+
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(
+			_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+			_state._currentBackbuffer,
+			_state._RTVDescriptorSize
+		);
+
+		_commandList->OMSetRenderTargets(
+			1,
+			&rtv,
+			FALSE,
+			NULL
+		);
+		ID3D12DescriptorHeap* heaps[] = {
+			_CBVDescriptorHeap.Get()
+		};
+
+		_commandList->SetDescriptorHeaps(_countof(heaps), heaps);
+
+#ifdef ORBIT_WITH_IMGUI
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+#endif
 
 		// go through each object in the scene and call
 		// Update(). If the object has a renderable component
 		// call Draw();
-		auto dt = _state._clock.Restart();
+		_state._frametime = _state._clock.Restart();
+
+		if (_state._framerateLimit > 0)
+		{
+			// enforce framerate limit
+			auto fr = 1.f / _state._framerateLimit;
+			if (_state._frametime.asSeconds() < fr)
+			{
+				auto sleep = static_cast<int>((fr - _state._frametime.asSeconds()) * 1000);
+				Sleep(sleep);
+			}
+		}
+
 		for (const auto& object : _scene->_objects)
 		{
 			if (!object.second->IsActive()) continue;
 
-			object.second->Update(dt);
+			object.second->Update(_state._frametime);
 			// go through all components and look for 
 			// Renderable and EventDriven components
 			for (auto component : object.second->_components)
 			{
 				auto rndComp = std::dynamic_pointer_cast<Renderable>(component.second);
 				auto evntComp = std::dynamic_pointer_cast<EventDriven>(component.second);
-				if (rndComp) rndComp->Draw(_cmdList);
-				if (evntComp) evntComp->Update(dt);
+				if (rndComp) rndComp->Draw(_commandQueue->GetCommandList());
+				if (evntComp) evntComp->Update(_state._frametime);
 			}
 		}
 	}
@@ -113,7 +184,7 @@ namespace orbit
 			D3D12_RESOURCE_STATE_PRESENT,
 			D3D12_RESOURCE_STATE_RENDER_TARGET
 		);
-		_cmdList->ResourceBarrier(1, &barrier);
+		_commandList->ResourceBarrier(1, &barrier);
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(
 			_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
@@ -121,12 +192,18 @@ namespace orbit
 			_state._RTVDescriptorSize
 		);
 
-		_cmdList->ClearRenderTargetView(
+		_commandList->ClearRenderTargetView(
 			rtv,
 			_state._clearColor.data(),
 			0,
 			nullptr
 		);
+
+#ifdef ORBIT_WITH_IMGUI
+		ImGui::Render();
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), _commandList.Get());
+#endif
+
 		//_cmdList->ClearDepthStencilView(
 		//	dsvHandle,
 		//	D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
@@ -145,19 +222,10 @@ namespace orbit
 			D3D12_RESOURCE_STATE_RENDER_TARGET,
 			D3D12_RESOURCE_STATE_PRESENT
 		);
-		_cmdList->ResourceBarrier(1, &barrier);
+		_commandList->ResourceBarrier(1, &barrier);
 
-		ORBIT_THROW_IF_FAILED(
-			_cmdList->Close(),
-			"Failed to close command list."
-		);
-		ID3D12CommandList* const commandLists[] = {
-			_cmdList.Get()
-		};
-		_cmdQueue->ExecuteCommandLists(
-			_countof(commandLists),
-			commandLists
-		);
+		_state._fences[_state._currentBackbuffer] = _commandQueue->ExecuteCommandList(_commandList);
+
 		static const auto syncInterval = _state._vSync ? 1 : 0;
 		static const auto presentFlags = _state._tearingSupported && !_state._vSync 
 			? DXGI_PRESENT_ALLOW_TEARING 
@@ -168,10 +236,8 @@ namespace orbit
 			"Failed to present the swap chain."
 		);
 
-		_state._fences[_state._currentBackbuffer] = Signal();
 		_state._currentBackbuffer = _swapChain->GetCurrentBackBufferIndex();
-
-		WaitForFenceValue(_state._fences[_state._currentBackbuffer]);
+		_commandQueue->WaitForFenceValue(_state._fences[_state._currentBackbuffer]);
 	}
 
 	Engine::Engine(EngineDesc* desc)
@@ -185,7 +251,6 @@ namespace orbit
 		_debug->EnableDebugLayer();
 #endif
 		_state._numBackbuffers = desc->numBackbuffers;
-		_commandAllocators.resize(_state._numBackbuffers);
 		_backbuffers.resize(_state._numBackbuffers);
 		_state._fences.resize(_state._numBackbuffers);
 		_state._clearColor = { 0.3f, 0.4f, 0.7f, 1.f };
@@ -287,18 +352,7 @@ namespace orbit
 			);
 		}
 #endif
-
-		D3D12_COMMAND_QUEUE_DESC cmdQDesc;
-		ZeroMemory(&cmdQDesc, sizeof(D3D12_COMMAND_QUEUE_DESC));
-		cmdQDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-		cmdQDesc.NodeMask = 0;
-		cmdQDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-		cmdQDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-
-		ORBIT_THROW_IF_FAILED(
-			_device->CreateCommandQueue(&cmdQDesc, IID_PPV_ARGS(_cmdQueue.GetAddressOf())),
-			"Failed to create the DX12 Command Queue."
-		);
+		_commandQueue = std::make_shared<CommandQueue>(_device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 
 		Ptr<IDXGIFactory4> dxgiFactory4;
 		UINT createFactoryFlags = 0;
@@ -332,7 +386,7 @@ namespace orbit
 		Ptr<IDXGISwapChain1> swapChain;
 		ORBIT_THROW_IF_FAILED(
 			dxgiFactory4->CreateSwapChainForHwnd(
-				_cmdQueue.Get(),
+				_commandQueue->GetCommandQueue().Get(),
 				_hWnd,
 				&swapChainDesc,
 				nullptr,
@@ -353,32 +407,17 @@ namespace orbit
 		_RTVDescriptorHeap = CreateDescriptorHeap(
 			_device,
 			D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-			3
+			_state._numBackbuffers
 		);
 		
+		_CBVDescriptorHeap = CreateDescriptorHeap(
+			_device,
+			D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+			1,
+			D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE
+		);
 
 		UpdateRenderTargetViews();
-
-		for (auto i = 0u; i < _state._numBackbuffers; ++i)
-		{
-			Ptr<ID3D12CommandAllocator> allocator;
-			ORBIT_THROW_IF_FAILED(_device->CreateCommandAllocator(
-				D3D12_COMMAND_LIST_TYPE_DIRECT,
-				IID_PPV_ARGS(allocator.GetAddressOf())),
-				"Failed to create command allocator."
-			);
-			_commandAllocators[i] = allocator;
-		}
-
-		ORBIT_THROW_IF_FAILED(_device->CreateCommandList(
-			0,
-			D3D12_COMMAND_LIST_TYPE_DIRECT,
-			_commandAllocators[0].Get(),
-			nullptr,
-			IID_PPV_ARGS(_cmdList.GetAddressOf())),
-			"Failed to create the command list."
-		);
-		_cmdList->Close();
 
 		ORBIT_THROW_IF_FAILED(_device->CreateFence(
 			0,
@@ -387,11 +426,94 @@ namespace orbit
 			"Failed to create the fence."
 		);
 
+		auto hInstance = GetModuleHandle(nullptr);
+
+		ORBIT_THROW_IF_FAILED(DirectInput8Create(
+			hInstance,
+			DIRECTINPUT_VERSION,
+			IID_IDirectInput8,
+			(void**)&_directInput,
+			0
+		), "Failed to create directX input device");
+
+#ifdef ORBIT_WITH_IMGUI
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+
+		// Setup Platform/Renderer bindings
+		ImGui_ImplWin32_Init(_hWnd);
+		ImGui_ImplDX12_Init(
+			_device.Get(), 
+			_state._numBackbuffers,
+			DXGI_FORMAT_R8G8B8A8_UNORM, 
+			_CBVDescriptorHeap.Get(),
+			_CBVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+			_CBVDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
+		);
+
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+#endif
+
+		ORBIT_INFO("PhysX initialization.");
+
+		_pxFoundation = PxCreateFoundation(
+			PX_PHYSICS_VERSION,
+			gAllocator,
+			gErrorCallback
+		);
+		if (_pxFoundation == nullptr)
+			ORBIT_THROW("Failed to create PhysX foundation.");
+
+		auto scale = PxTolerancesScale();
+		scale.speed = 4.f;
+		_pxPvd = PxCreatePvd(*_pxFoundation);
+		_pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *_pxFoundation, scale);
+		_pxCooking = PxCreateCooking(PX_PHYSICS_VERSION, *_pxFoundation, PxCookingParams(scale));
+		if (_pxFoundation == nullptr || _pxPvd == nullptr || _pxCooking == nullptr)
+			ORBIT_THROW("Failed to load NVidia Physx.");
+
+#ifdef _DEBUG
+		auto PVD_HOST = "127.0.0.1";
+		auto transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
+		if (!_pxPvd->connect(*transport, PxPvdInstrumentationFlag::eALL))
+			ORBIT_INFO("Visual debugger not connected");
+		else
+			ORBIT_INFO("Visual debugger connected.");
+#endif
+
+		_pxPhysics = PxCreatePhysics(
+			PX_PHYSICS_VERSION,
+			*_pxFoundation,
+			scale,
+			true,
+			_pxPvd
+		);
+
+		if (_pxPhysics == nullptr)
+			ORBIT_THROW("Failed to load NVidia Physx.");
+
+		PxSceneDesc sceneDesc(scale);
+		sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
+		sceneDesc.gravity = PxVec3(0.f, 0.f, 0.f);
+		sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+		sceneDesc.bounceThresholdVelocity = 1.9f;
+
+		_pxScene = _pxPhysics->createScene(sceneDesc);
+		if (_pxScene == nullptr)
+			ORBIT_THROW("Failed to load NVidia Physx Scene.");
+
+		_pxControllerManager = PxCreateControllerManager(*_pxScene);
+		if (_pxControllerManager == nullptr)
+			ORBIT_THROW("Failed to load NVidia Physx controller manager.");
+
 		std::fill(_state._fences.begin(), _state._fences.end(), 0);
 		_state._RTVDescriptorSize = _device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		_state._currentPipelineState = "default";
 		_state._fullscreen = desc->isFullscreen;
-		_state._nextFenceValue = 0;
 		_state._currentBackbuffer = 0;
 		_state._open = true;
 		_state._active = true;
@@ -418,7 +540,7 @@ namespace orbit
 				return;
 
 			_state._currentPipelineState = id;
-			_cmdList->SetPipelineState(pState.Get());
+			_commandList->SetPipelineState(pState.Get());
 		}
 	}
 
@@ -427,53 +549,30 @@ namespace orbit
 		_scene = scene;
 	}
 
-	uint64_t Engine::Signal()
-	{
-		ORBIT_THROW_IF_FAILED(_cmdQueue->Signal(
-				_fence.Get(),
-				_state._nextFenceValue
-			),
-			"Failed to signal the command queue."
-		);
-		return _state._nextFenceValue++;
-	}
-
-	void Engine::WaitForFenceValue(uint64_t value)
-	{
-		auto eventHandle = CreateEvent(0, false, false, 0);
-		if (_fence->GetCompletedValue() < value)
-		{
-			ORBIT_THROW_IF_FAILED(
-				_fence->SetEventOnCompletion(value, eventHandle),
-				"Failed to set event on completion."
-			);
-			::WaitForSingleObject(eventHandle, INFINITE);
-		}
-		::CloseHandle(eventHandle);
-	}
-
-	void Engine::Flush()
-	{
-		auto target = Signal();
-		WaitForFenceValue(target);
-	}
-
 	void Engine::Run()
 	{
 		ORBIT_INFO("Running engine.");
 		ShowWindow(_hWnd, SW_SHOW);
 		_state._clock.Restart();
+		_state._frametime = Time(0);
 		while (_state._open)
 		{
 			UpdateAndDraw();
 			Clear();
 			Display();
 
-			//_physxScene->simulate(_dt);
-			//_physxScene->fetchResults(true);
+			_pxScene->simulate(_state._frametime.asSeconds());
+			_pxScene->fetchResults(true);
 		}
 
-		Flush();
+		// this flush is making some difficulties :(
+		//_commandQueue->Flush();
+
+#ifdef ORBIT_WITH_IMGUI
+		ImGui_ImplDX12_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+#endif
 	}
 
 	void Engine::SetFullscreen(bool fullscreen)
@@ -524,5 +623,18 @@ namespace orbit
 			::ShowWindow(_hWnd, SW_NORMAL);
 		}
 	}
+
+	void Engine::SetFramerateLimit(int limit)
+	{
+		_state._framerateLimit = limit;
+	}
+
+	void Engine::CloseWindow()
+	{
+		SendMessage(_hWnd, WM_DESTROY, 0, 0);
+	}
+
+	PxDefaultAllocator Engine::gAllocator;
+	PxDefaultErrorCallback Engine::gErrorCallback;
 
 }

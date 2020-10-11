@@ -1,0 +1,5 @@
+add_executable(guiWindow main.cpp)
+target_link_libraries(guiWindow LINK_PUBLIC ${PROJECT_NAME})
+target_include_directories(guiWindow PUBLIC ${CMAKE_SOURCE_DIR}/inc/ ${CMAKE_SOURCE_DIR}/dep/)
+add_compile_definitions(DIRECTINPUT_VERSION=0x0800 NOMINMAX)
+physx_dependency(guiWindow)

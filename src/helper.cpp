@@ -174,12 +174,17 @@ namespace orbit
 		return allowTearing;
 	}
 
-	Ptr<ID3D12DescriptorHeap> CreateDescriptorHeap(Ptr<ID3D12Device6> device, D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors)
+	Ptr<ID3D12DescriptorHeap> CreateDescriptorHeap(
+		Ptr<ID3D12Device6> device, 
+		D3D12_DESCRIPTOR_HEAP_TYPE type,
+		uint32_t numDescriptors,
+		D3D12_DESCRIPTOR_HEAP_FLAGS flags)
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC desc;
 		ZeroMemory(&desc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
 		desc.NumDescriptors = numDescriptors;
 		desc.Type = type;
+		desc.Flags = flags;
 
 		Ptr<ID3D12DescriptorHeap> dHeap;
 		ORBIT_THROW_IF_FAILED(device->CreateDescriptorHeap(
