@@ -47,7 +47,7 @@ target_include_directories(${PROJECT_NAME}
 		../dep/
 )
 if (NOT "${EIGEN_ROOT_PATH}" STREQUAL "")
-	target_include_directories(${PROJECT_NAME} ${EIGEN_ROOT_PATH})
+	target_include_directories(${PROJECT_NAME} PRIVATE ${EIGEN_ROOT_PATH})
 endif()
 
 physx_dependency(${PROJECT_NAME})
