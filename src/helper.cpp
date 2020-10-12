@@ -175,7 +175,7 @@ namespace orbit
 	}
 
 	Ptr<ID3D12DescriptorHeap> CreateDescriptorHeap(
-		Ptr<ID3D12Device6> device, 
+		Ptr<ID3D12Device> device, 
 		D3D12_DESCRIPTOR_HEAP_TYPE type,
 		uint32_t numDescriptors,
 		D3D12_DESCRIPTOR_HEAP_FLAGS flags)

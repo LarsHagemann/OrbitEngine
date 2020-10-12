@@ -68,25 +68,25 @@ namespace orbit
 		static PxDefaultErrorCallback gErrorCallback;
 		static PxDefaultAllocator gAllocator;
 		// @member: the DirectX 12 rendering device
-		Ptr<ID3D12Device6> _device;
+		Ptr<ID3D12Device> _device;
 #ifdef _DEBUG
 		Ptr<ID3D12Debug> _debug;
 #endif
 		// @member: backbuffers for the swap chain
-		std::vector<Ptr<ID3D12Resource1>> _backbuffers;
+		std::vector<Ptr<ID3D12Resource>> _backbuffers;
 		// @member: command queue wrapper. 
 		// @see: command_queue.hpp
 		std::shared_ptr<CommandQueue> _commandQueue;
 		// @member: the current graphics command list used for rendering
-		Ptr<ID3D12GraphicsCommandList5> _commandList;
+		Ptr<ID3D12GraphicsCommandList> _commandList;
 		// @member: descriptor heap for Render Target Views
 		Ptr<ID3D12DescriptorHeap> _RTVDescriptorHeap;
 		// @member: descriptor heap for CBV/SRV/UAVs
 		Ptr<ID3D12DescriptorHeap> _CBVDescriptorHeap;
 		// @member: the DXGI swap chain
-		Ptr<IDXGISwapChain4> _swapChain;
+		Ptr<IDXGISwapChain3> _swapChain;
 		// @member: the syncronization fence
-		Ptr<ID3D12Fence1> _fence;
+		Ptr<ID3D12Fence> _fence;
 		// @member: the window handle
 		HWND _hWnd;
 		// @member: direct input device

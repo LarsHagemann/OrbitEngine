@@ -11,10 +11,10 @@ set_option(EIGEN_ROOT_PATH "" PATH "Leave this empty if Eigen is located in the 
 set_option(IMGUI_ROOT_PATH "" PATH "Leave this empty if ImGui sources and headers are located in the dep/ folder.")
 
 if ("${PHYSX_ROOT_PATH}" STREQUAL "")
-	message(FATAL_ERROR "Unable to find NVidia Physx built")
+	message(FATAL_ERROR "Unable to find NVidia Physx built. Please set the PHYSX_ROOT_PATH variable.")
 endif()
 if ("${PHYSX_LIBRARY_PATH}" STREQUAL "")
-	message(FATAL_ERROR "Unable to find NVidia Physx built")
+	message(FATAL_ERROR "Unable to find NVidia Physx built. Please set the PHYSX_LIBRARY_PATH variable.")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)

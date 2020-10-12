@@ -16,9 +16,9 @@ namespace orbit
 		return allocator;
 	}
 
-	Ptr<ID3D12GraphicsCommandList5> CommandQueue::CreateCommandList(Ptr<ID3D12CommandAllocator> allocator)
+	Ptr<ID3D12GraphicsCommandList> CommandQueue::CreateCommandList(Ptr<ID3D12CommandAllocator> allocator)
 	{
-		Ptr<ID3D12GraphicsCommandList5> cmdList;
+		Ptr<ID3D12GraphicsCommandList> cmdList;
 		ORBIT_THROW_IF_FAILED(_device->CreateCommandList(
 				0,
 				_cmdListType,
@@ -31,7 +31,7 @@ namespace orbit
 		return cmdList;
 	}
 
-	CommandQueue::CommandQueue(Ptr<ID3D12Device6> device, D3D12_COMMAND_LIST_TYPE type) :
+	CommandQueue::CommandQueue(Ptr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type) :
 		_device(device),
 		_cmdListType(type),
 		_cachedFenceValue(0)
@@ -65,9 +65,9 @@ namespace orbit
 
 	}
 
-	Ptr<ID3D12GraphicsCommandList5> CommandQueue::GetCommandList()
+	Ptr<ID3D12GraphicsCommandList> CommandQueue::GetCommandList()
 	{
-		Ptr<ID3D12GraphicsCommandList5> commandList;
+		Ptr<ID3D12GraphicsCommandList> commandList;
 		Ptr<ID3D12CommandAllocator> commandAllocator;
 
 		if (!_cmdAllocatorQueue.empty() &&
@@ -105,7 +105,7 @@ namespace orbit
 		return commandList;
 	}
 
-	uint64_t CommandQueue::ExecuteCommandList(Ptr<ID3D12GraphicsCommandList5> cmdList)
+	uint64_t CommandQueue::ExecuteCommandList(Ptr<ID3D12GraphicsCommandList> cmdList)
 	{
 		cmdList->Close();
 

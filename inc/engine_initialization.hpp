@@ -32,7 +32,7 @@ namespace orbit
 		unsigned sampleQuality;
 		// @brief: the video adapter (i.e. Graphics card) to use.
 		// @default: orbit::GetFavoredAdapter() in helper.hpp
-		Ptr<IDXGIAdapter4> adapter;
+		Ptr<IDXGIAdapter> adapter;
 		// @brief: creates a default engine descriptor
 		static EngineDesc DefaultDescriptor();
 	};

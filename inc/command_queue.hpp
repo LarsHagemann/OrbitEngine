@@ -20,7 +20,7 @@ namespace orbit
 		// @member: the command queue that processes all the command lists
 		Ptr<ID3D12CommandQueue> _commandQueue;
 		// @member: internally used device
-		Ptr<ID3D12Device6> _device;
+		Ptr<ID3D12Device> _device;
 		// @member: fence object for CPU/GPU syncronization
 		Ptr<ID3D12Fence> _fence;
 		// @member: event handle for CPU/GPU syncronization
@@ -29,7 +29,7 @@ namespace orbit
 		uint64_t _cachedFenceValue;
 
 		// helper typedef
-		using CommandListQueue = std::queue<Ptr<ID3D12GraphicsCommandList5>>;
+		using CommandListQueue = std::queue<Ptr<ID3D12GraphicsCommandList>>;
 		// helper typedef
 		using CommandAllocatorQueue = std::queue<CommandAllocator>;
 
@@ -43,21 +43,21 @@ namespace orbit
 		Ptr<ID3D12CommandAllocator> CreateCommandAllocator();
 		// @method: creates a new command list with a specified command allocator
 		// @internal
-		Ptr<ID3D12GraphicsCommandList5> CreateCommandList(Ptr<ID3D12CommandAllocator> allocator);
+		Ptr<ID3D12GraphicsCommandList> CreateCommandList(Ptr<ID3D12CommandAllocator> allocator);
 	public:
 		// @brief: constructs a new command queue with a certain command list type
 		// @param device: the initialized direct3d device to be used
 		// @param type: the command list type to be used
 		//	usually, you want D3D12_COMMAND_LIST_TYPE_DIRECT
-		CommandQueue(Ptr<ID3D12Device6> device, D3D12_COMMAND_LIST_TYPE type);
+		CommandQueue(Ptr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type);
 		// @brief: destructor
 		~CommandQueue();
 		// @method: returns a command list that can be used to render
 		// @return: the next available command list (might construct a new one)
-		Ptr<ID3D12GraphicsCommandList5> GetCommandList();
+		Ptr<ID3D12GraphicsCommandList> GetCommandList();
 		// @method: executes a command list
 		// @param cmdList: the command list to be executed on the local command queue
-		uint64_t ExecuteCommandList(Ptr<ID3D12GraphicsCommandList5> cmdList);
+		uint64_t ExecuteCommandList(Ptr<ID3D12GraphicsCommandList> cmdList);
 		// @method: signals the command queue
 		uint64_t Signal();
 		// @method: tests whether a certain fence value has been reached

@@ -91,7 +91,7 @@ namespace orbit
 		CameraPtr GetCamera() const;
 		// @method: prepares the scene to be rendered
 		// @param cmdList: the command list to prepare
-		void PrepareRendering(Ptr<ID3D12GraphicsCommandList5> cmdList);
+		void PrepareRendering(Ptr<ID3D12GraphicsCommandList> cmdList);
 	};
 
 	using ScenePtr = std::shared_ptr<Scene>;

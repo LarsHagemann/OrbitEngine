@@ -58,7 +58,7 @@ namespace orbit
 		return _camera;
 	}
 
-	void Scene::PrepareRendering(Ptr<ID3D12GraphicsCommandList5> cmdList)
+	void Scene::PrepareRendering(Ptr<ID3D12GraphicsCommandList> cmdList)
 	{
 		auto cp = _camera->GetTransform()->GetCombinedTranslation();
 		ShaderFrameBuffer buffer;

@@ -311,7 +311,7 @@ namespace orbit
 		auto width = dimensions.right - dimensions.left;
 		auto height = dimensions.bottom - dimensions.top;
 
-		Ptr<IDXGIAdapter4> adapter = desc->adapter;
+		Ptr<IDXGIAdapter> adapter = desc->adapter;
 		if (desc->useWARP)
 			adapter = GetWARPAdapter();
 
