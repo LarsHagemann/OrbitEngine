@@ -2,7 +2,7 @@
 #include "engine.hpp"
 
 #ifdef ORBIT_WITH_IMGUI
-#include "../dep/ImGui/imgui_impl_win32.h"
+#include "imgui_impl_win32.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
 
@@ -82,7 +82,7 @@ namespace orbit
 					_state._active = true;
 					_state._minimized = false;
 					_state._maximized = true;
-					OnResize();
+					_state._resizeNeccessary = true;
 				}
 				else if (wParam == SIZE_RESTORED)
 				{
@@ -92,7 +92,7 @@ namespace orbit
 					{
 						_state._active = true;
 						_state._minimized = false;
-						OnResize();
+						_state._resizeNeccessary = true;
 					}
 
 					// Restoring from maximized state?
@@ -100,7 +100,7 @@ namespace orbit
 					{
 						_state._active = true;
 						_state._maximized = false;
-						OnResize();
+						_state._resizeNeccessary = true;
 					}
 					else if (_state._resizing)
 					{
@@ -114,9 +114,7 @@ namespace orbit
 						// sends a WM_EXITSIZEMOVE message.
 					}
 					else
-					{
-						OnResize();
-					}
+						_state._resizeNeccessary = true;
 				}
 			}
 			return 0;
@@ -134,7 +132,7 @@ namespace orbit
 			_state._active = true;
 			_state._resizing = false;
 			_state._clock.Unpause();
-			OnResize();
+			_state._resizeNeccessary = true;
 			return 0;
 
 			// WM_DESTROY is sent when the window is being destroyed.

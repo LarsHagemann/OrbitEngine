@@ -3,9 +3,9 @@
 #include "event_driven.hpp"
 #include "exception.hpp"
 #ifdef ORBIT_WITH_IMGUI
-#include "../dep/ImGui/imgui_impl_win32.h"
-#include "../dep/ImGui/imgui.h"
-#include "../dep/ImGui/imgui_impl_dx12.h"
+#include "imgui_impl_win32.h"
+#include "imgui.h"
+#include "imgui_impl_dx12.h"
 #endif
 
 /*
@@ -239,7 +239,7 @@ namespace orbit
 		_state._currentBackbuffer = _swapChain->GetCurrentBackBufferIndex();
 		_commandQueue->WaitForFenceValue(_state._fences[_state._currentBackbuffer]);
 	}
-
+	
 	Engine::Engine(EngineDesc* desc)
 	{
 		ORBIT_INFO("Initializing the Window.");
@@ -553,6 +553,8 @@ namespace orbit
 	{
 		ORBIT_INFO("Running engine.");
 		ShowWindow(_hWnd, SW_SHOW);
+		OnResize();
+		_state._resizeNeccessary = false;
 		_state._clock.Restart();
 		_state._frametime = Time(0);
 		while (_state._open)
@@ -563,6 +565,12 @@ namespace orbit
 
 			_pxScene->simulate(_state._frametime.asSeconds());
 			_pxScene->fetchResults(true);
+
+			if (_state._resizeNeccessary)
+			{
+				_state._resizeNeccessary = false;
+				OnResize();
+			}
 		}
 
 		// this flush is making some difficulties :(
@@ -579,6 +587,8 @@ namespace orbit
 	{
 		if (_state._fullscreen == fullscreen) return;
 		_state._fullscreen = fullscreen;
+
+		_commandQueue->Flush();
 
 		if (fullscreen)
 		{

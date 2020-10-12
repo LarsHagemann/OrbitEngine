@@ -49,9 +49,12 @@ target_include_directories(${PROJECT_NAME}
 if (NOT "${EIGEN_ROOT_PATH}" STREQUAL "")
 	target_include_directories(${PROJECT_NAME} PRIVATE ${EIGEN_ROOT_PATH})
 endif()
+if (NOT "${IMGUI_ROOT_PATH}" STREQUAL "")
+	target_include_directories(${PROJECT_NAME} PRIVATE ${IMGUI_ROOT_PATH})
+endif()
 
 physx_dependency(${PROJECT_NAME})
-add_compile_definitions(DIRECTINPUT_VERSION=0x0800 NOMINMAX)
+add_compile_definitions(DIRECTINPUT_VERSION=0x0800 NOMINMAX _DISABLE_EXTENDED_ALIGNED_STORAGE)
 add_definitions(-DUNICODE)
 if (WITH_DEAR_IMGUI)
 	add_compile_definitions(ORBIT_WITH_IMGUI)

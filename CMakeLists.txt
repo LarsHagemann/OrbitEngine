@@ -3,6 +3,8 @@ project(Orbit)
 
 include(CMakeHelper.txt)
 
+#_DISABLE_EXTENDED_ALIGNED_STORAGE
+
 set_option(BUILD_SAMPLES TRUE BOOL "Uncheck this value if you don't want to build the samples.")
 set_option(WITH_DEAR_IMGUI TRUE BOOL "Uncheck to build without ImGui")
 set_option(PHYSX_ROOT_PATH "" PATH "Path to your NVidia PhysX build (Root folder with physx and physxshared).")

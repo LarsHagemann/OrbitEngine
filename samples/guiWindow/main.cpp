@@ -9,7 +9,7 @@
 #include "engine.hpp"
 #include "third_person_camera.hpp"
 #include "keyboard_component.hpp"
-#include "ImGui/imgui.h"
+#include "imgui.h"
 
 using namespace orbit;
 

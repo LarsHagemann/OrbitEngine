@@ -55,6 +55,8 @@ namespace orbit
 		bool _maximized;
 		// @member: is the window currently being resized?
 		bool _resizing;
+		// @member: cached resize neccessity
+		bool _resizeNeccessary;
 		// @member: the framerate limit for the renderer
 		int _framerateLimit;
 		// @member: elapsed time since the last frame
