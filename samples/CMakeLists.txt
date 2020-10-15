@@ -1,4 +1,5 @@
 add_subdirectory(simpleWindow)
+add_subdirectory(orbWindow)
 if (WITH_DEAR_IMGUI)
 	add_subdirectory(guiWindow)
 endif()

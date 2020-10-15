@@ -180,6 +180,8 @@ namespace orbit
 		uint32_t numDescriptors,
 		D3D12_DESCRIPTOR_HEAP_FLAGS flags)
 	{
+		ORBIT_INFO_LEVEL(FormatString("Creating descriptor heap."), 10);
+
 		D3D12_DESCRIPTOR_HEAP_DESC desc;
 		ZeroMemory(&desc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
 		desc.NumDescriptors = numDescriptors;
@@ -195,6 +197,60 @@ namespace orbit
 		);
 
 		return dHeap;
+	}
+
+	void UpdateBufferResource(
+		Ptr<ID3D12Device> device,
+		Ptr<ID3D12GraphicsCommandList> commandList, 
+		ID3D12Resource** pDestinationResource, 
+		ID3D12Resource** pIntermediateResource, 
+		size_t numElements, 
+		size_t elementSize, 
+		const void* bufferData, 
+		D3D12_RESOURCE_FLAGS flags)
+	{
+		auto bufferSize = numElements * elementSize;
+		ORBIT_THROW_IF_FAILED(device->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer(bufferSize, flags),
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(pDestinationResource)), 
+			"Failed to create committed resource."
+		);
+
+		if (bufferData)
+		{
+			ORBIT_INFO_LEVEL(FormatString("Updating buffer resource."), 11);
+
+			ORBIT_THROW_IF_FAILED(device->CreateCommittedResource(
+				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+				D3D12_HEAP_FLAG_NONE,
+				&CD3DX12_RESOURCE_DESC::Buffer(bufferSize),
+				D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr,
+				IID_PPV_ARGS(pIntermediateResource)),
+				"Failed to create committed resource."
+			);
+
+			D3D12_SUBRESOURCE_DATA subresourceData = {};
+			subresourceData.pData = bufferData;
+			subresourceData.RowPitch = bufferSize;
+			subresourceData.SlicePitch = subresourceData.RowPitch;
+
+			UpdateSubresources(
+				commandList.Get(),
+				*pDestinationResource, 
+				*pIntermediateResource,
+				0, 
+				0, 
+				1, 
+				&subresourceData
+			);
+
+		}
+
 	}
 
 }

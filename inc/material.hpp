@@ -20,6 +20,14 @@ namespace orbit
 		T_ROUGHNESS
 	};
 
+	enum class MaterialFlag
+	{
+		F_HAS_COLOR_MAP = (1 << 0),
+		F_HAS_NORMAL_MAP = (1 << 1),
+		F_HAS_OCCLUSION_MAP = (1 << 2),
+		F_HAS_ROUGHNESS_MAP = (1 << 3)
+	};
+
 	// @brief: data for creating a material
 	struct MaterialData
 	{
@@ -31,14 +39,13 @@ namespace orbit
 		uint32_t flags;
 		// @unused
 		Vector2f padding1;
-	};
 
-	enum class TextureFlag
-	{
-		F_HAS_COLOR_MAP = (1 << 0),
-		F_HAS_NORMAL_MAP = (1 << 1),
-		F_HAS_OCCLUSION_MAP = (1 << 2),
-		F_HAs_ROUGHNESS_MAP = (1 << 3)
+		// @method: returns whether a certain flag is set
+		// @param flag: flag to be tested
+		bool IsFlagSet(MaterialFlag flag)
+		{
+			return ((unsigned)flags & (unsigned)flag) == (unsigned)flag;
+		}
 	};
 
 	static constexpr auto SLOT_COLOR_MAP = 0u;
@@ -55,7 +62,6 @@ namespace orbit
 		EnginePtr _engine;
 		// @member: the cached material data
 		MaterialData _cachedData;
-
 		// @member: id of the color texture (might be empty)
 		std::string _colorTextureId;
 		// @member: id of the normal texture (might be empty)
@@ -64,6 +70,8 @@ namespace orbit
 		std::string _occlusionTextureId;
 		// @member: id of the roughness texture (might be empty)
 		std::string _roughnessTextureId;
+		// @member: material buffer for rendering
+		Ptr<ID3D12Resource> _materialBuffer;
 	protected:
 		// @method: reloads the buffer whenever _cachedData has been changed
 		void ReloadBuffer();
@@ -83,7 +91,7 @@ namespace orbit
 		Material& operator=(Material&& other) = default;
 
 		// @method: binds the material to the graphics pipeline
-		void BindMaterial();
+		void BindMaterial(Ptr<ID3D12GraphicsCommandList> cmdList);
 		// @method: sets the texture for a specific slot
 		void SetTexture(TextureType textureType, std::string_view textureId);
 	};

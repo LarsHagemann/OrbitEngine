@@ -24,6 +24,7 @@ namespace orbit
 		// @brief: title of the window
 		// @default: "OrbitWindow"
 		std::wstring title;
+		// @default: no default value. You have to specify this
 		// @brief: sample count for hardware multisampling
 		// @default: 1
 		unsigned sampleCount;
@@ -33,6 +34,9 @@ namespace orbit
 		// @brief: the video adapter (i.e. Graphics card) to use.
 		// @default: orbit::GetFavoredAdapter() in helper.hpp
 		Ptr<IDXGIAdapter> adapter;
+		// @brief: the color to be used when clearing the render target
+		// @default: Vector4f{ 1.f, 1.f, 1.f, 1.f };
+		Vector4f clearColor;
 		// @brief: creates a default engine descriptor
 		static EngineDesc DefaultDescriptor();
 	};

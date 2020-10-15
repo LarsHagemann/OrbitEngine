@@ -42,6 +42,7 @@ namespace orbit
 	{
 	protected:
 		friend class Engine;
+		EnginePtr _engine;
 		// @member: the objects in the scene (the player, enemies, terrain, etc...)
 		std::unordered_map<std::string, ObjectPtr> _objects;
 		// @member: the lights in the scene
@@ -56,7 +57,7 @@ namespace orbit
 		Vector4f _ambientLight = Vector4f{ 0.4f, 0.4f, 0.4f, 1.f };
 	public:
 		// @method: creates a new scene object
-		static std::shared_ptr<Scene> Create();
+		static std::shared_ptr<Scene> Create(EnginePtr engine);
 		// @method: adds an object to the scene
 		// @param id: the identifier for the object
 		// @param object: the object to be added
@@ -92,6 +93,18 @@ namespace orbit
 		// @method: prepares the scene to be rendered
 		// @param cmdList: the command list to prepare
 		void PrepareRendering(Ptr<ID3D12GraphicsCommandList> cmdList);
+		// @method: loads an orb file into the scene
+		// @param file: file to be loaded
+		// @param objectId: object to append meshes to. If the objectId does
+		//	not exist, the scene will insert a new object
+		// @return: the object
+		ObjectPtr LoadOrb(const fs::path& file, const std::string& objectId);
+		// @method: loads an orb file into the scene
+		// @param file: file to be loaded
+		// @param object: object to append meshes to. Must be a valid object if there are 
+		//	any geometries in the orb file
+		// @return: the object
+		ObjectPtr LoadOrb(const fs::path& file, ObjectPtr object);
 	};
 
 	using ScenePtr = std::shared_ptr<Scene>;

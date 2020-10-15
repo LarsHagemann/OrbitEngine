@@ -42,6 +42,12 @@ namespace orbit
 		//	and override this member
 		//		orbit::OrbitLogger::sErrorStream.rdbuf(my_ostream.rdbuf());
 		static std::ostream& sErrorStream;
+		// @member: the info level
+		//	0 - Only most important messages
+		//	1 - Less important messages
+		//	2 - ...
+		// Specify 0xFFFFFFFF to show all information 
+		static unsigned sInfoLevel;
 		// @brief: prints a message to a specified severity stream
 		// @param severity: the severity level (see enum class OrbitLogger::Severity)
 		// @param message: the message to log to a stream
@@ -66,6 +72,17 @@ namespace orbit
 			const char* function,
 			unsigned line
 		);
+		// @brief: prints a message with a specified info level
+		// @param message: the message to log to a stream
+		// @param level: level of information importance
+		// @param function: the function that called this method
+		// @param line: the line of the error
+		static void printLevel(
+			std::string_view message,
+			unsigned level,
+			const char* function,
+			unsigned line
+		);
 	};
 
 }
@@ -87,6 +104,15 @@ orbit::OrbitLogger::print(					\
 	ORBIT_FUNCTION,							\
 	__LINE__								\
 )
+
+#define ORBIT_INFO_LEVEL(message, level)    \
+orbit::OrbitLogger::printLevel(				\
+	message,								\
+	level,									\
+	ORBIT_FUNCTION,							\
+	__LINE__								\
+)
+	
 
 #define ORBIT_INFO(message) ORBIT_LOG(message, orbit::OrbitLogger::Severity::S_INFO)
 #define ORBIT_INFO_HR(message, hr) ORBIT_LOG_HR(message, orbit::OrbitLogger::Severity::S_INFO, hr)

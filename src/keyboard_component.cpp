@@ -10,6 +10,8 @@ namespace orbit {
 		Component(engine, boundObject),
 		_directInput(engine->GetInputDevice())
 	{
+		ORBIT_INFO_LEVEL(FormatString("Creating KeyboardComponent."), 5);
+
 		ZeroMemory(_downKeys, sizeof(_downKeys));
 		ZeroMemory(_prevDownKeys, sizeof(_prevDownKeys));
 

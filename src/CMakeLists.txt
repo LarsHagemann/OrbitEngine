@@ -1,24 +1,42 @@
 set(ORBIT_SOURCE
+	adler32.c
 	base_camera.cpp
 	batch_component.cpp
 	component.cpp
 	command_queue.cpp
+	compress.c
+	crc32.c
+	dds_texture_loader.cpp
+	deflate.c
 	engine.cpp
 	engine_callback.cpp
 	engine_initialization.cpp
 	exception.cpp
+	gzclose.c
 	helper.cpp
+	infback.c
+	inffast.c
+	inflate.c
+	inftrees.c
+	input_layout.cpp
 	keyboard_component.cpp
 	light.cpp
 	material.cpp
 	mesh.cpp
 	mouse_component.cpp
 	object.cpp
+	orb_loader.cpp
 	resource_manager.cpp
 	scene.cpp
+	shader.cpp
 	third_person_camera.cpp
+	texture.cpp
 	time.cpp
 	transform.cpp
+	trees.c
+	uncompr.c
+	wic_texture_loader.cpp
+	zutil.c
 )
 
 set(SOURCE ${ORBIT_SOURCE})

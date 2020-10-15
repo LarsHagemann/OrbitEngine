@@ -1,4 +1,5 @@
 #include "base_camera.hpp"
+#include "exception.hpp"
 
 namespace orbit
 {
@@ -10,6 +11,7 @@ namespace orbit
 
 	void BaseCamera::RecalculateProjectionMatrix(float vFOV, float aspectRatio, float nearZ, float farZ)
 	{
+		ORBIT_INFO_LEVEL("Recalculating projection matrix.", 5);
 		_projection = PerspectiveFovLH(
 			vFOV,
 			aspectRatio,

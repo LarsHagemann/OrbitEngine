@@ -15,11 +15,27 @@ namespace orbit
 		// @member: instances of the mesh
 		std::vector<TransformPtr> _transforms;
 		// @member: the instance buffer
-		Ptr<ID3D12Resource> _instanceBuffer;
+		mutable Ptr<ID3D12Resource> _instanceBuffer;
 		// @member: tracks the capacity of the instance buffer
 		uint32_t _instanceCapacity;
+	protected:
+		void ResizeBuffer();
 	public:
+		// @constructor
+		BatchComponent(EnginePtr engine, ObjectPtr boundObject, std::shared_ptr<Mesh> mesh);
+		// @brief: creates a new BatchComponent
+		static std::shared_ptr<BatchComponent> create(EnginePtr engine, ObjectPtr boundObject, std::shared_ptr<Mesh> mesh);
+		// @method: sets the mesh to be rendered
+		void SetMesh(std::shared_ptr<Mesh> mesh) { _mesh = mesh; }
+		// @method: draws the batch to the scene
 		virtual void Draw(Ptr<ID3D12GraphicsCommandList> renderTo) const override;
+		// @method: adds a transform to the batch
+		// @param transform: the transform to be added
+		// @return: same as param transform
+		TransformPtr AddTransform(TransformPtr transform);
+		// @method: adds a new transform to the batch
+		// @return: the newly created transform
+		TransformPtr AddTransform();
 	};
 
 }

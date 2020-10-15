@@ -1,18 +1,10 @@
 #pragma once
 #include "helper.hpp"
 #include "material.hpp"
+#include "vertex.hpp"
 
 namespace orbit
 {
-
-	// @brief: defines a single vertex
-	struct Vertex
-	{
-		Vector3f position;
-		Vector3f normal;
-		Vector3f tangent;
-		Vector2f uv;
-	};
 
 	// @brief: a mesh might consist of several pieces with
 	//	different materials. This stores information about
@@ -32,12 +24,20 @@ namespace orbit
 	class Mesh
 	{
 	protected:
+		friend class OrbLoader;
+		EnginePtr _engine;
 		// @member: list of all the vertices used by this mesh
 		std::vector<Vertex> _vertices;
 		// @member: list of all the indices used by this mesh
 		std::vector<uint32_t> _indices;
 		// @member: list of all the submeshes
 		std::vector<SubMesh> _submeshes;
+
+		Ptr<ID3D12Resource> _vertexBuffer;
+		Ptr<ID3D12Resource> _indexBuffer;
+
+		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
+		D3D12_INDEX_BUFFER_VIEW _indexBufferView;
 	protected:
 		// @method: reloads the internal dx12 buffer
 		void ReloadBuffer();
@@ -60,6 +60,10 @@ namespace orbit
 		// @brief: returns the list of indices
 		// @return: the list of indices
 		const std::vector<uint32_t>& GetIndices() const { return _indices; }
+		// @brief: returns a view to the vertex buffer
+		const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() const { return _vertexBufferView; }
+		// @brief: returns a view to the index buffer
+		const D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() const { return _indexBufferView; }
 	};
 
 }

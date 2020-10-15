@@ -8,13 +8,18 @@
 
 #include "PxPhysicsAPI.h"
 
+#include <array>
+
 namespace orbit
 {
 
 	using namespace physx;
 
-	struct EngineState
+	class EngineState
 	{
+	protected:
+		// @member: name of the current project
+		std::wstring _projectName;
 		// @member: the id of the currently bound pipeline state object
 		std::string _currentPipelineState;
 		// @member: the current index into the backbuffer array
@@ -33,6 +38,10 @@ namespace orbit
 		bool _active;
 		// @member: is the window currently open
 		bool _open;
+		// @member: sample count for multisampling
+		unsigned _sampleCount;
+		// @member: sample quality for multisampling
+		unsigned _sampleQuality;
 		// @member: stores the screen dimensions
 		Vector2i _dimensions;
 		// @member: used for fullscreen toggling
@@ -61,40 +70,61 @@ namespace orbit
 		int _framerateLimit;
 		// @member: elapsed time since the last frame
 		Time _frametime;
+		// @member: list of currently bound textures
+		std::array<std::string, 4> _boundTextures;
 	};
 
-	// @brief: this class is the heart piece of the Orbit Game Engine
-	class Engine : public ResourceManager
+	class DeviceResources
 	{
 	protected:
-		static PxDefaultErrorCallback gErrorCallback;
-		static PxDefaultAllocator gAllocator;
 		// @member: the DirectX 12 rendering device
 		Ptr<ID3D12Device> _device;
 #ifdef _DEBUG
 		Ptr<ID3D12Debug> _debug;
 #endif
-		// @member: backbuffers for the swap chain
-		std::vector<Ptr<ID3D12Resource>> _backbuffers;
 		// @member: command queue wrapper. 
 		// @see: command_queue.hpp
 		std::shared_ptr<CommandQueue> _commandQueue;
+		// @member: copy command queue wrapper
+		std::shared_ptr<CommandQueue> _copyCommandQueue;
 		// @member: the current graphics command list used for rendering
 		Ptr<ID3D12GraphicsCommandList> _commandList;
 		// @member: descriptor heap for Render Target Views
 		Ptr<ID3D12DescriptorHeap> _RTVDescriptorHeap;
 		// @member: descriptor heap for CBV/SRV/UAVs
 		Ptr<ID3D12DescriptorHeap> _CBVDescriptorHeap;
+		// @member: descriptor heap for DSVs
+		Ptr<ID3D12DescriptorHeap> _DSVDescriptorHeap;
 		// @member: the DXGI swap chain
 		Ptr<IDXGISwapChain3> _swapChain;
 		// @member: the syncronization fence
 		Ptr<ID3D12Fence> _fence;
-		// @member: the window handle
-		HWND _hWnd;
 		// @member: direct input device
 		Ptr<IDirectInput8W> _directInput;
-		// @member: helper struct for state management of the engine
-		EngineState _state;
+		// @member: backbuffers for the swap chain
+		std::vector<Ptr<ID3D12Resource>> _backbuffers;
+		// @member: Depth stencil resource
+		Ptr<ID3D12Resource> _dsvBuffer;
+		// @member: rendering viewport
+		D3D12_VIEWPORT _viewport;
+		// @member: scissor rect
+		D3D12_RECT _scissorRect;
+	public:
+		DeviceResources() :
+			_scissorRect(CD3DX12_RECT(0, 0, LONG_MAX, LONG_MAX)),
+			_viewport(CD3DX12_VIEWPORT(0.0f, 0.0f, 0.f, 0.f))
+		{
+		}
+	};
+
+	// @brief: this class is the heart piece of the Orbit Game Engine
+	class Engine : public ResourceManager, public DeviceResources, public EngineState
+	{
+	protected:
+		static PxDefaultErrorCallback gErrorCallback;
+		static PxDefaultAllocator gAllocator;
+		// @member: the window handle
+		HWND _hWnd;
 		// @member: scene to be rendered
 		std::shared_ptr<Scene> _scene;
 		// @member: NVIDIA foundation object
@@ -115,6 +145,8 @@ namespace orbit
 		// @method: called whenever the window is being resized
 		// @brief: resizes internal buffers to the new window size
 		void OnResize();
+		// @method: resizes the internal depth buffer
+		void ResizeDepthBuffers();
 		// @method: updates and draws the current scene
 		void UpdateAndDraw();
 		// @method: clears the screen to the specified clear color
@@ -135,15 +167,31 @@ namespace orbit
 		static constexpr float sNearZ = 0.5f;
 		static constexpr float sFarZ = 420.f;
 		// @brief: constructor. It's recommended to use Engine::Create(...) instead
-		Engine(EngineDesc* desc);
+		// @param project_name: name of your project
+		//	every project resource (shaders, assets, etc...) is found in
+		//	%APPDATA%/Roaming/Treelab/OrbitEngine/<project_name>/
+		//	in their respective folder
+		Engine(EngineDesc* desc, const std::wstring& project_name);
 		// @brief: engine desctructor
 		~Engine();
+		// @method: binds a texture to the shader pipeline
+		// @param texSlot: the slot to bind the texture to
+		// @param textureId: the texture id to be bound
+		void BindTexture(unsigned texSlot, const std::string& textureId, Ptr<ID3D12GraphicsCommandList> cmdList);
 		// @method: returns a shared pointer to an initialized engine object
 		// @param desc: descriptor for the engine. See engine_initialization.hpp for more
+		// @param project_name: name of your project
+		//	every project resource (shaders, assets, etc...) is found in
+		//	%APPDATA%/Roaming/Treelab/OrbitEngine/<project_name>/
+		//	in their respective folder
 		// @return: initialized engine object
-		static std::shared_ptr<Engine> Create(EngineDesc* desc);
+		static std::shared_ptr<Engine> Create(EngineDesc* desc, const std::wstring& project_name);
 		// @method: returns the DX12 Device
 		Ptr<ID3D12Device> GetDevice() const override { return _device; }
+		// @method: returns a command queue for easy command list access
+		// @param type: the command queue type (COPY for copy command lists, etc...)
+		// @return: command queue. Nullptr if a corresponding command queue does not exist
+		std::shared_ptr<CommandQueue> GetCommandQueue(D3D12_COMMAND_LIST_TYPE type);
 		// @method: returns the WIN32 window handle
 		// @return: the window handle of the window created by the engine
 		HWND GetHandle() const { return _hWnd; }
@@ -162,7 +210,7 @@ namespace orbit
 		// @param fullscreen: should the window be in fullscreen mode?
 		void SetFullscreen(bool fullscreen);
 		// @method: returns the current fullscreen mode
-		bool GetFullscreen() const { return _state._fullscreen; }
+		bool GetFullscreen() const { return _fullscreen; }
 		// @method: sets a limit to the framerate
 		//	will enforce, that every frame takes at least 1/limit seconds to render
 		// @param limit: framerate limit (for example 60 for 60fps)
@@ -172,7 +220,11 @@ namespace orbit
 		void CloseWindow();
 		// @method: returns the current size of the window
 		// @return: window size
-		Vector2i WindowSize() const { return _state._dimensions; }
+		Vector2i WindowSize() const { return _dimensions; }
+		// @method: returns a path to the engine base folder
+		static fs::path GetEngineFolder();
+		// @method: returns a path to the current projects base folder
+		fs::path GetProjectFolder() const;
 	};
 
 }

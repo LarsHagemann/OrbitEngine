@@ -1,10 +1,14 @@
 #include "transform.hpp"
+#include "exception.hpp"
 
 namespace orbit
 {
 
 	void Transform::RecalculateMatrix() const
 	{
+		if (!_isDirty) return;
+
+		ORBIT_INFO_LEVEL(FormatString("Recalculating transform matrix."), 100);
 		_isDirty = false;
 		auto aS = Translation3f(_pivot) * Scaling(_scaling) * Translation3f(-_pivot);
 		auto aT = Translation3f(_location);

@@ -108,6 +108,11 @@ namespace orbit
 	//	tearing (or vsync-off or G-Sync or FreeSync)
 	extern bool CheckTearingSupport();
 
+	// @brief: creates a descriptor heap
+	// @param device: d3d12 device to create the heap
+	// @param type: the heap type to be created (RTV/DSV/CBV...)
+	// @param numDescriptors: the number of descriptors in the heap
+	// @param flags: the descriptor heap flags
 	extern Ptr<ID3D12DescriptorHeap> CreateDescriptorHeap(
 		Ptr<ID3D12Device> device,
 		D3D12_DESCRIPTOR_HEAP_TYPE type,
@@ -115,4 +120,42 @@ namespace orbit
 		D3D12_DESCRIPTOR_HEAP_FLAGS flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE
 	);
 
+	// @brief: updates a buffer resource in the GPU
+	// @param device: d3d12 device
+	// @param commandList: the command list to upload the update instructions
+	// @param destinationResource:
+	// @param intermediateResource: 
+	// @param numElements: the number of elements in the bufferData buffer
+	// @param elementSize: the size of a single element in the bufferData buffer
+	// @param bufferData: data to be uploaded to the GPU
+	// @param flags: resource flags
+	extern void UpdateBufferResource(
+		Ptr<ID3D12Device> device,
+		Ptr<ID3D12GraphicsCommandList> commandList,
+		ID3D12Resource** destinationResource,
+		ID3D12Resource** intermediateResource,
+		size_t numElements, 
+		size_t elementSize, 
+		const void* bufferData,
+		D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE
+	);
+
+}
+
+// FROM http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0882r0.html
+//	P0882R0
+namespace orbit
+{
+	static fs::path operator "" _path(const char* str, size_t len) {
+		return fs::path(str, str + len, fs::path::generic_format);
+	}
+	static fs::path operator "" _path(const wchar_t* str, size_t len) {
+		return fs::path(str, str + len, fs::path::generic_format);
+	}
+	static fs::path operator "" _path(const char16_t* str, size_t len) {
+		return fs::path(str, str + len, fs::path::generic_format);
+	}
+	static fs::path operator "" _path(const char32_t* str, size_t len) {
+		return fs::path(str, str + len, fs::path::generic_format);
+	}
 }

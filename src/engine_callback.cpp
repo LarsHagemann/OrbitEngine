@@ -54,55 +54,55 @@ namespace orbit
 		case WM_ACTIVATE:
 			if (LOWORD(wParam) == WA_INACTIVE)
 			{
-				_state._active = false;
-				_state._clock.Pause();
+				_active = false;
+				_clock.Pause();
 			}
 			else
 			{
-				_state._active = true;
-				_state._clock.Unpause();
+				_active = true;
+				_clock.Unpause();
 			}
 			return 0;
 
 			// WM_SIZE is sent when the user resizes the window.  
 		case WM_SIZE:
 			// Save the new client area dimensions.
-			_state._dimensions.x() = LOWORD(lParam);
-			_state._dimensions.y() = HIWORD(lParam);
+			_dimensions.x() = LOWORD(lParam);
+			_dimensions.y() = HIWORD(lParam);
 			if (_device)
 			{
 				if (wParam == SIZE_MINIMIZED)
 				{
-					_state._active = false;
-					_state._minimized = true;
-					_state._maximized = false;
+					_active = false;
+					_minimized = true;
+					_maximized = false;
 				}
 				else if (wParam == SIZE_MAXIMIZED)
 				{
-					_state._active = true;
-					_state._minimized = false;
-					_state._maximized = true;
-					_state._resizeNeccessary = true;
+					_active = true;
+					_minimized = false;
+					_maximized = true;
+					_resizeNeccessary = true;
 				}
 				else if (wParam == SIZE_RESTORED)
 				{
 
 					// Restoring from minimized state?
-					if (_state._minimized)
+					if (_minimized)
 					{
-						_state._active = true;
-						_state._minimized = false;
-						_state._resizeNeccessary = true;
+						_active = true;
+						_minimized = false;
+						_resizeNeccessary = true;
 					}
 
 					// Restoring from maximized state?
-					else if (_state._maximized)
+					else if (_maximized)
 					{
-						_state._active = true;
-						_state._maximized = false;
-						_state._resizeNeccessary = true;
+						_active = true;
+						_maximized = false;
+						_resizeNeccessary = true;
 					}
-					else if (_state._resizing)
+					else if (_resizing)
 					{
 						// If user is dragging the resize bars, we do not resize 
 						// the buffers here because as the user continuously 
@@ -114,30 +114,30 @@ namespace orbit
 						// sends a WM_EXITSIZEMOVE message.
 					}
 					else
-						_state._resizeNeccessary = true;
+						_resizeNeccessary = true;
 				}
 			}
 			return 0;
 
 			// WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
 		case WM_ENTERSIZEMOVE:
-			_state._active = false;
-			_state._resizing = true;
-			_state._clock.Pause();
+			_active = false;
+			_resizing = true;
+			_clock.Pause();
 			return 0;
 
 			// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
 			// Here we reset everything based on the new window dimensions.
 		case WM_EXITSIZEMOVE:
-			_state._active = true;
-			_state._resizing = false;
-			_state._clock.Unpause();
-			_state._resizeNeccessary = true;
+			_active = true;
+			_resizing = false;
+			_clock.Unpause();
+			_resizeNeccessary = true;
 			return 0;
 
 			// WM_DESTROY is sent when the window is being destroyed.
 		case WM_DESTROY:
-			_state._open = false;
+			_open = false;
 			PostQuitMessage(0);
 			return 0;
 

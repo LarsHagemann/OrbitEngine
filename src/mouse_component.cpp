@@ -11,6 +11,8 @@ namespace orbit {
 		Component(engine, boundObject),
 		_directInput(engine->GetInputDevice())
 	{
+		ORBIT_INFO_LEVEL(FormatString("Creating MouseComponent"), 5);
+
 		ZeroMemory(&_mouseState, sizeof(_mouseState));
 		ZeroMemory(&_prevMouseState, sizeof(_prevMouseState));
 

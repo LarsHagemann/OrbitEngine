@@ -14,6 +14,7 @@ namespace orbit
 		desc.adapter = GetFavoredAdapter();
 		desc.sampleCount = 1;
 		desc.sampleQuality = 0;
+		desc.clearColor = Vector4f{ 1.f, 1.f, 1.f, 1.f };
 		return desc;
 	}
 

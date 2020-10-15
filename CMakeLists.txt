@@ -3,7 +3,9 @@ project(Orbit)
 
 include(CMakeHelper.txt)
 
-#_DISABLE_EXTENDED_ALIGNED_STORAGE
+file(TO_CMAKE_PATH "$ENV{TMP}" ENV_TMP)
+get_filename_component(ORBIT_APPDATA "../../Roaming/Treelab/OrbitEngine/"
+                       REALPATH BASE_DIR "${ENV_TMP}")
 
 set_option(BUILD_SAMPLES TRUE BOOL "Uncheck this value if you don't want to build the samples.")
 set_option(WITH_DEAR_IMGUI TRUE BOOL "Uncheck to build without ImGui")
@@ -18,6 +20,11 @@ endif()
 if ("${PHYSX_LIBRARY_PATH}" STREQUAL "")
 	message(FATAL_ERROR "Unable to find NVidia Physx built. Please set the PHYSX_LIBRARY_PATH variable.")
 endif()
+
+file(MAKE_DIRECTORY ${ORBIT_APPDATA}/__general/)
+file(COPY ${CMAKE_SOURCE_DIR}/shader DESTINATION ${ORBIT_APPDATA}/__general/)
+# copy shaders into the appdata path
+
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

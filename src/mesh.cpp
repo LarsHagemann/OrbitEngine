@@ -1,10 +1,46 @@
 #include "mesh.hpp"
+#include "engine.hpp"
 
 namespace orbit
 {
 
 	void Mesh::ReloadBuffer()
 	{
+		auto cmdQ = _engine->GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+		auto cmdList = cmdQ->GetCommandList();
+
+		Ptr<ID3D12Resource> intermediateVertexBuffer;
+		UpdateBufferResource(
+			_engine->GetDevice(),
+			cmdList.Get(),
+			_vertexBuffer.GetAddressOf(),
+			intermediateVertexBuffer.GetAddressOf(),
+			_vertices.size(),
+			sizeof(Vertex),
+			_vertices.data()
+		);
+
+		_vertexBufferView.BufferLocation = _vertexBuffer->GetGPUVirtualAddress();
+		_vertexBufferView.SizeInBytes = _vertices.size() * sizeof(Vertex);
+		_vertexBufferView.StrideInBytes = sizeof(Vertex);
+
+		Ptr<ID3D12Resource> intermediateIndexBuffer;
+		UpdateBufferResource(
+			_engine->GetDevice(),
+			cmdList.Get(),
+			_indexBuffer.GetAddressOf(),
+			intermediateIndexBuffer.GetAddressOf(),
+			_indices.size(),
+			sizeof(uint32_t),
+			_indices.data()
+		);
+
+		_indexBufferView.BufferLocation = _indexBuffer->GetGPUVirtualAddress();
+		_indexBufferView.SizeInBytes = _indices.size() * sizeof(uint32_t);
+		_indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+
+		auto fence = cmdQ->ExecuteCommandList(cmdList);
+		cmdQ->WaitForFenceValue(fence);
 	}
 
 	void Mesh::LoadSubMesh(

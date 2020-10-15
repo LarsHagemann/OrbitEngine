@@ -6,6 +6,7 @@ namespace orbit
 
 	Ptr<ID3D12CommandAllocator> CommandQueue::CreateCommandAllocator()
 	{
+		ORBIT_INFO_LEVEL(FormatString("Creating CommandAllocator"), 3);
 		Ptr<ID3D12CommandAllocator> allocator;
 		ORBIT_THROW_IF_FAILED(_device->CreateCommandAllocator(
 				_cmdListType,
@@ -18,6 +19,7 @@ namespace orbit
 
 	Ptr<ID3D12GraphicsCommandList> CommandQueue::CreateCommandList(Ptr<ID3D12CommandAllocator> allocator)
 	{
+		ORBIT_INFO_LEVEL(FormatString("Creating CommandList of type %d.", (int)_cmdListType), 3);
 		Ptr<ID3D12GraphicsCommandList> cmdList;
 		ORBIT_THROW_IF_FAILED(_device->CreateCommandList(
 				0,
@@ -36,6 +38,8 @@ namespace orbit
 		_cmdListType(type),
 		_cachedFenceValue(0)
 	{
+		ORBIT_INFO_LEVEL(FormatString("Creating CommandQueue"), 3);
+
 		D3D12_COMMAND_QUEUE_DESC desc;
 		ZeroMemory(&desc, sizeof(D3D12_COMMAND_QUEUE_DESC));
 		desc.Type = type;
@@ -160,6 +164,7 @@ namespace orbit
 
 	void CommandQueue::Flush()
 	{
+		ORBIT_INFO_LEVEL(FormatString("Flushing CommandQueue."), 3);
 		WaitForFenceValue(Signal());
 	}
 

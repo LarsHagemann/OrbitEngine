@@ -78,7 +78,7 @@ int main()
 EnginePtr EngineInit()
 {
 	auto desc = EngineDesc::DefaultDescriptor();
-	desc.title = L"simpleWindow Sample";
+	desc.title = L"guiWindow Sample";
 	auto engine = Engine::Create(&desc);
 
 	auto scene = Scene::Create();
@@ -86,7 +86,7 @@ EnginePtr EngineInit()
 
 	auto object = std::make_shared<SimpleWindowObject>();
 	object->Init(engine);
-	scene->AddObject("simpleWindowObject", object);
+	scene->AddObject("guiWindowObject", object);
 
 	auto camera = ThirdPersonCamera::Create();
 	scene->SetCamera(camera);

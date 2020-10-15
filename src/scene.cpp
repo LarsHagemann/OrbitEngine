@@ -1,15 +1,22 @@
 #include "scene.hpp"
+#include "orb_loader.hpp"
+#include "exception.hpp"
+#include "engine.hpp"
 
 namespace orbit
 {
 
-	std::shared_ptr<Scene> Scene::Create()
+	std::shared_ptr<Scene> Scene::Create(EnginePtr engine)
 	{
-		return std::make_shared<Scene>();
+		ORBIT_INFO_LEVEL(FormatString("Creating scene."), 10);
+		auto scene = std::make_shared<Scene>();
+		scene->_engine = engine;
+		return scene;
 	}
 
 	void Scene::AddObject(std::string_view id, ObjectPtr object)
 	{
+		ORBIT_INFO_LEVEL(FormatString("Adding object to scene '%*s'.", id.length(), id.data()), 10);
 		_objects.emplace(id, object);
 	}
 
@@ -76,14 +83,48 @@ namespace orbit
 				break;
 		}
 
-		void* cpu_buffer;
-		//if (SUCCEEDED(_perFrameBuffer->Map(0, nullptr, &cpu_buffer)))
-		//{
-		//	memcpy_s(cpu_buffer, sizeof(ShaderFrameBuffer), &buffer, sizeof(ShaderFrameBuffer));
-		//	_perFrameBuffer->Unmap(0, nullptr);
-		//}
+		Ptr<ID3D12Resource> intermediateSceneBuffer;
+		UpdateBufferResource(
+			_engine->GetDevice(),
+			cmdList,
+			_perFrameBuffer.GetAddressOf(),
+			intermediateSceneBuffer.GetAddressOf(),
+			1,
+			sizeof(ShaderFrameBuffer),
+			&buffer
+		);
 
+		D3D12_GPU_DESCRIPTOR_HANDLE pfbHandle;
+		pfbHandle.ptr = _perFrameBuffer->GetGPUVirtualAddress();
 
+		cmdList->SetGraphicsRootDescriptorTable(0, pfbHandle);
+	}
+
+	ObjectPtr Scene::LoadOrb(const fs::path& file, const std::string& objectId)
+	{
+		ORBIT_INFO_LEVEL(FormatString("Loading orb file '%s'.", file.generic_string().c_str()), 10);
+
+		auto object = _objects.find(objectId);
+		if (object == _objects.end())
+			return LoadOrb(file, object->second);
+		else
+		{
+			auto obj = std::make_shared<Object>();
+			obj->Init(_engine);
+			return LoadOrb(file, obj);
+		}
+	}
+
+	ObjectPtr Scene::LoadOrb(const fs::path& file, ObjectPtr object)
+	{
+		if (!object) return nullptr;
+
+		ORBIT_INFO_LEVEL(FormatString("Loading orb file '%s'.", file.generic_string().c_str()), 10);
+
+		// Load the corresponding orb file
+		OrbLoader loader(_engine);
+		loader.LoadOrb(file, this, object);
+		return object;
 	}
 
 }

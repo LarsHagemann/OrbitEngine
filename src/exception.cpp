@@ -79,8 +79,15 @@ namespace orbit
 		print(severity, msg, function, line);
 	}
 
+	void OrbitLogger::printLevel(std::string_view message, unsigned level, const char* function, unsigned line)
+	{
+		if (level <= sInfoLevel)
+			print(Severity::S_INFO, message, function, line);
+	}
+
 	std::ostream& OrbitLogger::sInfoStream = std::cout;
 	std::ostream& OrbitLogger::sWarnStream = std::clog;
 	std::ostream& OrbitLogger::sErrorStream = std::cerr;
+	unsigned OrbitLogger::sInfoLevel = 0xFFFFFFFFu;
 
 }
