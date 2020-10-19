@@ -58,7 +58,7 @@ if (WITH_DEAR_IMGUI)
 	)
 endif()
 
-add_library(${PROJECT_NAME} ${SOURCE})
+add_library(${PROJECT_NAME} ${SOURCE} "descriptor_allocator.cpp")
 target_include_directories(${PROJECT_NAME} 
 	PRIVATE 
 		../inc/ 

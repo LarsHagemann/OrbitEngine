@@ -1,7 +1,7 @@
 /dep/
-/build/
-/build64/
-/RawShader/
+/out/
+/Debug/
 *.iobj
 *.ipdb
 *.pdb
+*.vcxproj*
