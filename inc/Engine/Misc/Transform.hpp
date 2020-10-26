@@ -82,12 +82,22 @@ namespace orbit
 		// @return: the transformed point
 		Vector3f InverseTransformPoint(const Vector3f& point) const;
 
-		// @method: returns the local up direction
+		// @method: returns the local (in this model's space) up direction
 		Vector3f LocalUp() const;
-		// @method: returns the local forward direction
+		// @method: returns the local (in this model's space) forward direction
 		Vector3f LocalForward() const;
-		// @method: returns the local left direction
+		// @method: returns the local (in this model's space) left direction
 		Vector3f LocalLeft() const;
+
+		// @method: returns the local up direction of this transform and
+		// 	all of its parents (combined up)
+		Vector3f CombinedUp() const;
+		// @method: returns the local forward direction of this transform and
+		// 	all of its parents (combined forward)
+		Vector3f CombinedForward() const;
+		// @method: returns the local left direction of this transform and
+		// 	all of its parents (combined left)
+		Vector3f CombinedLeft() const;
 
 		// @method: translates the transform
 		// @param translation: amount to translate

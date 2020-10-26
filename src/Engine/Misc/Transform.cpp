@@ -83,17 +83,32 @@ namespace orbit
 
 	Vector3f Transform::LocalUp() const
 	{
-		return TransformVector(Vector3f{ 0.f, 1.f, 0.f });
+		return _rotation._transformVector(Vector3f{ 0.f, 0.f, 1.f });
 	}
 
 	Vector3f Transform::LocalForward() const
 	{
-		return TransformVector(Vector3f{ 1.f, 0.f, 0.f });
+		return _rotation._transformVector(Vector3f{ 0.f, 1.f, 0.f });
 	}
 
 	Vector3f Transform::LocalLeft() const
 	{
+		return _rotation._transformVector(Vector3f{ 1.f, 0.f, 0.f });
+	}
+
+	Vector3f Transform::CombinedUp() const
+	{
 		return TransformVector(Vector3f{ 0.f, 0.f, 1.f });
+	}
+
+	Vector3f Transform::CombinedForward() const
+	{
+		return TransformVector(Vector3f{ 0.f, 1.f, 0.f });
+	}
+
+	Vector3f Transform::CombinedLeft() const
+	{
+		return TransformVector(Vector3f{ 1.f, 0.f, 0.f });
 	}
 
 	void Transform::Translate(const Vector3f& translation)

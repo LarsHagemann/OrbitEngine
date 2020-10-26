@@ -109,10 +109,10 @@ namespace orbit
 
     void DebugObject::ShowMatrix(Matrix4f matrix)
     {
-        ImGui::Text("%f %f %f %f", matrix(0, 0), matrix(0, 1), matrix(0, 2), matrix(0, 3));
-        ImGui::Text("%f %f %f %f", matrix(1, 0), matrix(1, 1), matrix(1, 2), matrix(1, 3));
-        ImGui::Text("%f %f %f %f", matrix(2, 0), matrix(2, 1), matrix(2, 2), matrix(2, 3));
-        ImGui::Text("%f %f %f %f", matrix(3, 0), matrix(3, 1), matrix(3, 2), matrix(3, 3));
+        ImGui::Text("%f %f %f %f", matrix.row(0).x(), matrix.row(0).y(), matrix.row(0).z(), matrix.row(0).w());
+        ImGui::Text("%f %f %f %f", matrix.row(1).x(), matrix.row(1).y(), matrix.row(1).z(), matrix.row(1).w());
+        ImGui::Text("%f %f %f %f", matrix.row(2).x(), matrix.row(2).y(), matrix.row(2).z(), matrix.row(2).w());
+        ImGui::Text("%f %f %f %f", matrix.row(3).x(), matrix.row(3).y(), matrix.row(3).z(), matrix.row(3).w());
     }
 
     void DebugObject::ShowVector(Vector3f vector)

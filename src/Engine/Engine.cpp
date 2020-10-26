@@ -128,8 +128,8 @@ namespace orbit
 
 		while (_window->IsOpen())
 		{
-			Clear(_clearColor);
 			_window->HandleEvents();
+			Clear(_clearColor);
 			UpdateScene();
 			Display();
 

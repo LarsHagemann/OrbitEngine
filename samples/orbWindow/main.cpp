@@ -29,18 +29,17 @@ protected:
 	std::shared_ptr<MouseComponent> _mHandler;
 	std::shared_ptr<ThirdPersonCamera> _camera;
 	bool _debugCursor = false;
-	TransformPtr _axe;
+	TransformPtr _player;
 public:
 	virtual void Init() override
 	{
 		Object::Init();
 		_kHandler = AddComponent<KeyboardComponent>("keyboard_controller");
 		_mHandler = AddComponent<MouseComponent>("mouse_controller");
-		_axe = GetStatic<orbit::BatchComponent>("mdl_prp_axe")->AddTransform();
-		_axe->SetScaling(0.1f);
+		_player = GetStatic<orbit::BatchComponent>("Sphere")->AddTransform();
+		_player->SetScaling(0.3f);
 		_camera = ThirdPersonCamera::Create();
-		_camera->SetTarget(_axe);
-		_camera->SetTargetOffet({ 1.f, 0.f, 0.f });
+		_camera->SetTarget(_player);
 	}
 
 	std::shared_ptr<ThirdPersonCamera> GetCamera() const { return _camera; }
@@ -54,11 +53,11 @@ public:
 		if (_kHandler->keydownThisFrame(DIK_F4))
 			_debugCursor = !_debugCursor;
 
-		Vector3f movement = {
-			_kHandler->keydown(DIK_W) ? 1.f : (_kHandler->keydown(DIK_S) ? -1.f : 0.f),
+		Vector3f movement = _player->TransformVector({
 			_kHandler->keydown(DIK_A) ? 1.f : (_kHandler->keydown(DIK_D) ? -1.f : 0.f),
+			_kHandler->keydown(DIK_W) ? 1.f : (_kHandler->keydown(DIK_S) ? -1.f : 0.f),
 			_kHandler->keydown(DIK_SPACE) ? 1.f : (_kHandler->keydown(DIK_LSHIFT) ? -1.f : 0.f)
-		};
+		});
 
 		auto tilt = static_cast<float>(-_mHandler->mousePositionDelta().y());
 		auto pan = static_cast<float>(_mHandler->mousePositionDelta().x());
@@ -68,10 +67,10 @@ public:
 			pan = 0.f;
 		}
 
-		_axe->Rotate(pan * 0.01f, Eigen::Vector3f{ 0.f, 1.f, 0.f });
+		_player->Rotate(pan * 0.01f, Eigen::Vector3f{ 0.f, 0.f, 1.f });
 		_camera->Tilt(tilt * 0.01f);
 
-		_axe->Translate(movement * .01f);
+		_player->Translate(movement * .001f);
 	}
 };
 
@@ -81,20 +80,20 @@ public:
 	virtual void Init() override
 	{
 		Object::Init();
-		//GetStatic<BatchComponent>("Plane")->AddTransform();
 
 		std::mt19937 engine(0);
-		std::uniform_real_distribution<float> dist(-20.f, 20.f);
+		std::uniform_real_distribution<float> dist(-.5f, .5f);
 		std::uniform_real_distribution<float> angle(0.f, Math<float>::_2PI);
 
 		for (auto i = 0u; i < 100; ++i)
 		{
 			auto t = GetStatic<BatchComponent>("Cube")->AddTransform();
-			t->SetTranslation(Vector3f{ dist(engine), dist(engine), dist(engine) });
+			t->SetTranslation(Vector3f{ dist(engine), dist(engine), 0.f });
 			t->SetRotation(angle(engine), Vector3f::UnitZ());
 			t->SetScaling(0.1f);
 		}
 
+		//GetStatic<BatchComponent>("Plane")->AddTransform();
 		GetStatic<BatchComponent>("Cube.001")->AddTransform()->SetScaling(0.1f);
 		GetStatic<BatchComponent>("Cube.002")->AddTransform()->SetScaling(0.1f);
 		GetStatic<BatchComponent>("Cube.003")->AddTransform()->SetScaling(0.1f);
@@ -142,7 +141,7 @@ EnginePtr EngineInit()
 
 	auto object = std::make_shared<OrbWindowObject>();
 	scene->AddObject("orbWindowObject", object);
-	scene->LoadOrb("assets/axe.orb", object);
+	scene->LoadOrb("assets/player.orb", object);
 	object->Init();
 	scene->SetCamera(object->GetCamera());
 

@@ -13,8 +13,6 @@ namespace orbit
 		float _distanceToTarget;
 		// @member: minimum and maximum distance to the target
 		Vector2f _distanceMinMax;
-		// @member: offset from the target position
-		Vector3f _targetOffset;
 		// @member: tilt of the camera
 		float _cachedTilt;
 		// @member: tilt freedom
@@ -42,9 +40,6 @@ namespace orbit
 		// @method: sets the distance to the target (clamped to the min/max distance)
 		// @param distance: the new distance to the target
 		void SetDistance(float distance);
-		// @method: sets the offset from the target position
-		// @param offset: the offset from the target
-		void SetTargetOffet(const Vector3f& offset);
 		// @method: tilts the camera
 		// @param tilt: tilt amount in radians
 		void Tilt(float tilt);
