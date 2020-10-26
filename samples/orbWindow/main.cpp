@@ -29,7 +29,6 @@ protected:
 	std::shared_ptr<MouseComponent> _mHandler;
 	std::shared_ptr<ThirdPersonCamera> _camera;
 	bool _debugCursor = false;
-	TransformPtr _target;
 	TransformPtr _axe;
 public:
 	virtual void Init() override
@@ -37,11 +36,11 @@ public:
 		Object::Init();
 		_kHandler = AddComponent<KeyboardComponent>("keyboard_controller");
 		_mHandler = AddComponent<MouseComponent>("mouse_controller");
-		_target = std::make_shared<orbit::Transform>();
-		_camera = ThirdPersonCamera::Create();
-		_camera->SetTarget(_target);
-		_camera->SetTargetOffet({ 4.f, 2.f, 4.f });
 		_axe = GetStatic<orbit::BatchComponent>("mdl_prp_axe")->AddTransform();
+		_axe->SetScaling(0.1f);
+		_camera = ThirdPersonCamera::Create();
+		_camera->SetTarget(_axe);
+		_camera->SetTargetOffet({ 1.f, 0.f, 0.f });
 	}
 
 	std::shared_ptr<ThirdPersonCamera> GetCamera() const { return _camera; }
@@ -69,10 +68,8 @@ public:
 			pan = 0.f;
 		}
 
-		_target->Rotate(pan * 0.01f, Eigen::Vector3f{ 0.f, 1.f, 0.f });
+		_axe->Rotate(pan * 0.01f, Eigen::Vector3f{ 0.f, 1.f, 0.f });
 		_camera->Tilt(tilt * 0.01f);
-
-		Matrix4f view = _camera->GetViewProjectionMatrix();
 
 		_axe->Translate(movement * .01f);
 	}
@@ -95,11 +92,12 @@ public:
 			auto t = GetStatic<BatchComponent>("Cube")->AddTransform();
 			t->SetTranslation(Vector3f{ dist(engine), dist(engine), dist(engine) });
 			t->SetRotation(angle(engine), Vector3f::UnitZ());
+			t->SetScaling(0.1f);
 		}
 
-		GetStatic<BatchComponent>("Cube.001")->AddTransform();
-		GetStatic<BatchComponent>("Cube.002")->AddTransform();
-		GetStatic<BatchComponent>("Cube.003")->AddTransform();
+		GetStatic<BatchComponent>("Cube.001")->AddTransform()->SetScaling(0.1f);
+		GetStatic<BatchComponent>("Cube.002")->AddTransform()->SetScaling(0.1f);
+		GetStatic<BatchComponent>("Cube.003")->AddTransform()->SetScaling(0.1f);
 	}
 };
 

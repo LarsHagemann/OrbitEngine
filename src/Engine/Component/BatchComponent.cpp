@@ -87,6 +87,16 @@ namespace orbit
 				if (ImGui::TreeNode(FormatString("%d", i).c_str()))
 				{
 					object->ShowMatrix(_transforms[i]->LocalToWorldMatrix());
+
+					if (ImGui::SliderFloat3("Position", _transforms[i]->GetTranslation().data(), -1.f, 1.f, nullptr, ImGuiSliderFlags_Logarithmic))
+						_transforms[i]->SetTranslation(_transforms[i]->GetTranslation());
+
+					Vector3f eulerRot = _transforms[i]->GetRotation().toRotationMatrix().eulerAngles(2, 1, 0);
+					if(ImGui::SliderFloat3("Rotation", eulerRot.data(), -Math<float>::PI, Math<float>::PI, nullptr, ImGuiSliderFlags_Logarithmic))
+						_transforms[i]->SetRotation(eulerRot);
+					
+					if (ImGui::SliderFloat3("Scaling", _transforms[i]->GetScaling().data(), -2.f, 2.f, nullptr, ImGuiSliderFlags_Logarithmic))
+						_transforms[i]->SetScaling(_transforms[i]->GetScaling());
 					ImGui::TreePop();
 				}
 

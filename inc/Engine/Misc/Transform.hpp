@@ -47,19 +47,23 @@ namespace orbit
 		std::shared_ptr<Transform> GetParent() const { return _parent; }
 
 		// @method: returns the rotation part of the affine transformation
-		Quaternionf GetRotation() const { return _rotation; }
+		const Quaternionf& GetRotation() const { return _rotation; }
+		Quaternionf& GetRotation() { return _rotation; }
 		// @method: returns the rotation of this transform and all of its parents
 		Quaternionf GetCombinedRotation() const;
 		// @method: returns the translation part of the affine transformation
-		Vector3f GetTranslation() const { return _location; }
+		const Vector3f& GetTranslation() const { return _location; }
+		Vector3f& GetTranslation() { return _location; }
 		// @method: returns the translation of this transform and all of its parents
 		Vector3f GetCombinedTranslation() const;
 		// @method: returns the scaling part of the affine transformation
-		Vector3f GetScaling() const { return _scaling; }
+		const Vector3f& GetScaling() const { return _scaling; }
+		Vector3f& GetScaling() { return _scaling; }
 		// @method: returns the scaling of this transform and all of its parents
 		Vector3f GetCombinedScaling() const;
 		// @method: returns the scaling and rotation origin
-		Vector3f GetOrigin() const { return _pivot; }
+		const Vector3f& GetOrigin() const { return _pivot; }
+		Vector3f& GetOrigin() { return _pivot; }
 
 		// @method: transforms a vector
 		// @param vector: the vector to be transformed

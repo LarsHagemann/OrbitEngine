@@ -114,7 +114,7 @@ namespace orbit
 	{
 		Rotate(
 			AngleAxisf(euler.x(), Vector3f::UnitZ()) * 
-			AngleAxisf(euler.y(), Vector3f::UnitX()) *
+			AngleAxisf(euler.y(), Vector3f::UnitY()) *
 			AngleAxisf(euler.z(), Vector3f::UnitZ())
 		);
 	}
@@ -157,8 +157,8 @@ namespace orbit
 	{
 		_rotation =
 			AngleAxisf(euler.x(), Vector3f::UnitZ()) *
-			AngleAxisf(euler.y(), Vector3f::UnitX()) *
-			AngleAxisf(euler.z(), Vector3f::UnitZ());
+			AngleAxisf(euler.y(), Vector3f::UnitY()) *
+			AngleAxisf(euler.z(), Vector3f::UnitX());
 		_isDirty = true;
 	}
 

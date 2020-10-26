@@ -25,13 +25,17 @@ namespace orbit
     {
         ImGuiIO& io = ImGui::GetIO();
 		ImGuiWindowFlags window_flags = 
+            ImGuiWindowFlags_AlwaysAutoResize |
 			ImGuiWindowFlags_NoDecoration | 
 			ImGuiWindowFlags_NoSavedSettings | 
 			ImGuiWindowFlags_NoFocusOnAppearing | 
 			ImGuiWindowFlags_NoNav |
 			ImGuiWindowFlags_NoMove;
 		ImGui::SetNextWindowPos(ImVec2{ 0.f, 0.f }, ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2{ io.DisplaySize.x  / 3.f, io.DisplaySize.y }, ImGuiCond_Always);
+        ImGui::SetNextWindowSizeConstraints(
+            ImVec2{ io.DisplaySize.x  / 3.f, io.DisplaySize.y / 2.f},
+            ImVec2{ io.DisplaySize.x / 2.f, io.DisplaySize.y }
+        );
 		ImGui::SetNextWindowBgAlpha(0.35f);
 		ImGui::Begin("Debug", &_displayDebug, window_flags);
 
