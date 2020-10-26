@@ -65,4 +65,4 @@ target_include_directories(orbtool PUBLIC
 if (NOT "${EIGEN_ROOT_PATH}" STREQUAL "")
     target_include_directories(orbtool PUBLIC ${EIGEN_ROOT_PATH})
 endif()
-add_compile_definitions(NOMINMAX)
+add_compile_definitions(NOMINMAX _ENABLE_EXTENDED_ALIGNED_STORAGE)
