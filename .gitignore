@@ -14,7 +14,6 @@
 *.ipdb
 *.pdb
 *.vcxproj*
-*.bat
 *.exe
 *.fxc
 *.fxo
