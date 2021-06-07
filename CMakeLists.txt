@@ -31,6 +31,7 @@ if (NOT (EXISTS ${ORBIT_APPDATA}/__general))
 	file(MAKE_DIRECTORY ${ORBIT_APPDATA})
 	message(STATUS "Copying")
 	file(COPY ${CMAKE_SOURCE_DIR}/projects/__general DESTINATION ${ORBIT_APPDATA})
+	file(COPY ${CMAKE_SOURCE_DIR}/scripts/create_project.bat DESTINATION ${ORBIT_APPDATA})
 endif()
 
 set(ORBIT_RENDER_ENGINE "ORBIT_DX12")
