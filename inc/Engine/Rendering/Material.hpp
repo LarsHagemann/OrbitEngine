@@ -1,9 +1,12 @@
 #pragma once
 #include "Engine/Misc/Helper.hpp"
+#include "Engine/Management/UploadBuffer.hpp"
+#include "Engine/Bindings/Binding.hpp"
 
 namespace orbit
 {
 
+	class Renderer;
 	class Engine;
 	using EnginePtr = std::shared_ptr<Engine>;
 
@@ -60,6 +63,9 @@ namespace orbit
 	protected:
 		// @member: the cached material data
 		MaterialData _cachedData;
+		// @member: Buffer resource for the material
+		ConstantBuffer _buffer;
+		//UploadBuffer::Allocation _buffer;
 		// @member: id of the color texture (might be empty)
 		std::string _colorTextureId;
 		// @member: id of the normal texture (might be empty)
@@ -70,18 +76,21 @@ namespace orbit
 		std::string _roughnessTextureId;
 	public:
 		// @method: creates a new material initialized with initData
-		// @param engine: shared pointer to the game engine
 		// @param initData: data to initialize the material with
 		// @note: use Material::create(...) instead
 		Material(MaterialData initData);
 		// @method: creates a new material initialized with initData
-		// @param engine: shared pointer to the game engine
 		// @param initData: data to initialize the material with
 		static std::shared_ptr<Material> Create(MaterialData initData);
 		Material(const Material& other) = default;
 		Material(Material&& other) = default;
 		Material& operator=(const Material& other) = default;
 		Material& operator=(Material&& other) = default;
+
+		const ConstantBuffer& GetBuffer() const { return _buffer; }
+
+		// @method: binds the material and all its textures to the shader pipeline
+		void BindMaterial(Renderer* renderer, Ptr<ID3D12GraphicsCommandList> cmdList);
 
 		// @method: sets the texture for a specific slot
 		void SetTexture(TextureType textureType, std::string_view textureId);

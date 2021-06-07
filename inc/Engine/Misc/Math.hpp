@@ -29,6 +29,12 @@ namespace orbit
             T aspectRatio,
             T nearZ,
             T farZ);
+        static constexpr Matrix<T, 4, 4> OrthogonalProjection(
+            T vFOV,
+            T aspectRatio,
+            T nearZ,
+            T farZ
+        );
         static constexpr Matrix<T, 4, 4> LookAt(
             const Matrix<T, 3, 1>& eye,
             const Matrix<T, 3, 1>& target,

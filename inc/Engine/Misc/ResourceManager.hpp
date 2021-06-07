@@ -2,10 +2,12 @@
 #include <unordered_map>
 #include "Engine/Bindings/Shader.hpp"
 #include "Engine/Rendering/Texture.hpp"
-#include "Engine/Rendering/Material.hpp"
+//#include "Engine/Rendering/Material.hpp"
 
 namespace orbit
 {
+
+	class Material;
 
 	// @brief: manages game resources like textures, materials, etc...
 	class ResourceManager

@@ -7,6 +7,8 @@
 #include "Engine/Component/EventDriven.hpp"
 #include "Engine/DebugObject.hpp"
 
+#include <future>
+
 #ifdef ORBIT_WITH_IMGUI
 #include "imgui.h"
 #ifdef ORBIT_WIN 
@@ -25,9 +27,11 @@ namespace orbit
 	Engine::Engine(std::shared_ptr<WindowBase> window, InitDesc* desc, std::wstring_view projectName) :
 		EngineResources(window->GetHandle(), desc),
 		_window(window),
-		_workerPool(desc->numThreads),
-		_projectName(projectName)
+		_projectName(projectName),
+		_lastFrametime(Time(1))
 	{
+		
+
 		auto enginePath = GetEngineFolder();
 		auto projectPath = enginePath / _projectName;
 		if (!fs::exists(projectPath))
@@ -69,10 +73,10 @@ namespace orbit
 				auto rndComp = std::dynamic_pointer_cast<Renderable>(component.second);
 				auto evntComp = std::dynamic_pointer_cast<EventDriven>(component.second);
 				if (rndComp) rndComp->Draw(&renderer);
-				if (evntComp) evntComp->Update(Time(0));
+				if (evntComp) evntComp->Update(_lastFrametime);
 			}
 
-			object->Update(Time(0));
+			object->Update(_lastFrametime);
 		});
 	}
 
@@ -83,10 +87,14 @@ namespace orbit
 		renderer.BindPipelineState("orbit/default");
 		_scene->PrepareRendering(&renderer);
 
-#ifdef _DEBUG
-		_debugObject->GetStatic<KeyboardComponent>("keyboard_handler")->Update(Time(0));
-		_debugObject->Update(Time(0));
-#endif
+		_lastFrametime = _frameClock.Restart();
+
+//#ifdef _DEBUG
+		_debugObject->GetStatic<KeyboardComponent>("keyboard_handler")->Update(_lastFrametime);
+		_debugObject->Update(_lastFrametime);
+//#endif
+
+		std::vector<std::future<void>> results;
 
 		const auto workPerThread = std::max(static_cast<size_t>(1u), _scene->_objects.size() / GetParallelRenderCount());
 		for (auto i = 0U; i < GetParallelRenderCount(); ++i)
@@ -106,10 +114,11 @@ namespace orbit
 			std::advance(begin, beginIdx);
 			std::advance(end, endIdx);
 
-			_workerPool.EnqueueTask(&Engine::PartialUpdate, this, begin, end);
+			results.emplace_back(std::async(&Engine::PartialUpdate, this, begin, end));
 		}
 
-		_workerPool.AwaitFinish();
+		for (auto i = 0U; i < results.size(); ++i)
+			results.at(i).wait();
 	}
 
 	void Engine::Run()
@@ -121,10 +130,12 @@ namespace orbit
 		if (_scene && _scene->GetCamera())
 			_scene->GetCamera()->RecalculateProjectionMatrix(svFOV, aspect, sNearZ, sFarZ);
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 		_debugObject = std::make_shared<DebugObject>();
 		_debugObject->Init();
-#endif
+//#endif
+
+		_frameClock.Restart();
 
 		while (_window->IsOpen())
 		{
@@ -146,7 +157,7 @@ namespace orbit
 			}
 		}
 
-		_workerPool.ForceStopJoin();
+		//_workerPool.ForceStopJoin();
 		Cleanup();
 
 		ORBIT_INFO_LEVEL(FormatString("Shutting down."), 5);

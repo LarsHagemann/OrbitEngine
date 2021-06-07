@@ -108,7 +108,8 @@ namespace orbit
 
 		// Load the corresponding orb file
 		OrbLoader loader;
-		loader.LoadOrb(file, this, object);
+		if (!loader.LoadOrb(file, this, object))
+			ORBIT_WARN(FormatString("Failed to load/open file '%s'!", fs::absolute(file).generic_string().c_str()));
 		return object;
 	}
 

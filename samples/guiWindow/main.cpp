@@ -21,12 +21,16 @@ class GuiWindowObject : public Object
 {
 protected:
 	std::shared_ptr<KeyboardComponent> _kHandler;
+	TransformPtr _myTransform;
 public:
 	virtual void Init() override
 	{
 		Object::Init();
+		_myTransform = std::make_shared<orbit::Transform>();
 		_kHandler = AddComponent<KeyboardComponent>("keyboard_controller");
 	}
+
+	TransformPtr MyTransform() const { return _myTransform; }
 
 	virtual void Update(Time dt) override
 	{
@@ -69,6 +73,7 @@ std::shared_ptr<Engine> EngineInit()
 	scene->AddObject("guiWindowObject", object);
 
 	auto camera = ThirdPersonCamera::Create();
+	camera->SetTarget(object->MyTransform());
 	scene->SetCamera(camera);
 
 	return engine;

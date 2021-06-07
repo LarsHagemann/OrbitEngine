@@ -11,6 +11,8 @@
 namespace orbit
 {
 
+	extern const char* TranslateFeatureLevel(D3D_FEATURE_LEVEL fLevel);
+
 	extern Ptr<ID3D12DescriptorHeap> CreateDescriptorHeap(
 		Ptr<ID3D12Device> device,
 		D3D12_DESCRIPTOR_HEAP_TYPE type,

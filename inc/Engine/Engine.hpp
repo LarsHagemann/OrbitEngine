@@ -3,8 +3,9 @@
 #include "Engine/Rendering/WindowBase.hpp"
 #include "Engine/Bindings/Binding.hpp"
 #include "Engine/Management/Allocator.hpp"
-#include "Misc/ThreadPool.hpp"
+#include "Engine/Misc/ThreadPool.hpp"
 #include "Engine/Misc/Math.hpp"
+#include "Engine/Misc/Time.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -25,9 +26,11 @@ namespace orbit
 		std::shared_ptr<WindowBase> _window;
 		std::shared_ptr<Scene> _scene;
 		std::shared_ptr<Object> _debugObject;
-		ThreadPool _workerPool;
+		std::vector<std::thread> _workerPool;
 		std::wstring_view _projectName;
 		Vector4f _clearColor = { 0.24f, 0.4f, 0.6f, 1.f };
+		Clock _frameClock;
+		Time _lastFrametime;
 
 		static std::shared_ptr<Engine> sEngine;
 	private:
@@ -35,11 +38,10 @@ namespace orbit
 		void PartialUpdate(ObjMap::iterator begin, ObjMap::iterator end);
 	public:
 		static constexpr auto svFOV = Math<float>::PIDIV4;
-		static constexpr auto sNearZ = 0.5f;
-		static constexpr auto sFarZ = 1000.f;
+		static constexpr auto sNearZ = .01f;
+		static constexpr auto sFarZ = 20.f;
 
 		Engine(std::shared_ptr<WindowBase> window, InitDesc* desc, std::wstring_view);
-		virtual ~Engine() { _workerPool.ForceStopJoin(); }
 		static std::shared_ptr<Engine> Init(
 			std::shared_ptr<WindowBase> window, 
 			InitDesc* desc,

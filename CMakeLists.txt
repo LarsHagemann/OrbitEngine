@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION "3.12.4")
 project(Orbit)
+set(Orbit_VERSION 0.0.1)
 
+include(GenerateExportHeader)
 include(CMakeHelper.txt)
 
 file(TO_CMAKE_PATH "$ENV{TMP}" ENV_TMP)
@@ -25,9 +27,11 @@ if ("${PHYSX_LIBRARY_PATH}" STREQUAL "")
 	message(FATAL_ERROR "Unable to find NVidia Physx built. Please set the PHYSX_LIBRARY_PATH variable.")
 endif()
 
-file(MAKE_DIRECTORY ${ORBIT_APPDATA}/__general/)
-file(COPY ${CMAKE_SOURCE_DIR}/shader DESTINATION ${ORBIT_APPDATA}/__general/)
-# copy shaders into the appdata path
+if (NOT (EXISTS ${ORBIT_APPDATA}/__general))
+	file(MAKE_DIRECTORY ${ORBIT_APPDATA})
+	message(STATUS "Copying")
+	file(COPY ${CMAKE_SOURCE_DIR}/projects/__general DESTINATION ${ORBIT_APPDATA})
+endif()
 
 set(ORBIT_RENDER_ENGINE "ORBIT_DX12")
 if ("${ORBIT_RENDERER}" STREQUAL "DX12")
@@ -48,3 +52,18 @@ add_subdirectory(converter)
 if (BUILD_SAMPLES)
 	add_subdirectory(samples)
 endif()
+
+install(TARGETS
+        ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}Config
+    LIBRARY DESTINATION src
+	PUBLIC_HEADER DESTINATION ${CMAKE_SOURCE_DIR}/inc
+	INCLUDES DESTINATION ${CMAKE_SOURCE_DIR}/inc
+)
+set_target_properties(${PROJECT_NAME} PROPERTIES ORBIT_RENDER_ENGINE ${ORBIT_RENDER_ENGINE})
+export(TARGETS
+        ${PROJECT_NAME}
+    NAMESPACE Orbit::
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+)
+export (PACKAGE ${PROJECT_NAME})

@@ -16,7 +16,7 @@ namespace orbit
         //  DebugObject::ShowDebug();
         //  if (ImGui::Button("debug_button")) { ... }
         // }
-        virtual void ShowDebug();
+        virtual void ShowDebug(Time dt);
         virtual void End();
     public:
         void ShowMatrix(Matrix4f matrix);

@@ -15,4 +15,7 @@
 *.pdb
 *.vcxproj*
 *.bat
+*.exe
+*.fxc
+*.fxo
 /shader/Raw/log.txt

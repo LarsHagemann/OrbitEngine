@@ -7,6 +7,9 @@ namespace orbit
 
 	Matrix4f ThirdPersonCamera::GetViewMatrix() const
 	{
+		if (!_target)
+			return Matrix4f::Identity();
+
 		auto target = _target->GetCombinedTranslation();
 
 		auto r = Quaternionf(AngleAxisf(_cachedTilt, _target->LocalLeft()));

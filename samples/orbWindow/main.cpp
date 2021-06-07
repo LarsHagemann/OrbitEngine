@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <type_traits>
 #include <random>
 
 #include "Engine/Engine.hpp"
@@ -17,10 +18,63 @@
 #include "Engine/Rendering/Cameras/ThirdPersonCamera.hpp"
 #include "Engine/Object.hpp"
 #include "Engine/Scene.hpp"
+#include "Engine/DebugObject.hpp"
+#include "Engine/Misc/Random.hpp"
+#include "Engine/Misc/Noise/OpenSimplexNoise.hpp"
 
 #include "imgui.h"
 
+/*
+Next steps:
+	Texture support (for materials: diffuse, occlusion, normal and roughness textures/maps)
+	PhysX Components (static collision bodies, player controller, ...)
+	Render only whats in the view frustum (PhysX Object Lookup: What can actually be seen?)
+*/
+
 using namespace orbit;
+
+class TorchComponent : public EventDriven, public Component
+{
+private:
+	LightPtr _light;
+	ScenePtr _scene;
+	Clock _lifeClock;
+	float _randomizer;
+	float _baseStrength;
+	float _timeMultiplier;
+	OpenSimplexNoise _noise;
+public:
+	TorchComponent(ObjectPtr object, ScenePtr scene) :
+		Component(object),
+		_light(Light::CreatePointLight({ 800.f, 500.f, 500.f, 1.f }, Vector4f::Zero(), 0.1f, 0.2f)),
+		_randomizer(Random::UniformNumber(0.f, 2.f)),
+		_baseStrength(1.5f),
+		_timeMultiplier(0.01f),
+		_noise(Random::UniformNumber(0ll, std::numeric_limits<int64_t>::max()))
+	{
+		scene->AddLight(_light);
+	}
+	static std::shared_ptr<TorchComponent> create(ObjectPtr object, ScenePtr scene)
+	{
+		return std::make_shared<TorchComponent>(object, scene);
+	}
+	float calculateStrength()
+	{
+		return static_cast<float>(
+			(_noise.Evaluate(_lifeClock.GetElapsedTime().asMilliseconds() * _timeMultiplier, _randomizer) + 1.) / 2.);
+	}
+	virtual void Update(Time dt) override
+	{
+		// Color = 237, 196, 14
+		auto normStrength = calculateStrength();
+		auto strength = (normStrength + 3.f) / 4.f * _baseStrength;
+		_light->_color = Vector4f{ 237 * strength, 196 * strength, 14 * strength, 1.f };
+	}
+	void SetPosition(Vector3f pos)
+	{
+		_light->_position = { pos.x(), pos.y(), pos.z(), 0.f };
+	}
+};
 
 class OrbWindowObject : public Object
 {
@@ -30,16 +84,25 @@ protected:
 	std::shared_ptr<ThirdPersonCamera> _camera;
 	bool _debugCursor = false;
 	TransformPtr _player;
+	float _speed;
+	float _mouseSensitivity;
+	ScenePtr _scene;
+	std::shared_ptr<TorchComponent> _torch;
 public:
+	void SetScene(ScenePtr scene) { _scene = scene; }
 	virtual void Init() override
 	{
 		Object::Init();
+		_speed = 0.25f;
+		_mouseSensitivity = 0.001f;
 		_kHandler = AddComponent<KeyboardComponent>("keyboard_controller");
 		_mHandler = AddComponent<MouseComponent>("mouse_controller");
-		_player = GetStatic<orbit::BatchComponent>("Sphere")->AddTransform();
+		_player = GetStatic<orbit::BatchComponent>("Cube")->AddTransform();
 		_player->SetScaling(0.3f);
+		_player->SetTranslation({ 0.f, 1.f, 0.f });
 		_camera = ThirdPersonCamera::Create();
 		_camera->SetTarget(_player);
+		_torch = AddComponent<TorchComponent>("player_torch", _scene);
 	}
 
 	std::shared_ptr<ThirdPersonCamera> GetCamera() const { return _camera; }
@@ -55,22 +118,23 @@ public:
 
 		Vector3f movement = _player->TransformVector({
 			_kHandler->keydown(DIK_A) ? 1.f : (_kHandler->keydown(DIK_D) ? -1.f : 0.f),
-			_kHandler->keydown(DIK_W) ? 1.f : (_kHandler->keydown(DIK_S) ? -1.f : 0.f),
+			_kHandler->keydown(DIK_W) ? -1.f : (_kHandler->keydown(DIK_S) ? 1.f : 0.f),
 			_kHandler->keydown(DIK_SPACE) ? 1.f : (_kHandler->keydown(DIK_LSHIFT) ? -1.f : 0.f)
 		});
 
-		auto tilt = static_cast<float>(-_mHandler->mousePositionDelta().y());
-		auto pan = static_cast<float>(_mHandler->mousePositionDelta().x());
+		auto tilt = static_cast<float>(_mHandler->mousePositionDelta().y());
+		auto pan = static_cast<float>(-_mHandler->mousePositionDelta().x());
 		if (_debugCursor)
 		{
 			tilt = 0.f;
 			pan = 0.f;
 		}
 
-		_player->Rotate(pan * 0.01f, Eigen::Vector3f{ 0.f, 0.f, 1.f });
-		_camera->Tilt(tilt * 0.01f);
+		_player->Rotate(pan * _mouseSensitivity, Eigen::Vector3f{ 0.f, 0.f, 1.f });
+		_camera->Tilt(tilt * _mouseSensitivity);
 
-		_player->Translate(movement * .001f);
+		_player->Translate(movement * dt.asSeconds() * _speed);
+		_torch->SetPosition(_player->GetCombinedTranslation());
 	}
 };
 
@@ -81,22 +145,10 @@ public:
 	{
 		Object::Init();
 
-		std::mt19937 engine(0);
-		std::uniform_real_distribution<float> dist(-.5f, .5f);
-		std::uniform_real_distribution<float> angle(0.f, Math<float>::_2PI);
-
-		for (auto i = 0u; i < 100; ++i)
-		{
-			auto t = GetStatic<BatchComponent>("Cube")->AddTransform();
-			t->SetTranslation(Vector3f{ dist(engine), dist(engine), 0.f });
-			t->SetRotation(angle(engine), Vector3f::UnitZ());
-			t->SetScaling(0.1f);
-		}
-
 		//GetStatic<BatchComponent>("Plane")->AddTransform();
-		GetStatic<BatchComponent>("Cube.001")->AddTransform()->SetScaling(0.1f);
-		GetStatic<BatchComponent>("Cube.002")->AddTransform()->SetScaling(0.1f);
-		GetStatic<BatchComponent>("Cube.003")->AddTransform()->SetScaling(0.1f);
+		GetStatic<BatchComponent>("Plane")->AddTransform()->SetScaling(0.1f);
+		GetStatic<BatchComponent>("Cone")->AddTransform()->SetScaling(0.1f);
+		GetStatic<BatchComponent>("Cylinder")->AddTransform()->SetScaling(0.1f);
 	}
 };
 
@@ -108,6 +160,10 @@ int main()
 		Logger::sInfoLevel = 10;
 		auto engine = EngineInit();
 		engine->Run();
+	}
+	catch (Exception& e)
+	{
+		std::cout << e.what() << '\n';
 	}
 	catch (std::exception& e)
 	{
@@ -142,13 +198,17 @@ EnginePtr EngineInit()
 	auto object = std::make_shared<OrbWindowObject>();
 	scene->AddObject("orbWindowObject", object);
 	scene->LoadOrb("assets/player.orb", object);
+	object->SetScene(scene);
 	object->Init();
 	scene->SetCamera(object->GetCamera());
+	scene->SetAmbientLighting({ 0.15f, 0.15f, 0.15f, 1.f });
 
 	auto sceneObject = std::make_shared<SceneObject>();
 	scene->AddObject("sceneObject", sceneObject);
 	scene->LoadOrb("assets/scene.orb", sceneObject);
 	sceneObject->Init();
+
+	scene->AddLight(Light::CreateDirectionalLight(Vector4f::Ones(), Vector4f(0.f, -1.f, 0.f, 0.f)));
 
 	return engine;
 }

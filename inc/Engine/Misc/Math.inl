@@ -45,18 +45,38 @@ namespace orbit
         T nearZ,
         T farZ)
     {
-        Matrix<T,4,4> matrix = Matrix<T, 4, 4>::Zero();
+        Matrix<T, 4, 4> matrix = Matrix<T, 4, 4>::Identity();
+        float theta = vFOV * 0.5f;
+        float range = farZ - nearZ;
+        float invtan = 1.f / tan(theta);
 
-        const auto theta = vFOV * static_cast<T>(0.5);
-        const auto range = farZ - nearZ;
-        const auto invtan = static_cast<T>(1.) / tan(theta);
-        const auto tmp = (farZ) / range;
-        
         matrix(0, 0) = invtan / aspectRatio;
         matrix(1, 1) = invtan;
-        matrix(2, 2) = 2 * tmp;
-        matrix(2, 3) = 1;
-        matrix(3, 2) = -nearZ * tmp;
+        matrix(2, 2) = -(nearZ + farZ) / range;
+        matrix(3, 2) = -1;
+        matrix(2, 3) = -2 * nearZ * farZ / range;
+        matrix(3, 3) = 0;
+
+        return matrix;
+    }
+
+    template<typename T>
+    constexpr Matrix<T, 4, 4> Math<T>::OrthogonalProjection(
+        T vFOV,
+        T aspectRatio,
+        T nearZ,
+        T farZ
+    )
+    {
+        Matrix<T, 4, 4> matrix = Matrix<T, 4, 4>::Zero();
+
+        matrix(0, 0) = 2 / (right - left);
+        matrix(1, 1) = 2 / (top - bottom);
+        matrix(2, 2) = -2 / (far - near);
+        matrix(3, 2) = (far + near) / (far - near);
+        matrix(3, 0) = (right + left) / (right - left);
+        matrix(3, 1) = (top + bottom) / (top - bottom);
+        matrix(3, 3) = 1;
 
         return matrix;
     }

@@ -15,7 +15,7 @@ namespace orbit
 		{}
 		template<typename... _Format>
 		Exception(std::string_view msg, _Format... args) :
-			std::exception(FormatString(msg, args...).data())
+			std::exception(FormatString(msg, args...).c_str())
 		{}
 	};
 

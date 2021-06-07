@@ -18,7 +18,7 @@ namespace orbit
 			aspectRatio,
 			nearZ,
 			farZ
-		);
+		).transpose();
 	}
 
 	Matrix4f BaseCamera::GetViewProjectionMatrix() const

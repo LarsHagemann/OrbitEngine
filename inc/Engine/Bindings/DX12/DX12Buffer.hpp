@@ -52,8 +52,45 @@ namespace orbit
 
     extern VertexBuffer CreateVertexBuffer(const VertexData& vData);
     extern IndexBuffer CreateIndexBuffer(const IndexData& iData);
+
     extern void UpdateVertexBuffer(VertexBuffer* buffer, const VertexData& vData);
     extern void UpdateIndexBuffer(IndexBuffer* buffer, const IndexData& iData);
     extern VertexBufferView MakeVertexBufferView(UploadBuffer::Allocation allocation, size_t sizeInBytes, size_t stride);
+
+    template<class BufferPtrType>
+    void UpdateBuffer(BufferPtrType buffer, size_t elementCount, size_t stride, void* memory)
+    {
+        //ORBIT_INFO("Lars, you still need to change this. Always flushing the COPY command queue is vastly inefficient!");
+        auto cmdQ = Engine::Get()->GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY);
+        auto cmdList = cmdQ->GetCommandList();
+
+        Ptr<ID3D12Resource> intermediate;
+        UpdateBufferResource(
+            cmdList,
+            buffer->buffer,
+            intermediate,
+            elementCount,
+            stride,
+            memory
+        );
+        intermediate->SetName(L"Intermediate Buffer");
+
+        cmdQ->ExecuteCommandList(cmdList);
+        cmdQ->Flush();
+    }
+
+    template<class CopyType>
+    extern ConstantBuffer CreateConstantBuffer(const CopyType& data, const wchar_t* name)
+    {
+        ConstantBuffer buffer;
+        UpdateBuffer(&buffer, 1, sizeof(CopyType), (void*)&data);
+
+        buffer.view.BufferLocation = buffer.buffer->GetGPUVirtualAddress();
+        buffer.view.SizeInBytes = sizeof(CopyType);
+        
+        if (name)
+            buffer.buffer->SetName(name);
+        return buffer;
+    }
 
 }

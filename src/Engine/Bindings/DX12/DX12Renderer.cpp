@@ -1,4 +1,5 @@
 #include "Engine/Bindings/DX12/DX12Renderer.hpp"
+#include "Engine/Rendering/Material.hpp"
 #include "Engine/Engine.hpp"
 
 namespace orbit
@@ -76,7 +77,16 @@ namespace orbit
     {
         if (_currentMaterial != id)
         {
-
+            auto material = Engine::Get()->GetMaterial(id);
+            if (material)
+            {
+                material->BindMaterial(this, _commandList);
+                //BindConstantBuffer(1, material->GetBuffer());
+                // Load neccessary textures
+                
+            }
+            else
+                ORBIT_WARN(FormatString("Unable to bind material '%s'", id.c_str()));
 
             _currentMaterial = id;
         }
@@ -87,9 +97,11 @@ namespace orbit
         if (_currentPipelineState != id)
         {
             auto pso = Engine::Get()->GetPipelineState(id);
-            if (!pso) return;
+            if (pso)
+                _commandList->SetPipelineState(pso.Get());
+            else
+                ORBIT_WARN(FormatString("Unable to bind pipeline state '%s'", id.c_str()));
 
-            _commandList->SetPipelineState(pso.Get());
             _currentPipelineState = id;
         }
     }

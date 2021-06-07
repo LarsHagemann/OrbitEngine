@@ -1,5 +1,6 @@
 #include "Engine/Bindings/DX12/DX12Engine.hpp"
 #include "Engine/Bindings/DX12/DX12Renderer.hpp"
+#include "Engine/Bindings/DX12/DX12Helper.hpp"
 #include "Engine/Bindings/Platform.hpp"
 #include "Engine/Misc/Logger.hpp"
 
@@ -156,7 +157,7 @@ namespace orbit
 		auto height = dimensions.bottom - dimensions.top;
 
 		if (desc->useWARP)
-			desc->adapter = GetWARPAdapter();		
+			desc->adapter = GetWARPAdapter();
 
 #if defined(_DEBUG)
 		Ptr<ID3D12Debug> debug;
@@ -171,12 +172,30 @@ namespace orbit
 		spDebugController1->EnableDebugLayer();
 		spDebugController1->SetEnableGPUBasedValidation(true);
 #endif
+		D3D_FEATURE_LEVEL featureLevels[] = {
+			D3D_FEATURE_LEVEL_12_1,
+			D3D_FEATURE_LEVEL_12_0,
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_11_0
+		};
+		auto numFeatureLevels = _countof(featureLevels);
 
-		ORBIT_THROW_IF_FAILED(D3D12CreateDevice(
-			desc->adapter.Get(),
-			D3D_FEATURE_LEVEL_11_0,
-			IID_PPV_ARGS(_device.GetAddressOf())
-		), "Creating the directx device failed.");
+		HRESULT result;
+		unsigned i = 0u;
+		for (; i < numFeatureLevels; ++i)
+		{
+			result = D3D12CreateDevice(
+				desc->adapter.Get(),
+				featureLevels[i],
+				IID_PPV_ARGS(_device.GetAddressOf())
+			);
+			// If we found a valid configuration, we break
+			if (result == S_OK)
+				break;
+		}
+
+		ORBIT_THROW_IF_FAILED(result, "Creating the directx device failed.");
+		ORBIT_INFO_LEVEL(FormatString("Device created using Feature Level %s.", TranslateFeatureLevel(featureLevels[i])), 8);
 
 #ifdef _DEBUG
 
@@ -352,7 +371,7 @@ namespace orbit
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Tex2D(
-				DXGI_FORMAT_D32_FLOAT,
+				optimizedClearValue.Format,
 				width,
 				height,
 				1,
@@ -368,7 +387,7 @@ namespace orbit
 		);
 
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
-		dsv.Format = DXGI_FORMAT_D32_FLOAT;
+		dsv.Format = optimizedClearValue.Format;
 		dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		dsv.Texture2D.MipSlice = 0;
 		dsv.Flags = D3D12_DSV_FLAG_NONE;

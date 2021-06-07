@@ -69,6 +69,7 @@ source_group(Engine\\Misc
 	Engine/Misc/Transform.cpp
 	Engine/Misc/ResourceManager.cpp
 	Engine/Misc/OrbLoader.cpp
+	Engine/Misc/Random.cpp
 )
 
 source_group(Engine\\Rendering
@@ -137,6 +138,7 @@ set(ORBIT_SOURCE
 	Engine/Misc/Transform.cpp
 	Engine/Misc/ResourceManager.cpp
 	Engine/Misc/OrbLoader.cpp
+	Engine/Misc/Random.cpp
 
 	Engine/Management/Allocator.cpp
 	Engine/Management/AllocatorPage.cpp
@@ -172,6 +174,7 @@ if (WITH_DEAR_IMGUI)
 		${ORBIT_SOURCE}
 		${IMGUI_PREFIX}/imgui.cpp
 		${IMGUI_PREFIX}/imgui_draw.cpp
+		${IMGUI_PREFIX}/imgui_tables.cpp
 		${IMGUI_PREFIX}/imgui_impl_${TARGET_FRAMEWORK}.cpp
 		${IMGUI_PREFIX}/imgui_impl_${TARGET_PLATFORM}.cpp
 		${IMGUI_PREFIX}/imgui_widgets.cpp
@@ -181,6 +184,7 @@ if (WITH_DEAR_IMGUI)
 		FILES
 		${IMGUI_PREFIX}/imgui.cpp
 		${IMGUI_PREFIX}/imgui_draw.cpp
+		${IMGUI_PREFIX}/imgui_tables.cpp
 		${IMGUI_PREFIX}/imgui_impl_${TARGET_FRAMEWORK}.cpp
 		${IMGUI_PREFIX}/imgui_impl_${TARGET_PLATFORM}.cpp
 		${IMGUI_PREFIX}/imgui_widgets.cpp
@@ -191,15 +195,22 @@ endif()
 add_library(${PROJECT_NAME} ${SOURCE})
 target_include_directories(${PROJECT_NAME} 
 	PRIVATE 
-		../inc/ 
-		../dep/
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/inc/>
+		PUBLIC $<INSTALL_INTERFACE:${CMAKE_SOURCE_DIR}/inc/> 
+		PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/dep/>
+		PUBLIC $<INSTALL_INTERFACE:${CMAKE_SOURCE_DIR}/dep/> 
 )
+generate_export_header(${PROJECT_NAME})
+set_property(TARGET ${PROJECT_NAME} PROPERTY VERSION ${Orbit_VERSION})
+set_property(TARGET ${PROJECT_NAME} PROPERTY SOVERSION 0)
+set_property(TARGET ${PROJECT_NAME} PROPERTY INTERFACE_${PROJECT_NAME}_MAJOR_VERSION 0)
+set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPATIBLE_INTERFACE_STRING ${PROJECT_NAME}_MAJOR_VERSION)
 
 if (NOT "${EIGEN_ROOT_PATH}" STREQUAL "")
-	target_include_directories(${PROJECT_NAME} PRIVATE ${EIGEN_ROOT_PATH})
+	target_include_directories(${PROJECT_NAME} PUBLIC ${EIGEN_ROOT_PATH})
 endif()
 if (NOT "${IMGUI_ROOT_PATH}" STREQUAL "")
-	target_include_directories(${PROJECT_NAME} PRIVATE ${IMGUI_ROOT_PATH})
+	target_include_directories(${PROJECT_NAME} PUBLIC ${IMGUI_ROOT_PATH})
 endif()
 
 physx_dependency(${PROJECT_NAME})

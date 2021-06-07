@@ -1,0 +1,33 @@
+Beginning compilation. 
+Microsoft (R) Direct3D Shader Compiler 10.1
+Copyright (C) 2013 Microsoft. All rights reserved.
+
+C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\Raw\default.hlsl(18,18-47): warning X3206: 'mul': implicit truncation of vector type
+C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\Raw\default.hlsl(21,19-49): warning X3206: 'mul': implicit truncation of vector type
+
+compilation object save succeeded; see C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\vs_default_d.fxc
+Microsoft (R) Direct3D Shader Compiler 10.1
+Copyright (C) 2013 Microsoft. All rights reserved.
+
+C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\Raw\default.hlsl(18,18-47): warning X3206: 'mul': implicit truncation of vector type
+C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\Raw\default.hlsl(21,19-49): warning X3206: 'mul': implicit truncation of vector type
+
+compilation object save succeeded; see C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\ps_default_d.fxc
+Microsoft (R) Direct3D Shader Compiler 10.1
+Copyright (C) 2013 Microsoft. All rights reserved.
+
+C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\Raw\default.hlsl(18,18-47): warning X3206: 'mul': implicit truncation of vector type
+C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\Raw\default.hlsl(21,19-49): warning X3206: 'mul': implicit truncation of vector type
+
+compilation object save succeeded; see C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\vs_default.fxc
+Microsoft (R) Direct3D Shader Compiler 10.1
+Copyright (C) 2013 Microsoft. All rights reserved.
+
+C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\Raw\default.hlsl(18,18-47): warning X3206: 'mul': implicit truncation of vector type
+C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\Raw\default.hlsl(21,19-49): warning X3206: 'mul': implicit truncation of vector type
+
+compilation object save succeeded; see C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\ps_default.fxc
+Microsoft (R) Direct3D Shader Compiler 10.1
+Copyright (C) 2013 Microsoft. All rights reserved.
+
+compilation object save succeeded; see C:\Users\Lars\source\repos\OrbitEngine\OrbitEngine\projects\__general\shader\rs_default.fxo

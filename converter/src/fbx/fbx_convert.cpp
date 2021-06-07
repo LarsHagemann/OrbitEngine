@@ -51,7 +51,6 @@ namespace fbx
 	bool FBXToOrb(const FBXNode* rootNode, orbit::Orb* orb)
 	{
 		FBXData data;
-		FBXInterModel intermediate;
 		LoadFBXData(rootNode, &data);
 		FBXDataToOrb(&data, orb);
 		return true;
@@ -71,6 +70,7 @@ namespace fbx
 		submesh.indexCount = static_cast<unsigned>(tmpMesh.indices.size());
 		submesh.startVertex = static_cast<unsigned>(mesh->vertices.size());
 		submesh.vertexCount = static_cast<unsigned>(tmpMesh.vertices.size());
+		
 		mesh->indices.insert(
 			mesh->indices.end(),
 			tmpMesh.indices.begin(),
@@ -471,7 +471,9 @@ namespace fbx
 			};
 		};
 		auto get_string = [](const FBXNode* node) {
-			return std::get<std::string>(node->properties[0]);
+			auto prop = std::get<std::string>(node->properties[0]);
+			prop = prop.substr(0, prop.find('\0'));
+			return prop;
 		};
 
 		material->id = std::get<int64_t>(materialNode->properties[0]);
@@ -514,6 +516,14 @@ namespace fbx
 				mesh.name = modelName.substr(0, modelName.find('\0'));
 				for (auto geometry : model.second->geometries)
 					FBXGeometryAppendToMesh(geometry.get(), &mesh);
+
+				if (!model.second->materials.empty())
+				{
+					auto name = model.second->materials[0]->name;
+					name = name.substr(0, name.find('\0'));
+					for (auto& submesh : mesh.submeshes)
+						submesh.material = name;
+				}
 
 				orb->AddMesh(std::move(mesh));
 			}
@@ -849,17 +859,14 @@ namespace fbx
 		tex->flags = TEXTURE_UNKNOWN;
 		if (channel == "Maya|specularRoughness")
 		{
-			//mat->flags |= MaterialFlag::F_HAS_ROUGHNESS_MAP;
 			tex->flags = TEXTURE_ROUGHNESS;
 		}
 		else if (channel == "Maya|normalCamera")
 		{
-			//mat->flags |= MaterialFlag::F_HAS_NORMAL_MAP;
 			tex->flags = TEXTURE_NORMAL;
 		}
 		else if (channel == "Maya|baseColor" || channel == "DiffuseColor")
 		{
-			//mat->flags |= MaterialFlag::F_HAS_COLOR_MAP;
 			tex->flags = TEXTURE_COLOR;
 		}
 		mat->textures.emplace_back(tex);

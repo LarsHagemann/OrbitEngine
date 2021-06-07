@@ -21,7 +21,7 @@ namespace orbit
         ImGui::End();
     }
 
-    void DebugObject::ShowDebug()
+    void DebugObject::ShowDebug(Time dt)
     {
         ImGuiIO& io = ImGui::GetIO();
 		ImGuiWindowFlags window_flags = 
@@ -90,19 +90,24 @@ namespace orbit
         }
         if (ImGui::TreeNode("Engine"))
         {
+            auto frametime = dt.asMilliseconds();
+            auto fps = 1000000 / dt.asMicroseconds();
+
             ImGui::ColorEdit3("Clear Color", Engine::Get()->_clearColor.data());
+            ImGui::Text("Framerate: %d FPS", fps);
+            ImGui::Text("Frametime: %d ms", frametime);
             ImGui::TreePop();
         }
     }
 
-    void DebugObject::Update(Time)
+    void DebugObject::Update(Time dt)
     {
         if (_kHandler->keydownThisFrame(DIK_F3))
             _displayDebug = !_displayDebug;
 
         if (_displayDebug)
         {
-            ShowDebug();
+            ShowDebug(dt);
             End();
         }
     }

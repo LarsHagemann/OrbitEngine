@@ -65,7 +65,7 @@ namespace orbit
 		ZeroMemory(&rDesc, sizeof(D3D12_RASTERIZER_DESC));
 		rDesc.AntialiasedLineEnable = true;
 		rDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
-		rDesc.CullMode = D3D12_CULL_MODE_NONE;
+		rDesc.CullMode = D3D12_CULL_MODE_BACK;
 		rDesc.DepthBias = 0;
 		rDesc.DepthBiasClamp = 0.f;
 		rDesc.DepthClipEnable = false;
@@ -85,7 +85,7 @@ namespace orbit
 		pipelineStateStream.PS = GetPixelShader(pixelShaderId)->GetBytecode();
 		pipelineStateStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 		pipelineStateStream.RTVFormats = rtvFormats;
-		pipelineStateStream.rasterizer = rDesc;		
+		pipelineStateStream.rasterizer = rDesc;
 
 		Ptr<ID3D12Device2> device;
 		ORBIT_THROW_IF_FAILED(GetDevice()->QueryInterface(device.GetAddressOf()), "Failed to query ID3D12Device2.");

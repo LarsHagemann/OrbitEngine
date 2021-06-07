@@ -26,7 +26,9 @@ namespace orbit
 			const auto my_id = std::this_thread::get_id();
 			Task task;
 			{
-				std::lock_guard<std::mutex> lock(_taskMutex);
+				while (!_taskMutex.try_lock()) { pt::Sleep(_sleepTime); }
+				std::lock_guard<std::mutex> lock(_taskMutex, std::adopt_lock);
+
 				// look for a task given to this thread
 				if (!_tasks.empty())
 				{

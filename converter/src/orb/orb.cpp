@@ -325,6 +325,7 @@ namespace orbit
 			printf_s("\tIndex count : %d\n", submesh.indexCount);
 			printf_s("\tVertex start: %d\n", submesh.startVertex);
 			printf_s("\tIndex start : %d\n", submesh.startIndex);
+			printf_s("\tMaterial    : %s\n", submesh.material.c_str());
 			++i;
 		}
 		printf_s("\n");

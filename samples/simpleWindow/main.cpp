@@ -3,7 +3,6 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "DXGI.lib")
-#pragma comment(lib, "Orbit.lib")
 
 #include <iostream>
 #include "Engine/Window.hpp"
@@ -57,7 +56,7 @@ std::shared_ptr<Engine> EngineInit()
 {
 	auto window = Window::Create({ 1080, 600 }, L"simpleWindow");
 	auto desc = InitDesc::GetDefaultDesc();
-	auto engine = Engine::Init(window, &desc);
+	auto engine = Engine::Init(window, &desc, L"simpleWindow");
 
 	auto scene = Scene::Create();
 	engine->SetScene(scene);
@@ -66,7 +65,7 @@ std::shared_ptr<Engine> EngineInit()
 	auto object = std::make_shared<SimpleWindowObject>();
 	object->Init();
 	scene->AddObject("simpleWindowObject", object);
-	
+
 	//auto camera = ThirdPersonCamera::Create();
 	//scene->SetCamera(camera);
 

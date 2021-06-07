@@ -6,9 +6,10 @@ namespace orbit
 {
 
 	Material::Material(MaterialData initData) :
-		_cachedData(initData)
+		_cachedData(initData),
+		_buffer(CreateConstantBuffer(initData, L"MaterialBuffer"))
 	{
-		// This buffer is probably static, thus, put it in the default heap
+		//memcpy_s(_buffer.CPU, sizeof(MaterialData), &initData, sizeof(MaterialData));
 	}
 
 	std::shared_ptr<Material> Material::Create(MaterialData initData)
@@ -16,37 +17,36 @@ namespace orbit
 		return std::make_shared<Material>(initData);
 	}
 
-	//void Material::BindMaterial()
-	//{
-	//	D3D12_GPU_DESCRIPTOR_HANDLE mbHandle;
-//
-	//	CD3DX12_GPU_DESCRIPTOR_HANDLE cmbHandle;
-	//	cmbHandle.InitOffsetted(mbHandle, 1);
-	//	cmdList->SetGraphicsRootDescriptorTable(0, cmbHandle);
-	//	if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_COLOR_MAP))
-	//	{
-	//		_engine->BindTexture(SLOT_COLOR_MAP, _colorTextureId, cmdList);
-	//	}
-	//	if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_NORMAL_MAP))
-	//	{
-	//		_engine->BindTexture(SLOT_NORMAL_MAP, _normalTextureId, cmdList);
-	//	}
-	//	if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_ROUGHNESS_MAP))
-	//	{
-	//		_engine->BindTexture(SLOT_ROUGHNESS_MAP, _roughnessTextureId, cmdList);
-	//	}
-	//	if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_OCCLUSION_MAP))
-	//	{
-	//		_engine->BindTexture(SLOT_OCCLUSION_MAP, _occlusionTextureId, cmdList);
-	//	}
-	//}
+	void Material::BindMaterial(Renderer* renderer, Ptr<ID3D12GraphicsCommandList> cmdList)
+	{
+		cmdList->SetGraphicsRootConstantBufferView(1, _buffer.view.BufferLocation);
+		//renderer->BindConstantBuffer(1, _buffer);
+		
+
+		if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_COLOR_MAP))
+		{
+			//renderer->BindTexture(SLOT_COLOR_MAP, _colorTextureId);
+		}
+		if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_NORMAL_MAP))
+		{
+			//renderer->BindTexture(SLOT_NORMAL_MAP, _normalTextureId);
+		}
+		if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_ROUGHNESS_MAP))
+		{
+			//renderer->BindTexture(SLOT_ROUGHNESS_MAP, _roughnessTextureId);
+		}
+		if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_OCCLUSION_MAP))
+		{
+			//renderer->BindTexture(SLOT_OCCLUSION_MAP, _occlusionTextureId);
+		}
+	}
     
 	void Material::SetTexture(TextureType textureType, std::string_view textureId)
 	{
 		switch (textureType)
 		{
-		case orbit::TextureType::T_COLOR: _colorTextureId = textureId; break;
-		case orbit::TextureType::T_NORMAL: _normalTextureId = textureId; break;
+		case orbit::TextureType::T_COLOR:     _colorTextureId     = textureId; break;
+		case orbit::TextureType::T_NORMAL:    _normalTextureId    = textureId; break;
 		case orbit::TextureType::T_OCCLUSION: _occlusionTextureId = textureId; break;
 		case orbit::TextureType::T_ROUGHNESS: _roughnessTextureId = textureId; break;
 		}
