@@ -17,4 +17,9 @@
 *.exe
 *.fxc
 *.fxo
+*.tex
+*.aux
+*.log
+*.out
+*.synctex.gz
 /shader/Raw/log.txt

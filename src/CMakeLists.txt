@@ -175,8 +175,8 @@ if (WITH_DEAR_IMGUI)
 		${IMGUI_PREFIX}/imgui.cpp
 		${IMGUI_PREFIX}/imgui_draw.cpp
 		${IMGUI_PREFIX}/imgui_tables.cpp
-		${IMGUI_PREFIX}/imgui_impl_${TARGET_FRAMEWORK}.cpp
-		${IMGUI_PREFIX}/imgui_impl_${TARGET_PLATFORM}.cpp
+		${IMGUI_PREFIX}/Backends/imgui_impl_${TARGET_FRAMEWORK}.cpp
+		${IMGUI_PREFIX}/Backends/imgui_impl_${TARGET_PLATFORM}.cpp
 		${IMGUI_PREFIX}/imgui_widgets.cpp
 		${IMGUI_PREFIX}/imgui_demo.cpp
 	)
@@ -185,8 +185,8 @@ if (WITH_DEAR_IMGUI)
 		${IMGUI_PREFIX}/imgui.cpp
 		${IMGUI_PREFIX}/imgui_draw.cpp
 		${IMGUI_PREFIX}/imgui_tables.cpp
-		${IMGUI_PREFIX}/imgui_impl_${TARGET_FRAMEWORK}.cpp
-		${IMGUI_PREFIX}/imgui_impl_${TARGET_PLATFORM}.cpp
+		${IMGUI_PREFIX}/Backends/imgui_impl_${TARGET_FRAMEWORK}.cpp
+		${IMGUI_PREFIX}/Backends/imgui_impl_${TARGET_PLATFORM}.cpp
 		${IMGUI_PREFIX}/imgui_widgets.cpp
 		${IMGUI_PREFIX}/imgui_demo.cpp
 	)

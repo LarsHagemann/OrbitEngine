@@ -5,6 +5,7 @@ set(Orbit_VERSION 0.0.1)
 include(GenerateExportHeader)
 include(CMakeHelper.txt)
 
+# Change this part so that it works with Linux
 file(TO_CMAKE_PATH "$ENV{TMP}" ENV_TMP)
 get_filename_component(ORBIT_APPDATA "../../Roaming/Treelab/OrbitEngine/"
                        REALPATH BASE_DIR "${ENV_TMP}")

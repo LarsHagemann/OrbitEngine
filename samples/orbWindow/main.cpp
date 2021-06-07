@@ -29,6 +29,8 @@ Next steps:
 	Texture support (for materials: diffuse, occlusion, normal and roughness textures/maps)
 	PhysX Components (static collision bodies, player controller, ...)
 	Render only whats in the view frustum (PhysX Object Lookup: What can actually be seen?)
+	Animations
+	Skeletal Animations
 */
 
 using namespace orbit;
