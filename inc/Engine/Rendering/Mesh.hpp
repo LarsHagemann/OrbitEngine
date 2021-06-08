@@ -1,12 +1,23 @@
 #pragma once
 #include "Vertex.hpp"
 #include "Engine/Bindings/Binding.hpp"
+#include "Engine/Engine.hpp"
 
 #include <vector>
 #include <string>
+#include <cassert>
 
 namespace orbit
 {
+
+	// Default vertex layout
+	struct DefaultVertex
+	{
+		Vector3f position;
+		Vector3f normal;
+		Vector3f tangent;
+		Vector2f uv;
+	};
 
 	// @brief: a mesh might consist of several pieces with
 	//	different materials. This stores information about
@@ -57,6 +68,73 @@ namespace orbit
 		size_t GetIndexCount() const;
 
 		const std::vector<SubMesh>& GetSubmeshes() const { return _submeshes; }
+		void AddSubMesh(SubMesh&& submesh) { _submeshes.emplace_back(std::move(submesh)); }
+
+		template<class Modifier>
+		static std::shared_ptr<Mesh> CreatePlaneMesh(size_t subdivisions, Modifier vertexModifier)
+		{
+			auto mesh = std::make_shared<Mesh>();
+			assert(subdivisions <= 6 && "At most 6 subdivions are allowed for planes.");
+
+			// Create vertices
+			const auto verticesPerSide = static_cast<size_t>(std::pow(2, subdivisions) + 1);
+			const auto numVertices = verticesPerSide * verticesPerSide;
+			const auto oneOverVerticesPerSide = 1.f / (verticesPerSide - 1.f);
+			const auto numQuads = static_cast<size_t>(std::pow(2, subdivisions * 2));
+			const auto numIndices = 6 * numQuads;
+
+			auto vertices = Engine::Get()->CPUAllocate(sizeof(DefaultVertex) * numVertices);
+			for (auto zidx = 0u; zidx < verticesPerSide; ++zidx)
+			{
+				const auto z = static_cast<float>(zidx) * oneOverVerticesPerSide;
+				for (auto xidx = 0u; xidx < verticesPerSide; ++xidx)
+				{
+					const auto x = static_cast<float>(xidx) * oneOverVerticesPerSide;
+					const auto idx = zidx * verticesPerSide + xidx;
+					const auto memory_loc = idx * sizeof(DefaultVertex);
+
+					DefaultVertex vertex;
+					vertex.position = Vector3f{ x, 0.f, z };
+					vertex.uv = Vector2f{ x, z };
+					vertexModifier(vertex.position);
+
+					memcpy_s((char*)vertices.memory + memory_loc, sizeof(DefaultVertex), (void*)&vertex, sizeof(DefaultVertex));
+				}
+			}
+
+			mesh->_vertices.SetBuffer(vertices, sizeof(DefaultVertex), numVertices);
+			mesh->_indices.indices.resize(numIndices); // We have 6 indices for every quad
+
+			for (auto zidx = 0u; zidx < verticesPerSide - 1; ++zidx)
+			{
+				const auto rowIdx = zidx * verticesPerSide;
+				for (auto xidx = 0u; xidx < verticesPerSide - 1; ++xidx)
+				{
+					const auto idx = rowIdx + xidx;
+					const auto base_idx = (idx - zidx) * 6;
+					mesh->_indices.indices[base_idx + 0] = static_cast<uint16_t>(idx);
+					mesh->_indices.indices[base_idx + 1] = static_cast<uint16_t>(idx + 1);
+					mesh->_indices.indices[base_idx + 2] = static_cast<uint16_t>(idx + verticesPerSide);
+					mesh->_indices.indices[base_idx + 3] = static_cast<uint16_t>(idx + verticesPerSide);
+					mesh->_indices.indices[base_idx + 4] = static_cast<uint16_t>(idx + 1);
+					mesh->_indices.indices[base_idx + 5] = static_cast<uint16_t>(idx + verticesPerSide + 1);
+				}
+			}
+
+			mesh->ReloadBuffer();
+
+			SubMesh submesh;
+			submesh.startVertex = 0u;
+			submesh.vertexCount = static_cast<size_t>(numVertices);
+			submesh.startIndex = 0u;
+			submesh.indexCount = static_cast<size_t>(numIndices);
+			submesh.pipelineState = "orbit/default";
+
+			mesh->AddSubMesh(std::move(submesh));
+
+			return mesh;
+		}
+		static std::shared_ptr<Mesh> CreatePlaneMesh(size_t subdivisions);
 	};
 
 }

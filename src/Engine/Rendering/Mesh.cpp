@@ -108,4 +108,9 @@ namespace orbit
         return _indices.size();
     }
 
+    std::shared_ptr<Mesh> Mesh::CreatePlaneMesh(size_t subdivisions)
+    {
+        return CreatePlaneMesh(subdivisions, [](Vector3f& position) {});
+    }
+
 }

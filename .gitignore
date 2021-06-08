@@ -21,5 +21,6 @@
 *.aux
 *.log
 *.out
+*.toc
 *.synctex.gz
 /shader/Raw/log.txt

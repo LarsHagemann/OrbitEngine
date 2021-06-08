@@ -14,6 +14,7 @@
 #include "Engine/Component/KeyboardComponent.hpp"
 #include "Engine/Component/MouseComponent.hpp"
 #include "Engine/Component/BatchComponent.hpp"
+#include "Engine/Component/StateComponent.hpp"
 #include "Engine/Misc/Logger.hpp"
 #include "Engine/Rendering/Cameras/ThirdPersonCamera.hpp"
 #include "Engine/Object.hpp"
@@ -24,21 +25,16 @@
 
 #include "imgui.h"
 
-/*
-Next steps:
-	Texture support (for materials: diffuse, occlusion, normal and roughness textures/maps)
-	PhysX Components (static collision bodies, player controller, ...)
-	Render only whats in the view frustum (PhysX Object Lookup: What can actually be seen?)
-	Animations
-	Skeletal Animations
-*/
-
 using namespace orbit;
 
+// This component implements a torch that is
+// attached to a certain transform (moving the transform
+// will move the torch)
 class TorchComponent : public EventDriven, public Component
 {
 private:
 	LightPtr _light;
+	TransformPtr _transform;
 	ScenePtr _scene;
 	Clock _lifeClock;
 	float _randomizer;
@@ -46,24 +42,26 @@ private:
 	float _timeMultiplier;
 	OpenSimplexNoise _noise;
 public:
-	TorchComponent(ObjectPtr object, ScenePtr scene) :
+	TorchComponent(ObjectPtr object, ScenePtr scene, TransformPtr target) :
 		Component(object),
 		_light(Light::CreatePointLight({ 800.f, 500.f, 500.f, 1.f }, Vector4f::Zero(), 0.1f, 0.2f)),
 		_randomizer(Random::UniformNumber(0.f, 2.f)),
 		_baseStrength(1.5f),
 		_timeMultiplier(0.01f),
-		_noise(Random::UniformNumber(0ll, std::numeric_limits<int64_t>::max()))
+		_noise(Random::UniformNumber(0ll, std::numeric_limits<int64_t>::max())),
+		_transform(target)
 	{
 		scene->AddLight(_light);
 	}
-	static std::shared_ptr<TorchComponent> create(ObjectPtr object, ScenePtr scene)
+	static std::shared_ptr<TorchComponent> create(ObjectPtr object, ScenePtr scene, TransformPtr target)
 	{
-		return std::make_shared<TorchComponent>(object, scene);
+		return std::make_shared<TorchComponent>(object, scene, target);
 	}
 	float calculateStrength()
 	{
 		return static_cast<float>(
-			(_noise.Evaluate(_lifeClock.GetElapsedTime().asMilliseconds() * _timeMultiplier, _randomizer) + 1.) / 2.);
+			(_noise.Evaluate(static_cast<double>(
+				_lifeClock.GetElapsedTime().asMilliseconds() * _timeMultiplier), _randomizer) + 1.) / 2.);
 	}
 	virtual void Update(Time dt) override
 	{
@@ -71,13 +69,12 @@ public:
 		auto normStrength = calculateStrength();
 		auto strength = (normStrength + 3.f) / 4.f * _baseStrength;
 		_light->_color = Vector4f{ 237 * strength, 196 * strength, 14 * strength, 1.f };
-	}
-	void SetPosition(Vector3f pos)
-	{
-		_light->_position = { pos.x(), pos.y(), pos.z(), 0.f };
+		auto p = _transform->GetCombinedTranslation();
+		_light->_position = { p.x(), p.y(), p.z(), 0.f };
 	}
 };
 
+// The Player Object
 class OrbWindowObject : public Object
 {
 protected:
@@ -90,6 +87,7 @@ protected:
 	float _mouseSensitivity;
 	ScenePtr _scene;
 	std::shared_ptr<TorchComponent> _torch;
+	std::shared_ptr<StateComponent<>> _stateManager;
 public:
 	void SetScene(ScenePtr scene) { _scene = scene; }
 	virtual void Init() override
@@ -104,7 +102,26 @@ public:
 		_player->SetTranslation({ 0.f, 1.f, 0.f });
 		_camera = ThirdPersonCamera::Create();
 		_camera->SetTarget(_player);
-		_torch = AddComponent<TorchComponent>("player_torch", _scene);
+		_torch = AddComponent<TorchComponent>("player_torch", _scene, _player);
+		_stateManager = AddComponent<StateComponent<>>("state", _kHandler, _mHandler);
+		_stateManager->AddState("default");
+		_stateManager->AddState("forward");
+		_stateManager->AddState("backward");
+		_stateManager->AddState("single_click");
+		_stateManager->AddState("double_click");
+
+		_stateManager->Transition_OnKeyDown(0, 1, DIK_W);
+		_stateManager->Transition_OnKeyUp(1, 0, DIK_W);
+		
+		_stateManager->Transition_OnKeyDown(0, 2, DIK_S);
+		_stateManager->Transition_OnKeyUp(2, 0, DIK_S);
+
+		_stateManager->Transition_OnMouseKeyDown(0, 3, MouseComponent::MouseButton::Left);
+		_stateManager->Transition_OnMouseKeyDown(3, 4, MouseComponent::MouseButton::Left);
+		_stateManager->Transition_OnTimeElapsed(4, 0, 1000);
+		_stateManager->Transition_OnTimeElapsed(3, 0, 500);
+
+		_stateManager->RegisterOnStateEnterCallback(4, [](size_t, std::string_view) { ORBIT_INFO("Super power function used!"); });
 	}
 
 	std::shared_ptr<ThirdPersonCamera> GetCamera() const { return _camera; }
@@ -136,10 +153,11 @@ public:
 		_camera->Tilt(tilt * _mouseSensitivity);
 
 		_player->Translate(movement * dt.asSeconds() * _speed);
-		_torch->SetPosition(_player->GetCombinedTranslation());
+		Engine::Get()->GetDebugObject()->ShowText("State: %d / %s", _stateManager->GetCurrentStateId(), _stateManager->GetCurrentStateName().data());
 	}
 };
 
+// The Environment object
 class SceneObject : public Object
 {
 public:
@@ -147,7 +165,6 @@ public:
 	{
 		Object::Init();
 
-		//GetStatic<BatchComponent>("Plane")->AddTransform();
 		GetStatic<BatchComponent>("Plane")->AddTransform()->SetScaling(0.1f);
 		GetStatic<BatchComponent>("Cone")->AddTransform()->SetScaling(0.1f);
 		GetStatic<BatchComponent>("Cylinder")->AddTransform()->SetScaling(0.1f);
@@ -210,7 +227,7 @@ EnginePtr EngineInit()
 	scene->LoadOrb("assets/scene.orb", sceneObject);
 	sceneObject->Init();
 
-	scene->AddLight(Light::CreateDirectionalLight(Vector4f::Ones(), Vector4f(0.f, -1.f, 0.f, 0.f)));
+	scene->AddLight(Light::CreateDirectionalLight(Vector4f{ 15.f, 15.f, 15.f, 1.f }, Vector4f(0.f, -1.f, 0.f, 0.f)));
 
 	return engine;
 }

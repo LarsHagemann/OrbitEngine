@@ -26,6 +26,7 @@ namespace orbit
         void BindMaterial(const std::string& id);
         void BindPipelineState(const std::string& id);
         void BindRootSignature(const std::string& id);
+        void BindTexture(const std::string& id, size_t textureSlot);
         void DrawInstanced(size_t vertexCount, size_t instanceCount, size_t startVertex, size_t startInstance);
         void DrawIndexedInstanced(size_t indexCount, size_t instanceCount, size_t startIndex, size_t startVertex, size_t startInstance);
     };

@@ -22,8 +22,6 @@ namespace orbit
 				data,
 				sdata
 			);
-			if (FAILED(result))
-				ORBIT_WARN_HR(FormatString("Failed to load texture '%s'!", filepath.generic_string().data()), result);
 		}
 		else
 		{
@@ -36,9 +34,11 @@ namespace orbit
 				data,
 				sdata
 			);
-			if (FAILED(result))
-				ORBIT_WARN_HR(FormatString("Failed to load texture '%s'!", filepath.generic_string().data()), result);
 		}
+		
+		if (FAILED(result))
+			ORBIT_WARN_HR(FormatString("Failed to load texture '%s'!", filepath.generic_string().data()), result);
+
 		return SUCCEEDED(result);
 	}
 

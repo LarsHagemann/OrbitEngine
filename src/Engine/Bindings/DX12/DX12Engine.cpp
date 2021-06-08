@@ -9,9 +9,9 @@
 #ifdef ORBIT_WITH_IMGUI
 #include "imgui.h"
 #ifdef ORBIT_WIN 
-#include "imgui_impl_win32.h"
+#include "backends/imgui_impl_win32.h"
 #endif
-#include "imgui_impl_dx12.h"
+#include "backends/imgui_impl_dx12.h"
 #endif
 
 #include <thread>

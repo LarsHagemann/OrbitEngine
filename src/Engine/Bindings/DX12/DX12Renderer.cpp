@@ -118,6 +118,21 @@ namespace orbit
         }
     }
 
+    void Renderer::BindTexture(const std::string& id, size_t textureSlot)
+    {
+        auto texture = Engine::Get()->GetTexture(id);
+        if (texture)
+        {
+            CD3DX12_GPU_DESCRIPTOR_HANDLE tex;
+            
+            _commandList->SetGraphicsRootDescriptorTable(textureSlot, tex);
+        }
+        else
+        {
+            ORBIT_WARN(FormatString("Unable to bind texture '%s'", id.c_str()));
+        }
+    }
+
     void Renderer::DrawInstanced(size_t vertexCount, size_t instanceCount, size_t startVertex, size_t startInstance)
     {
         _commandList->DrawInstanced(

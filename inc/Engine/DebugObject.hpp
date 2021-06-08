@@ -1,6 +1,10 @@
 #include "Object.hpp"
 #include "Engine/Component/KeyboardComponent.hpp"
 
+//#ifdef ORBIT_WITH_IMGUI
+#include "imgui.h"
+//#endif
+
 namespace orbit
 {
 
@@ -23,6 +27,12 @@ namespace orbit
         void ShowVector(Vector3f vector);
         void ShowVector(Vector4f vector);
         void ShowQuaternion(Quaternionf quaternion);
+        
+        template<class ...Args>
+        void ShowText(const std::string& format, Args... args)
+        {
+            ImGui::Text(format.c_str(), args...);
+        }
 
         virtual void Init() override;
         virtual void Update(Time dt) override;

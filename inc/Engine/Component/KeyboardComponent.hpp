@@ -25,8 +25,8 @@ namespace orbit {
 		Ptr<IDirectInput8W> _directInput;
 		// @brief: the direct input keyboard device
 		Ptr<IDirectInputDevice8W> _keyboardDevice;
-		// @brief: key state of the current keyboard
 #endif
+		// @brief: key state of the current keyboard
 		char _downKeys[256];
 		// @brief: key state of the previous keyboard
 		char _prevDownKeys[256];

@@ -69,7 +69,7 @@ namespace orbit
 		rDesc.DepthBias = 0;
 		rDesc.DepthBiasClamp = 0.f;
 		rDesc.DepthClipEnable = false;
-		rDesc.FillMode = D3D12_FILL_MODE_SOLID;
+		rDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
 		rDesc.ForcedSampleCount = 0;
 		rDesc.FrontCounterClockwise = true;
 		rDesc.MultisampleEnable = false;

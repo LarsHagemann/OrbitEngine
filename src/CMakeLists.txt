@@ -59,6 +59,7 @@ source_group(Engine\\Components
 	Engine/Component/KeyboardComponent.cpp
 	Engine/Component/MouseComponent.cpp
 	Engine/Component/BatchComponent.cpp
+	Engine/Component/StateComponent.cpp
 )
 
 source_group(Engine\\Misc
@@ -131,6 +132,7 @@ set(ORBIT_SOURCE
 	Engine/Component/KeyboardComponent.cpp
 	Engine/Component/MouseComponent.cpp
 	Engine/Component/BatchComponent.cpp
+	Engine/Component/StateComponent.cpp
 
 	Engine/Misc/Logger.cpp
 	Engine/Misc/ThreadPool.cpp
