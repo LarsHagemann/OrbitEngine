@@ -32,6 +32,10 @@ macro(orbit_sample sample_name additional_files)
 	add_executable(${sample_name} main.cpp ${additional_files})
 	target_link_libraries(${sample_name} LINK_PUBLIC ${PROJECT_NAME})
 	target_include_directories(${sample_name} PUBLIC ${CMAKE_SOURCE_DIR}/inc/ ${CMAKE_SOURCE_DIR}/dep/)
+	if ("${ORBIT_RENDERER}" STREQUAL "OpenGL")
+		target_include_directories(${sample_name} ${GLUT_INCLUDE_DIRS})
+		target_link_libraries(${sample_name} ${GLUT_LIBRARY})
+	endif()
 	if (NOT "${EIGEN_ROOT_PATH}" STREQUAL "")
 		target_include_directories(${sample_name} PUBLIC ${EIGEN_ROOT_PATH})
 	endif()
@@ -43,21 +47,3 @@ macro(orbit_sample sample_name additional_files)
 	file(COPY ${CMAKE_SOURCE_DIR}/shader DESTINATION ${ORBIT_APPDATA}/${sample_name}/)
 	physx_dependency(${sample_name})
 endmacro()
-
-macro(copy_files GLOBPAT DESTINATION)
-  file(GLOB COPY_FILES
-    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    ${GLOBPAT})
-  add_custom_target(copy ALL
-    COMMENT "Copying files: ${GLOBPAT}")
-
-  foreach(FILENAME ${COPY_FILES})
-    set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-    set(DST "${DESTINATION}/${FILENAME}")
-
-    add_custom_command(
-      TARGET copy
-      COMMAND ${CMAKE_COMMAND} -E copy ${SRC} ${DST}
-      )
-  endforeach(FILENAME)
-endmacro(copy_files)

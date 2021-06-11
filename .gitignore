@@ -4,6 +4,7 @@
 /.vscode/
 /.vs/
 /build/
+/build_unix/
 /CMakeFiles/
 /converter/.vscode/
 /converter/code.png

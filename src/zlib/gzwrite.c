@@ -86,11 +86,9 @@ local int gz_comp(state, flush)
     if (state->direct) {
         while (strm->avail_in) {
             put = strm->avail_in > max ? max : strm->avail_in;
-            writ = _write(state->fd, strm->next_in, put);
+            writ = write(state->fd, strm->next_in, put);
             if (writ < 0) {
-                char buffer[1024];
-                strerror_s(buffer, 1024, errno);
-                gz_error(state, Z_ERRNO, buffer);
+                gz_error(state, Z_ERRNO, zstrerror());
                 return -1;
             }
             strm->avail_in -= (unsigned)writ;
@@ -109,11 +107,9 @@ local int gz_comp(state, flush)
             while (strm->next_out > state->x.next) {
                 put = strm->next_out - state->x.next > (int)max ? max :
                       (unsigned)(strm->next_out - state->x.next);
-                writ = _write(state->fd, state->x.next, put);
+                writ = write(state->fd, state->x.next, put);
                 if (writ < 0) {
-                    char buffer[1024];
-                    strerror_s(buffer, 1024, errno);
-                    gz_error(state, Z_ERRNO, buffer);
+                    gz_error(state, Z_ERRNO, zstrerror());
                     return -1;
                 }
                 state->x.next += writ;
@@ -213,7 +209,7 @@ local z_size_t gz_write(state, buf, len)
                               state->in);
             copy = state->size - have;
             if (copy > len)
-                copy = (unsigned)len;
+                copy = len;
             memcpy(state->in + have, buf, copy);
             state->strm.avail_in += copy;
             state->x.pos += copy;
@@ -233,7 +229,7 @@ local z_size_t gz_write(state, buf, len)
         do {
             unsigned n = (unsigned)-1;
             if (n > len)
-                n = (unsigned)len;
+                n = len;
             state->strm.avail_in = n;
             state->x.pos += n;
             if (gz_comp(state, Z_NO_FLUSH) == -1)
@@ -372,7 +368,7 @@ int ZEXPORT gzputs(file, str)
 
     /* write string */
     len = strlen(str);
-    ret = (int)gz_write(state, str, len);
+    ret = gz_write(state, str, len);
     return ret == 0 && len != 0 ? -1 : ret;
 }
 
@@ -662,7 +658,7 @@ int ZEXPORT gzclose_w(file)
     }
     gz_error(state, Z_OK, NULL);
     free(state->path);
-    if (_close(state->fd) == -1)
+    if (close(state->fd) == -1)
         ret = Z_ERRNO;
     free(state);
     return ret;

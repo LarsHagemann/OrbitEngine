@@ -38,6 +38,10 @@ namespace orbit
     {
         MouseComponent::MouseButton button;
     };
+    struct CustomTransition
+    {
+        std::string_view customId;
+    };
     struct Dummy
     {};
 
@@ -46,6 +50,7 @@ namespace orbit
         KeyboardTransition keyboardTransition;
         TemporalTransition temporalTransition;
         MouseTransition mouseTransition;
+        CustomTransition customTransition;
 
         Dummy dummyTransition;
 
@@ -160,6 +165,7 @@ if (to >= _states.size()) \
     return; \
 }
 #define TRANSITION(from, to, name, transition_type, parameter) \
+ORBIT_INFO_LEVEL(FormatString("Transition from %d to %d on event <%s>.", from, to, #transition_type), 32);  \
 _transitions.emplace_back(from, to, Transition::name, Transition{ Transition::container_type{ transition_type{ parameter } } })
 
         void Transition_OnKeyDown(StateIndex from, StateIndex to, KeyboardComponent::KeyCode keyCode)
@@ -197,6 +203,50 @@ _transitions.emplace_back(from, to, Transition::name, Transition{ Transition::co
         {
             VERIFY_FROM_TO(from, to);
             TRANSITION(from, to, TRANSITION_MOUSE_WHEEL_UP, Dummy, );
+        }
+
+        void Transition_OnKeyDown(StateName from, StateName to, KeyboardComponent::KeyCode keyCode)
+        {
+            auto fromId = GetStateByName(from), toId = GetStateByName(to);
+            VERIFY_FROM_TO(fromId, toId);
+            TRANSITION(fromId, toId, TRANSITION_KEYDOWN, KeyboardTransition, keyCode);
+        }
+        void Transition_OnKeyUp(StateName from, StateName to, KeyboardComponent::KeyCode keyCode)
+        {
+            auto fromId = GetStateByName(from), toId = GetStateByName(to);
+            VERIFY_FROM_TO(fromId, toId);
+            TRANSITION(fromId, toId, TRANSITION_KEYUP, KeyboardTransition, keyCode);
+        }
+        void Transition_OnTimeElapsed(StateName from, StateName to, uint32_t elapsedTimeInMS)
+        {
+            auto fromId = GetStateByName(from), toId = GetStateByName(to);
+            VERIFY_FROM_TO(fromId, toId);
+            TRANSITION(fromId, toId, TRANSITION_TIME_ELAPSED, TemporalTransition, elapsedTimeInMS);
+        }
+        void Transition_OnMouseKeyDown(StateName from, StateName to, MouseComponent::MouseButton button)
+        {
+            auto fromId = GetStateByName(from), toId = GetStateByName(to);
+            VERIFY_FROM_TO(fromId, toId);
+            TRANSITION(fromId, toId, TRANSITION_MOUSE_KEY_DOWN, MouseTransition, button);
+        }
+        void Transition_OnMouseKeyUp(StateName from, StateName to, MouseComponent::MouseButton button)
+        {
+            auto fromId = GetStateByName(from), toId = GetStateByName(to);
+            VERIFY_FROM_TO(fromId, toId);
+            TRANSITION(fromId, toId, TRANSITION_MOUSE_KEY_UP, MouseTransition, button);
+        }
+        void Transition_OnMouseWheelUp(StateName from, StateName to)
+        {
+            auto fromId = GetStateByName(from), toId = GetStateByName(to);
+            VERIFY_FROM_TO(fromId, toId);
+            TRANSITION(fromId, toId, TRANSITION_MOUSE_WHEEL_DOWN, Dummy, );
+            _transitions.emplace_back(fromId, toId, Transition::TRANSITION_MOUSE_WHEEL_DOWN, Transition{ Dummy{  } });
+        }
+        void Transition_OnMouseWheelDown(StateName from, StateName to)
+        {
+            auto fromId = GetStateByName(from), toId = GetStateByName(to);
+            VERIFY_FROM_TO(fromId, toId);
+            TRANSITION(fromId, toId, TRANSITION_MOUSE_WHEEL_UP, Dummy, );
         }
 
 #undef TRANSITION
@@ -250,11 +300,11 @@ _transitions.emplace_back(from, to, Transition::name, Transition{ Transition::co
             for (auto i = 0u; i < _states.size(); ++i)
             {
                 if (_states.at(i).stateName == name)
-                    return _states.at(i).stateID;
+                    return i;
             }
 
 #ifdef _DEBUG
-            ORBIT_ERR(FormatString("Cannot find state with name '%s'.", name.c_str()));
+            ORBIT_ERR(FormatString("Cannot find state with name '%s'.", name.data()));
 #endif
 
             return std::numeric_limits<StateIndex>::max();

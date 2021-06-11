@@ -27,6 +27,8 @@ namespace orbit
 			wStr->data(), 
 			len
 		);
+#else
+
 #endif
 	}
 
@@ -56,6 +58,8 @@ namespace orbit
 			&defaultChar, 
 			&useDefault
 		);
+#else
+
 #endif
 	}
 

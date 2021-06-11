@@ -87,7 +87,7 @@ protected:
 	float _mouseSensitivity;
 	ScenePtr _scene;
 	std::shared_ptr<TorchComponent> _torch;
-	std::shared_ptr<StateComponent<>> _stateManager;
+	std::shared_ptr<StateComponent<>> _boostState;
 public:
 	void SetScene(ScenePtr scene) { _scene = scene; }
 	virtual void Init() override
@@ -103,25 +103,43 @@ public:
 		_camera = ThirdPersonCamera::Create();
 		_camera->SetTarget(_player);
 		_torch = AddComponent<TorchComponent>("player_torch", _scene, _player);
-		_stateManager = AddComponent<StateComponent<>>("state", _kHandler, _mHandler);
-		_stateManager->AddState("default");
-		_stateManager->AddState("forward");
-		_stateManager->AddState("backward");
-		_stateManager->AddState("single_click");
-		_stateManager->AddState("double_click");
+		_boostState = AddComponent<StateComponent<>>("boost", _kHandler, _mHandler);
 
-		_stateManager->Transition_OnKeyDown(0, 1, DIK_W);
-		_stateManager->Transition_OnKeyUp(1, 0, DIK_W);
-		
-		_stateManager->Transition_OnKeyDown(0, 2, DIK_S);
-		_stateManager->Transition_OnKeyUp(2, 0, DIK_S);
+		_boostState->AddState("default");
+		_boostState->AddState("prepare_boost_w");
+		_boostState->AddState("prepare_boost_a");
+		_boostState->AddState("prepare_boost_s");
+		_boostState->AddState("prepare_boost_d");
+		_boostState->AddState("boost");
+		_boostState->AddState("cooldown");
 
-		_stateManager->Transition_OnMouseKeyDown(0, 3, MouseComponent::MouseButton::Left);
-		_stateManager->Transition_OnMouseKeyDown(3, 4, MouseComponent::MouseButton::Left);
-		_stateManager->Transition_OnTimeElapsed(4, 0, 1000);
-		_stateManager->Transition_OnTimeElapsed(3, 0, 500);
+		_boostState->Transition_OnKeyDown("default", "prepare_boost_w", DIK_W);
+		_boostState->Transition_OnTimeElapsed("prepare_boost_w", "default", 200);
+		_boostState->Transition_OnKeyDown("prepare_boost_w", "boost", DIK_W);
 
-		_stateManager->RegisterOnStateEnterCallback(4, [](size_t, std::string_view) { ORBIT_INFO("Super power function used!"); });
+		_boostState->Transition_OnKeyDown("default", "prepare_boost_a", DIK_A);
+		_boostState->Transition_OnTimeElapsed("prepare_boost_a", "default", 200);
+		_boostState->Transition_OnKeyDown("prepare_boost_a", "boost", DIK_A);
+
+		_boostState->Transition_OnKeyDown("default", "prepare_boost_s", DIK_S);
+		_boostState->Transition_OnTimeElapsed("prepare_boost_s", "default", 200);
+		_boostState->Transition_OnKeyDown("prepare_boost_s", "boost", DIK_S);
+
+		_boostState->Transition_OnKeyDown("default", "prepare_boost_d", DIK_D);
+		_boostState->Transition_OnTimeElapsed("prepare_boost_d", "default", 200);
+		_boostState->Transition_OnKeyDown("prepare_boost_d", "boost", DIK_D);
+
+		_boostState->Transition_OnTimeElapsed("boost", "cooldown", 120);
+		_boostState->Transition_OnTimeElapsed("cooldown", "default", 2000);
+
+		_boostState->RegisterOnStateEnterCallback("boost", [&](size_t, std::string_view) {
+			_speed = 5.f;
+			}
+		);
+		_boostState->RegisterOnStateEnterCallback("cooldown", [&](size_t, std::string_view) {
+			_speed = 0.25f;
+			}
+		);
 	}
 
 	std::shared_ptr<ThirdPersonCamera> GetCamera() const { return _camera; }
@@ -153,7 +171,8 @@ public:
 		_camera->Tilt(tilt * _mouseSensitivity);
 
 		_player->Translate(movement * dt.asSeconds() * _speed);
-		Engine::Get()->GetDebugObject()->ShowText("State: %d / %s", _stateManager->GetCurrentStateId(), _stateManager->GetCurrentStateName().data());
+		Engine::Get()->GetDebugObject()->ShowText("State: %d / %s", _boostState->GetCurrentStateId(), _boostState->GetCurrentStateName().data());
+		Engine::Get()->GetDebugObject()->ShowText("Speed: %f", _speed);
 	}
 };
 

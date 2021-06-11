@@ -5,6 +5,11 @@
 #include <Windows.h>
 #include <ShlObj.h>
 #endif
+#else
+#ifndef ORBIT_UNIX
+#define ORBIT_UNIX
+
+#endif
 #endif
 
 #ifdef ORBIT_DX12
@@ -20,7 +25,7 @@ namespace orbit
 	using BufferHeap = CPUAllocator;
 }
 #elif defined ORBIT_OPENGL
-#include OPENGL_ERROR_INCLUDE
+
 #endif
 
 #include "Engine/Misc/Filesystem.hpp"
@@ -34,6 +39,8 @@ namespace orbit
 {
 #ifdef ORBIT_WIN
 	using window_handle = HWND;
+#else
+	using window_handle = int*;
 #endif
 
 	namespace pt {
@@ -73,11 +80,18 @@ namespace orbit
 			::CloseHandle(handle);
 			auto nano100 = (LONGLONG)ft.dwLowDateTime + ((LONGLONG)(ft.dwHighDateTime) << 32LL);
 			return (nano100 / 10000ULL) - 116444736000000000ULL;
+#else
+			struct stat result;
+			if(stat(filepath.generic_string().c_str(), &result) == 0)
+				return static_cast<uint64_t>(result.st_mtime);
+			
+			return 0;
 #endif
 		}
 
 		static fs::path GetAppdataPath()
 		{
+#ifdef ORBIT_WIN
 			PWSTR buffer;
 			::SHGetKnownFolderPath(
 				FOLDERID_RoamingAppData,
@@ -86,6 +100,9 @@ namespace orbit
 				&buffer
 			);
 			return fs::path(buffer);
+#else
+			return "/usr/.orbit/";
+#endif
 		}
 
 	}

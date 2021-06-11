@@ -6,9 +6,14 @@ include(GenerateExportHeader)
 include(CMakeHelper.txt)
 
 # Change this part so that it works with Linux
-file(TO_CMAKE_PATH "$ENV{TMP}" ENV_TMP)
-get_filename_component(ORBIT_APPDATA "../../Roaming/Treelab/OrbitEngine/"
-                       REALPATH BASE_DIR "${ENV_TMP}")
+if (NOT (UNIX))
+	file(TO_CMAKE_PATH "$ENV{TMP}" ENV_TMP)
+	get_filename_component(ORBIT_APPDATA "../../Roaming/Treelab/OrbitEngine/"
+						REALPATH BASE_DIR "${ENV_TMP}")
+else()
+	set(ORBIT_APPDATA "/usr/.orbit/")
+	file(MAKE_DIRECTORY ${ORBIT_APPDATA})
+endif()
 
 set_option(BUILD_SAMPLES TRUE BOOL "Uncheck this value if you don't want to build the samples.")
 set_option(WITH_DEAR_IMGUI TRUE BOOL "Uncheck to build without ImGui")
@@ -30,7 +35,6 @@ endif()
 
 if (NOT (EXISTS ${ORBIT_APPDATA}/__general))
 	file(MAKE_DIRECTORY ${ORBIT_APPDATA})
-	message(STATUS "Copying")
 	file(COPY ${CMAKE_SOURCE_DIR}/projects/__general DESTINATION ${ORBIT_APPDATA})
 	file(COPY ${CMAKE_SOURCE_DIR}/scripts/create_project.bat DESTINATION ${ORBIT_APPDATA})
 endif()
@@ -46,8 +50,21 @@ else()
 	message(FATAL_ERROR "Invalid render engine selected. Choose one of DX12, OpenGL, DX11.")
 endif()
 
+if (UNIX AND NOT("${ORBIT_RENDERER}" STREQUAL "OpenGL"))
+	message(FATAL_ERROR "Invalid render engine selected. On Unix systems only OpenGL is allowed.")
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if ("${ORBIT_RENDERER}" STREQUAL "OpenGL")
+	set(CMAKE_FIND_DEBUG_MODE True)
+	find_package(GLUT REQUIRED)
+	set(CMAKE_FIND_DEBUG_MODE False)
+
+	include_directories(${GLUT_INCLUDE_DIRS})
+endif()
+
 
 add_subdirectory(src)
 add_subdirectory(converter)

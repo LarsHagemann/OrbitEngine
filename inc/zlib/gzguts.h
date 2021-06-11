@@ -37,13 +37,15 @@
 
 #if defined(__TURBOC__) || defined(_MSC_VER) || defined(_WIN32)
 #  include <io.h>
+#else
+#  include <unistd.h>
 #endif
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 #  define WIDECHAR
 #endif
 
-#ifdef WINAPI_FAMILY
+#if defined WINAPI_FAMILY  || defined(_WIN32)
 #  define open _open
 #  define read _read
 #  define write _write

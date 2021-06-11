@@ -24,10 +24,10 @@ namespace orbit
 	//	a mesh subset
 	struct SubMesh
 	{
-		unsigned startVertex = 0u;
-		unsigned vertexCount = 0u;
-		unsigned startIndex = 0u;
-		unsigned indexCount = 0u;
+		size_t startVertex = 0u;
+		size_t vertexCount = 0u;
+		size_t startIndex = 0u;
+		size_t indexCount = 0u;
 		std::string pipelineState;
 		std::string material;
 	};
