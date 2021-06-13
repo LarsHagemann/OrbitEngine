@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <functional>
 #include <tuple>
+#include <unordered_set>
 
 namespace orbit
 {
@@ -66,6 +67,9 @@ namespace orbit
         DefaultTransitionContainer(Dummy t) :
             dummyTransition(t)
         {}
+        DefaultTransitionContainer(CustomTransition t) :
+            customTransition(t)
+        {}
     };
 
     template<class TransitionContainer = DefaultTransitionContainer>
@@ -80,6 +84,7 @@ namespace orbit
         constexpr static uint32_t TRANSITION_MOUSE_KEY_UP = 4;
         constexpr static uint32_t TRANSITION_MOUSE_WHEEL_UP = 5;
         constexpr static uint32_t TRANSITION_MOUSE_WHEEL_DOWN = 6;
+        constexpr static uint32_t TRANSITION_CUSTOM_EVENT = 7;
 
         TransitionContainer container;
     };
@@ -107,6 +112,8 @@ namespace orbit
         
         std::unordered_map<StateIndex, StateChangeCallback> _onEnterCallbacks;
         std::unordered_map<StateIndex, StateChangeCallback> _onLeaveCallbacks;
+
+        std::unordered_set<std::string_view> _customEvents;
 
         StateIndex _currentState;
     public:
@@ -204,6 +211,11 @@ _transitions.emplace_back(from, to, Transition::name, Transition{ Transition::co
             VERIFY_FROM_TO(from, to);
             TRANSITION(from, to, TRANSITION_MOUSE_WHEEL_UP, Dummy, );
         }
+        void Transition_OnCustomEvent(StateIndex from, StateIndex to, std::string_view customEventName)
+        {
+            VERIFY_FROM_TO(from, to);
+            TRANSITION(from, to, TRANSITION_CUSTOM_EVENT, CustomTransition, customEventName);
+        }
 
         void Transition_OnKeyDown(StateName from, StateName to, KeyboardComponent::KeyCode keyCode)
         {
@@ -240,7 +252,6 @@ _transitions.emplace_back(from, to, Transition::name, Transition{ Transition::co
             auto fromId = GetStateByName(from), toId = GetStateByName(to);
             VERIFY_FROM_TO(fromId, toId);
             TRANSITION(fromId, toId, TRANSITION_MOUSE_WHEEL_DOWN, Dummy, );
-            _transitions.emplace_back(fromId, toId, Transition::TRANSITION_MOUSE_WHEEL_DOWN, Transition{ Dummy{  } });
         }
         void Transition_OnMouseWheelDown(StateName from, StateName to)
         {
@@ -248,9 +259,20 @@ _transitions.emplace_back(from, to, Transition::name, Transition{ Transition::co
             VERIFY_FROM_TO(fromId, toId);
             TRANSITION(fromId, toId, TRANSITION_MOUSE_WHEEL_UP, Dummy, );
         }
+        void Transition_OnCustomEvent(StateName from, StateName to, std::string_view customEventName)
+        {
+            auto fromId = GetStateByName(from), toId = GetStateByName(to);
+            VERIFY_FROM_TO(fromId, toId);
+            TRANSITION(fromId, toId, TRANSITION_CUSTOM_EVENT, CustomTransition, customEventName);
+        }
 
 #undef TRANSITION
 #undef VERIFY_FROM_TO
+
+        void Trigger_CustomEvent(std::string_view customEventName)
+        {
+            _customEvents.emplace(customEventName);
+        }
 
         StateName GetCurrentStateName() const { return GetStateName(_currentState); }
         StateIndex GetCurrentStateId() const { return _currentState; }
@@ -359,6 +381,12 @@ _transitions.emplace_back(from, to, Transition::name, Transition{ Transition::co
                             condition_met = true;
                     } break;
 
+                    case Transition::TRANSITION_CUSTOM_EVENT: {
+                        auto eventName = std::get<3>(t).container.customTransition.customId;
+                        if (_customEvents.find(eventName) != _customEvents.end())
+                            condition_met = true;
+                    } break;
+
                     } /* end of switch */
 
                     if (condition_met)
@@ -375,10 +403,14 @@ _transitions.emplace_back(from, to, Transition::name, Transition{ Transition::co
                         _currentState = nextState;
                         _stateClock.Restart();
 
+                        _customEvents.clear();
+
                         return;
                     }
                 }
             }
+
+            _customEvents.clear();
         }
     };
 

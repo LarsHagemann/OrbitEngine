@@ -59,7 +59,6 @@ source_group(Engine\\Components
 	Engine/Component/KeyboardComponent.cpp
 	Engine/Component/MouseComponent.cpp
 	Engine/Component/BatchComponent.cpp
-	Engine/Component/StateComponent.cpp
 )
 
 source_group(Engine\\Misc
@@ -91,6 +90,12 @@ source_group(Engine\\Rendering\\Cameras
 	FILES
 	Engine/Rendering/Cameras/BaseCamera.cpp
 	Engine/Rendering/Cameras/ThirdPersonCamera.cpp	
+)
+
+source_group(Engine\\PhysX
+	FILES
+	Engine/PhysX/PhysXController.cpp
+	Engine/PhysX/PxOrbitErrorCallback.cpp
 )
 
 set(ORBIT_SOURCE
@@ -132,7 +137,6 @@ set(ORBIT_SOURCE
 	Engine/Component/KeyboardComponent.cpp
 	Engine/Component/MouseComponent.cpp
 	Engine/Component/BatchComponent.cpp
-	Engine/Component/StateComponent.cpp
 
 	Engine/Misc/Logger.cpp
 	Engine/Misc/ThreadPool.cpp
@@ -141,6 +145,9 @@ set(ORBIT_SOURCE
 	Engine/Misc/ResourceManager.cpp
 	Engine/Misc/OrbLoader.cpp
 	Engine/Misc/Random.cpp
+
+	Engine/PhysX/PhysXController.cpp
+	Engine/PhysX/PxOrbitErrorCallback.cpp
 
 	Engine/Management/Allocator.cpp
 	Engine/Management/AllocatorPage.cpp

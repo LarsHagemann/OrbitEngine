@@ -6,6 +6,7 @@
 #include "Engine/Misc/ThreadPool.hpp"
 #include "Engine/Misc/Math.hpp"
 #include "Engine/Misc/Time.hpp"
+#include "PhysX/PhysXController.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -18,7 +19,7 @@ namespace orbit
 	class DebugObject;
 	using ObjectPtr = std::shared_ptr<Object>;
 
-	class Engine : public EngineResources, public UploadBuffer, public Allocator
+	class Engine : public EngineResources, public UploadBuffer, public Allocator, public Clock, public PhysXController
 	{
 	private:
 		friend class DebugObject;

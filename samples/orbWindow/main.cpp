@@ -197,6 +197,8 @@ int main()
 	try {
 		Logger::sInfoLevel = 10;
 		auto engine = EngineInit();
+
+		engine->Restart();
 		engine->Run();
 	}
 	catch (Exception& e)

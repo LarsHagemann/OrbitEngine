@@ -26,6 +26,7 @@ macro(physx_dependency dependency)
 		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXPvdSDK_static_64.lib"
 		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXExtensions_static_64.lib"
 	)
+	add_compile_definitions(PX_PHYSX_STATIC_LIB)
 endmacro()
 
 macro(orbit_sample sample_name additional_files)
