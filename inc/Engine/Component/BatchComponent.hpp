@@ -23,6 +23,8 @@ namespace orbit
 		static std::shared_ptr<BatchComponent> create(ObjectPtr boundObject, std::shared_ptr<Mesh> mesh);
 		// @method: sets the mesh to be rendered
 		void SetMesh(std::shared_ptr<Mesh> mesh) { _mesh = mesh; }
+		// @return: Returns the underlying mesh
+		std::shared_ptr<Mesh> GetMesh() const { return _mesh; }
 		// @method: draws the batch to the scene
 		virtual void Draw(Renderer* renderer) const override;
 		// @method: adds a transform to the batch

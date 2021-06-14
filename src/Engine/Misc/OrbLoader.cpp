@@ -9,7 +9,7 @@
 #include "Engine/Rendering/Material.hpp"
 #include "Engine/Rendering/Texture.hpp"
 
-#include "zlib/zlib.h"
+#include "zlib.h"
 
 #include <sstream>
 

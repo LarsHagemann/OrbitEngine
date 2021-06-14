@@ -1,5 +1,5 @@
 #include "fbx/fbx_read.hpp"
-#include "zlib/zlib.h"
+#include <zlib.h>
 
 #include <iostream>
 #include <cassert>

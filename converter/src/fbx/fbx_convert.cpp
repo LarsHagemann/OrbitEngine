@@ -48,6 +48,17 @@ namespace fbx
 	void ConnectModelMaterial(std::shared_ptr<FBXModel> m0, std::shared_ptr<FBXMaterial> mat, FBXInterType* intermediate);
 	void ConnectMaterialTexture(std::shared_ptr<FBXMaterial> mat, std::shared_ptr<FBXTexture> tex, const std::string& channel);
 
+	float FastSigmoid(float value)
+	{
+		return (std::tanh(value) + 1.f) * 0.5f;
+	}
+
+	float Sigmoid(float value)
+	{
+		// return FastSigmoid(value);
+		return 1.f / (1 + std::exp(-value));
+	}
+
 	bool FBXToOrb(const FBXNode* rootNode, orbit::Orb* orb)
 	{
 		FBXData data;
@@ -494,11 +505,11 @@ namespace fbx
 			if (channel == "Maya|base")
 				material->diffuse *= std::clamp(std::get<float>(p.properties[4]), 0.f, 1.f);
 			if (channel == "Roughness")
-				material->roughness = static_cast<float>(std::get<double>(p.properties[4]));
+				material->roughness = Sigmoid(static_cast<float>(std::get<double>(p.properties[4])));
 			if (channel == "Maya|specularRoughness")
-				material->roughness = std::get<float>(p.properties[4]);
+				material->roughness = Sigmoid(std::get<float>(p.properties[4]));
 			if (channel == "Shininess")
-				material->roughness = 1.f - static_cast<float>(std::get<double>(p.properties[4]));
+				material->roughness = Sigmoid(1.f - static_cast<float>(std::get<double>(p.properties[4])));
 		}
 	}
 

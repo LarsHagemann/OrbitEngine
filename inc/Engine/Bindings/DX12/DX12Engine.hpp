@@ -24,6 +24,7 @@ namespace orbit
 		unsigned sampleQuality;
 		unsigned numBackbuffers;
 		unsigned numThreads;
+		unsigned physicsUpdatesPerSecond;
 		static InitDesc GetDefaultDesc();
 	};
 

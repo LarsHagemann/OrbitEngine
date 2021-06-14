@@ -60,6 +60,7 @@ add_executable(orbtool
 target_include_directories(orbtool PUBLIC 
     ${CMAKE_SOURCE_DIR}/converter/inc/ 
     ${CMAKE_SOURCE_DIR}/dep/
+	${ZLIB_DIR}/
     ../inc/
 )
 if (NOT "${EIGEN_ROOT_PATH}" STREQUAL "")

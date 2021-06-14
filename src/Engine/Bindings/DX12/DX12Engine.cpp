@@ -30,6 +30,7 @@ namespace orbit
 		desc.sampleQuality = 0;
 		desc.numThreads = 1;
 		desc.useWARP = false;
+		desc.physicsUpdatesPerSecond = 60;
 		return desc;
 	}
 
@@ -351,6 +352,8 @@ namespace orbit
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 #endif
+
+		ORBIT_INFO_LEVEL("DX12 initialized", 11);
 	}
 
 	void EngineResources::ResizeDepthBuffer()

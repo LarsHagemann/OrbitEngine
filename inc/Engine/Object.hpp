@@ -45,6 +45,10 @@ namespace orbit
 		//	for updating the internal state.
 		// @param dTime: time elapsed since the last frame.
 		virtual void Update(Time dTime) {}
+		// @method: use this function if you want to update information
+		// 	that depends on physics. 
+		// @param millis: physics time
+		virtual void PhysicsUpdate(size_t millis) {};
 		// @method: sets the active status of the object
 		// @param active: the new active status of the object
 		//	inactive objects (objects with SetActive(false)) do not

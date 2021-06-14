@@ -125,7 +125,7 @@ namespace orbit
         {
             CD3DX12_GPU_DESCRIPTOR_HANDLE tex;
             
-            _commandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(textureSlot), tex);
+            //_commandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(textureSlot), tex);
         }
         else
         {

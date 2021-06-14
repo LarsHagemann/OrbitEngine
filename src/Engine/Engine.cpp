@@ -8,6 +8,7 @@
 #include "Engine/DebugObject.hpp"
 
 #include <future>
+#include <thread>
 
 #ifdef ORBIT_WITH_IMGUI
 #include "imgui.h"
@@ -30,8 +31,9 @@ namespace orbit
 		_projectName(projectName),
 		_lastFrametime(Time(1))
 	{
-		
+		ORBIT_INFO_LEVEL("Initializing project.", 13);
 
+		m_updatesPerSecond = desc->physicsUpdatesPerSecond;
 		auto enginePath = GetEngineFolder();
 		auto projectPath = enginePath / _projectName;
 		if (!fs::exists(projectPath))
@@ -94,7 +96,7 @@ namespace orbit
 		_debugObject->Update(_lastFrametime);
 //#endif
 
-		std::vector<std::future<void>> results;
+		std::vector<std::future<void>> results{};
 
 		const auto workPerThread = std::max(static_cast<size_t>(1u), _scene->_objects.size() / GetParallelRenderCount());
 		for (auto i = 0U; i < GetParallelRenderCount(); ++i)
@@ -135,6 +137,26 @@ namespace orbit
 		_debugObject->Init();
 //#endif
 
+		bool isRunning = true;
+		std::thread t_physics([&]() {
+			Clock clock;
+			auto targetPhysicsTime = static_cast<int32_t>(1000.f / m_updatesPerSecond);
+			while(isRunning)
+			{
+				UpdatePhysX();
+
+				for (auto object : _scene->_objects)
+					object.second->PhysicsUpdate(targetPhysicsTime);
+
+				auto elapsed = clock.GetElapsedTime().asMilliseconds();
+				auto correction = targetPhysicsTime - elapsed;
+				if (correction > 0)
+					orbit::pt::Sleep(correction);
+				
+				clock.Restart();
+			}
+		});
+
 		_frameClock.Restart();
 
 		while (_window->IsOpen())
@@ -156,6 +178,9 @@ namespace orbit
 				OnResize();
 			}
 		}
+		isRunning = false;
+		if (t_physics.joinable())
+			t_physics.join();
 
 		//_workerPool.ForceStopJoin();
 		Cleanup();

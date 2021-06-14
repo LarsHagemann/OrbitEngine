@@ -15,7 +15,10 @@
 #include "Engine/Component/MouseComponent.hpp"
 #include "Engine/Component/BatchComponent.hpp"
 #include "Engine/Component/StateComponent.hpp"
+#include "Engine/Component/RigidStaticComponent.hpp"
+#include "Engine/Component/EntityControllerComponent.hpp"
 #include "Engine/Misc/Logger.hpp"
+#include "Engine/Misc/Math.hpp"
 #include "Engine/Rendering/Cameras/ThirdPersonCamera.hpp"
 #include "Engine/Object.hpp"
 #include "Engine/Scene.hpp"
@@ -88,6 +91,21 @@ protected:
 	ScenePtr _scene;
 	std::shared_ptr<TorchComponent> _torch;
 	std::shared_ptr<StateComponent<>> _boostState;
+	PxController* _controller;
+	Vector3f m_movement;
+
+	struct PlayerCallback : public PxUserControllerHitReport
+	{
+		virtual void onShapeHit(const PxControllerShapeHit& hit) override
+		{
+		}
+		virtual void onControllerHit(const PxControllersHit& hit) override
+		{
+		}
+		virtual void onObstacleHit(const PxControllerObstacleHit& hit) override
+		{
+		}
+	} m_callback;
 public:
 	void SetScene(ScenePtr scene) { _scene = scene; }
 	virtual void Init() override
@@ -104,6 +122,23 @@ public:
 		_camera->SetTarget(_player);
 		_torch = AddComponent<TorchComponent>("player_torch", _scene, _player);
 		_boostState = AddComponent<StateComponent<>>("boost", _kHandler, _mHandler);
+
+		auto material = Engine::Get()->GetPhysics()->createMaterial(10.f, 10.f, 0.15f);
+
+		PxCapsuleControllerDesc desc;
+		desc.height = .2f;
+		desc.radius = .1f;
+		desc.material = material;
+		desc.maxJumpHeight = .4f;
+		desc.position = PxExtendedVec3(0.f, 0.f, 1.f);
+		desc.reportCallback = &m_callback;
+		desc.slopeLimit = 0.0f;
+		desc.stepOffset = 0.015f;
+		desc.upDirection = PxVec3{ 0.f, 0.f, 1.f };
+		desc.volumeGrowth = 1.6f;
+		desc.contactOffset = 0.001f;
+
+		_controller = AddComponent<EntityControllerComponent<>>("player_controller", std::ref(desc))->GetController();
 
 		_boostState->AddState("default");
 		_boostState->AddState("prepare_boost_w");
@@ -153,11 +188,16 @@ public:
 		if (_kHandler->keydownThisFrame(DIK_F4))
 			_debugCursor = !_debugCursor;
 
-		Vector3f movement = _player->TransformVector({
+		auto localUp = _player->LocalUp();
+		_player->SetTranslation(Math<float>::PxToEigen(_controller->getPosition()));
+		_controller->setUpDirection(Math<>::EigenToPx3(localUp));
+
+		m_movement = _player->TransformVector({
 			_kHandler->keydown(DIK_A) ? 1.f : (_kHandler->keydown(DIK_D) ? -1.f : 0.f),
 			_kHandler->keydown(DIK_W) ? -1.f : (_kHandler->keydown(DIK_S) ? 1.f : 0.f),
-			_kHandler->keydown(DIK_SPACE) ? 1.f : (_kHandler->keydown(DIK_LSHIFT) ? -1.f : 0.f)
+			_kHandler->keydownThisFrame(DIK_SPACE) ? 3.f * 3.f : (_kHandler->keydown(DIK_LSHIFT) ? 0.f : 0.f)
 		});
+		m_movement += localUp * -3.f; // gravity
 
 		auto tilt = static_cast<float>(_mHandler->mousePositionDelta().y());
 		auto pan = static_cast<float>(-_mHandler->mousePositionDelta().x());
@@ -170,10 +210,17 @@ public:
 		_player->Rotate(pan * _mouseSensitivity, Eigen::Vector3f{ 0.f, 0.f, 1.f });
 		_camera->Tilt(tilt * _mouseSensitivity);
 
-		_player->Translate(movement * dt.asSeconds() * _speed);
+		//
+		//_player->Translate(movement * dt.asSeconds() * _speed);
 		Engine::Get()->GetDebugObject()->ShowText("State: %d / %s", _boostState->GetCurrentStateId(), _boostState->GetCurrentStateName().data());
 		Engine::Get()->GetDebugObject()->ShowText("Speed: %f", _speed);
 	}
+
+	virtual void PhysicsUpdate(size_t millis) override
+	{
+		_controller->move(Math<>::EigenToPx3((Vector3f)(m_movement * (1000.f / millis))) * _speed * 0.0001f, 0.001f, 1000.f / millis, PxControllerFilters());
+	}
+
 };
 
 // The Environment object
@@ -187,6 +234,8 @@ public:
 		GetStatic<BatchComponent>("Plane")->AddTransform()->SetScaling(0.1f);
 		GetStatic<BatchComponent>("Cone")->AddTransform()->SetScaling(0.1f);
 		GetStatic<BatchComponent>("Cylinder")->AddTransform()->SetScaling(0.1f);
+
+		AddComponent<RigidStaticComponent>("rigid_place_body", GetStatic<BatchComponent>("Plane")->GetMesh());
 	}
 };
 
@@ -194,8 +243,17 @@ EnginePtr EngineInit();
 
 int main()
 {
+#ifndef _DEBUG
+	std::ofstream log("log.txt");
+	auto cachedCout = std::cout.rdbuf();
+	auto cachedClog = std::clog.rdbuf();
+	auto cachedCerr = std::cerr.rdbuf();
+	std::cout.rdbuf(log.rdbuf());
+	std::clog.rdbuf(log.rdbuf());
+	std::cerr.rdbuf(log.rdbuf());
+#endif
 	try {
-		Logger::sInfoLevel = 10;
+		Logger::sInfoLevel = std::numeric_limits<uint32_t>::max();
 		auto engine = EngineInit();
 
 		engine->Restart();
@@ -217,17 +275,17 @@ int main()
 	{
 		// Undetectable exception
 	}
+#ifndef _DEBUG
+	log.flush();
+	std::cout.rdbuf(cachedCout);
+	std::clog.rdbuf(cachedClog);
+	std::cerr.rdbuf(cachedCerr);
+	log.close();
+#endif
 }
 
 EnginePtr EngineInit()
 {
-#ifndef _DEBUG
-	std::ofstream log("log.txt");
-	std::cout.rdbuf(log.rdbuf());
-	std::clog.rdbuf(log.rdbuf());
-	std::cerr.rdbuf(log.rdbuf());
-#endif
-
 	auto window = Window::Create({ 1080, 600 }, L"orbWindow sample");
 	auto desc = InitDesc::GetDefaultDesc();
 	desc.numThreads = 1u;

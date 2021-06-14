@@ -47,12 +47,17 @@ namespace orbit
 		{
 		case orbit::Logger::Severity::S_INFO:
 			print(sInfoStream, prefix, message, function, line);
+#ifdef ORBIT_FLUSH_ON_INFO
+			sInfoStream.flush();
+#endif
 			break;
 		case orbit::Logger::Severity::S_WARN:
 			print(sWarnStream, prefix, message, function, line);
+			sWarnStream.flush(); // Warnings are important, flush them.
 			break;
 		case orbit::Logger::Severity::S_ERR:
 			print(sErrorStream, prefix, message, function, line);
+			sErrorStream.flush(); // Errors are important, flush them.
 			break;
 		default:
 			// invalid severity level

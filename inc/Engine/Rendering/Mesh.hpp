@@ -70,6 +70,9 @@ namespace orbit
 		const std::vector<SubMesh>& GetSubmeshes() const { return _submeshes; }
 		void AddSubMesh(SubMesh&& submesh) { _submeshes.emplace_back(std::move(submesh)); }
 
+		const VertexData& GetVertexData() const { return _vertices; }
+		const IndexData& GetIndexData() const { return _indices; }
+
 		template<class Modifier>
 		static std::shared_ptr<Mesh> CreatePlaneMesh(size_t subdivisions, Modifier vertexModifier)
 		{

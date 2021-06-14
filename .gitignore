@@ -24,4 +24,5 @@
 *.out
 *.toc
 *.synctex.gz
+.clang-tidy
 /shader/Raw/log.txt

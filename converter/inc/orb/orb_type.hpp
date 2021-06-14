@@ -124,9 +124,9 @@ namespace orbit
 	}
 
 #ifdef _DEBUG
-	static const OrbVersion tool_version = OrbVersion{ 3, 3, 'D', 'a' };
+	static const OrbVersion tool_version = OrbVersion{ 3, 3, 'D', 'b' };
 #else
-	static const OrbVersion tool_version = OrbVersion{ 3, 3, 'R', 'a' };
+	static const OrbVersion tool_version = OrbVersion{ 3, 3, 'R', 'b' };
 #endif
 
 }

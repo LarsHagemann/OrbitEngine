@@ -12,4 +12,4 @@ namespace fbx
 
 	bool FBXToOrb(const FBXNode* rootNode, orbit::Orb* orb);
 
-}
+} // namespace fbx

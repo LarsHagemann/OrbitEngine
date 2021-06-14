@@ -32,11 +32,11 @@ namespace fbx
 		std::vector<FBXNode> children;
 	};
 
-	void PrintTree(const FBXNode* node, unsigned offset = 0);
+	void PrintTree(const FBXNode* node, unsigned offset = 0U);
 
 	void GenerateFBXTree(FBXNode* root, const fs::path& filepath);
 	void GenerateFBXTree(FBXNode* root, std::ifstream* stream);
 
-	const FBXNode* FindChild(const FBXNode* parent, std::string_view childName, size_t nthChild = 0u);
+	const FBXNode* FindChild(const FBXNode* parent, std::string_view childName, size_t nthChild = 0U);
 
-}
+} // namespace fbx

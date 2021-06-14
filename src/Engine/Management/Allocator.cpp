@@ -21,6 +21,7 @@ namespace orbit
 	Allocator::Allocator(size_t pagesize) :
 		_pagesize(pagesize)
 	{
+		ORBIT_INFO_LEVEL(FormatString("Initializing Allocator with pagesize <%d>", pagesize), 13);
 	}
 
 	Allocator::~Allocator()

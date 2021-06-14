@@ -14,7 +14,7 @@ void PrintVersion()
 {
     std::cout 
         << "orbtool " << orbit::tool_version
-        <<  " - (c) 2020 Lars Hagemann\n"
+        <<  " - (c) 2020 - 2021 Lars Hagemann\n"
             "This program converts model files (fbx, obj, dae) into the Orbit game engine file format\n"
             "See https://github.com/LarsHagemann/OrbitFileFormat for the latest specification\n"
             "Use '>orbtool ?' for help\n\n";

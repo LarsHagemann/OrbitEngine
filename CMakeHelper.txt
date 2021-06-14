@@ -19,6 +19,7 @@ macro(physx_dependency dependency)
 		debug "${PHYSX_LIBRARY_PATH}/debug/PhysXCharacterKinematic_static_64.lib"
 		debug "${PHYSX_LIBRARY_PATH}/debug/PhysXPvdSDK_static_64.lib"
 		debug "${PHYSX_LIBRARY_PATH}/debug/PhysXExtensions_static_64.lib"
+		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXCommon_static_64.lib"
 		optimized "${PHYSX_LIBRARY_PATH}/release/PhysX_static_64.lib"
 		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXFoundation_static_64.lib"
 		optimized "${PHYSX_LIBRARY_PATH}/release/PhysXCooking_static_64.lib"

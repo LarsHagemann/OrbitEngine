@@ -17,9 +17,11 @@ namespace orbit
 
     class PhysXController
     {
-    private:
+    protected:
         static PxOrbitErrorCallback gErrorCallback;
         static PxDefaultAllocator gAllocator;
+
+        unsigned m_updatesPerSecond;
 
         PxControllerManager* m_controllerManager;
         PxFoundation* m_foundation;
@@ -30,6 +32,14 @@ namespace orbit
         PxCooking* m_cooking;
     public:
         PhysXController();
+        virtual ~PhysXController();
+
+        PxPhysics* GetPhysics() const { return m_physics; }
+        PxCooking* GetCooking() const { return m_cooking; }
+        PxScene* GetPhysXScene() const { return m_scene; }
+        PxControllerManager* GetControllerManager() const { return m_controllerManager; }
+
+        void UpdatePhysX();
     };
 
 }

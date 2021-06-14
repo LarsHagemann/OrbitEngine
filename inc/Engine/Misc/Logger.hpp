@@ -18,6 +18,9 @@ namespace orbit
 			S_WARN,
 			S_ERR
 		};
+		constexpr static auto sInfoLevel_All = std::numeric_limits<uint32_t>::max();
+		constexpr static auto sInfoLevel_None = 0U;
+		constexpr static auto sInfoLevel_Important = 10U;
 	protected:
 		// @brief: internal helper function for logging
 		static void print(
@@ -47,7 +50,7 @@ namespace orbit
 		//	0 - Only most important messages
 		//	1 - Less important messages
 		//	2 - ...
-		// Specify 0xFFFFFFFF to show all information 
+		// Specify 0xFFFFFFFF or Logger::sInfoLevel_All to show all information 
 		static unsigned sInfoLevel;
 		// @brief: prints a message to a specified severity stream
 		// @param severity: the severity level (see enum class OrbitLogger::Severity)

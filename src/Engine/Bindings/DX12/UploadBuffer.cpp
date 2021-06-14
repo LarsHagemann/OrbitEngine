@@ -25,6 +25,7 @@ namespace orbit
 	UploadBuffer::UploadBuffer(size_t pagesize) :
 		_pagesize(pagesize)
 	{
+		ORBIT_INFO_LEVEL(FormatString("Initializing UploadBuffer with pagesize <%d>", pagesize), 13);
 	}
 
 	UploadBuffer::Allocation UploadBuffer::Allocate(size_t sizeInBytes, size_t alignment)

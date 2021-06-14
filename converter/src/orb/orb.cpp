@@ -1,5 +1,5 @@
 #include "orb/orb.hpp"
-#include "zlib/zlib.h"
+#include <zlib.h>
 #include <iostream>
 
 namespace orbit
