@@ -1,21 +1,21 @@
 source_group(zlib
 	FILES
 	
-	../src/zlib/adler32.c
-	../src/zlib/compress.c
-	../src/zlib/crc32.c
-	../src/zlib/deflate.c
-	../src/zlib/gzclose.c
-    ../src/zlib/gzlib.c
-    ../src/zlib/gzread.c
-    ../src/zlib/gzwrite.c
-	../src/zlib/infback.c
-	../src/zlib/inffast.c
-	../src/zlib/inflate.c
-	../src/zlib/inftrees.c
-	../src/zlib/trees.c
-	../src/zlib/uncompr.c
-	../src/zlib/zutil.c
+	${ZLIB_DIR}/adler32.c
+	${ZLIB_DIR}/compress.c
+	${ZLIB_DIR}/crc32.c
+	${ZLIB_DIR}/deflate.c
+	${ZLIB_DIR}/gzclose.c
+    ${ZLIB_DIR}/gzlib.c
+    ${ZLIB_DIR}/gzread.c
+    ${ZLIB_DIR}/gzwrite.c
+	${ZLIB_DIR}/infback.c
+	${ZLIB_DIR}/inffast.c
+	${ZLIB_DIR}/inflate.c
+	${ZLIB_DIR}/inftrees.c
+	${ZLIB_DIR}/trees.c
+	${ZLIB_DIR}/uncompr.c
+	${ZLIB_DIR}/zutil.c
 )
 
 source_group(fbx
@@ -38,21 +38,21 @@ add_executable(orbtool
 
 	src/orb/orb.cpp
 
-    ../src/zlib/adler32.c
-	../src/zlib/compress.c
-	../src/zlib/crc32.c
-	../src/zlib/deflate.c
-	../src/zlib/gzclose.c
-    ../src/zlib/gzlib.c
-    ../src/zlib/gzread.c
-    ../src/zlib/gzwrite.c
-	../src/zlib/infback.c
-	../src/zlib/inffast.c
-	../src/zlib/inflate.c
-	../src/zlib/inftrees.c
-	../src/zlib/trees.c
-	../src/zlib/uncompr.c
-	../src/zlib/zutil.c
+    ${ZLIB_DIR}/adler32.c
+	${ZLIB_DIR}/compress.c
+	${ZLIB_DIR}/crc32.c
+	${ZLIB_DIR}/deflate.c
+	${ZLIB_DIR}/gzclose.c
+    ${ZLIB_DIR}/gzlib.c
+    ${ZLIB_DIR}/gzread.c
+    ${ZLIB_DIR}/gzwrite.c
+	${ZLIB_DIR}/infback.c
+	${ZLIB_DIR}/inffast.c
+	${ZLIB_DIR}/inflate.c
+	${ZLIB_DIR}/inftrees.c
+	${ZLIB_DIR}/trees.c
+	${ZLIB_DIR}/uncompr.c
+	${ZLIB_DIR}/zutil.c
 
     src/main.cpp 
 )

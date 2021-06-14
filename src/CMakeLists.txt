@@ -1,20 +1,20 @@
 source_group(zlib
 	FILES
-	zlib/adler32.c
-	zlib/compress.c
-	zlib/crc32.c
-	zlib/deflate.c
-	zlib/gzclose.c
-	zlib/gzlib.c
-    zlib/gzread.c
-    zlib/gzwrite.c
-	zlib/infback.c
-	zlib/inffast.c
-	zlib/inflate.c
-	zlib/inftrees.c
-	zlib/trees.c
-	zlib/uncompr.c
-	zlib/zutil.c
+	${ZLIB_DIR}/adler32.c
+	${ZLIB_DIR}/compress.c
+	${ZLIB_DIR}/crc32.c
+	${ZLIB_DIR}/deflate.c
+	${ZLIB_DIR}/gzclose.c
+	${ZLIB_DIR}/gzlib.c
+    ${ZLIB_DIR}/gzread.c
+    ${ZLIB_DIR}/gzwrite.c
+	${ZLIB_DIR}/infback.c
+	${ZLIB_DIR}/inffast.c
+	${ZLIB_DIR}/inflate.c
+	${ZLIB_DIR}/inftrees.c
+	${ZLIB_DIR}/trees.c
+	${ZLIB_DIR}/uncompr.c
+	${ZLIB_DIR}/zutil.c
 )
 
 source_group(Engine
@@ -99,21 +99,21 @@ source_group(Engine\\PhysX
 )
 
 set(ORBIT_SOURCE
-	zlib/adler32.c
-	zlib/compress.c
-	zlib/crc32.c
-	zlib/deflate.c
-	zlib/gzclose.c
-	zlib/gzlib.c
-    zlib/gzread.c
-    zlib/gzwrite.c
-	zlib/infback.c
-	zlib/inffast.c
-	zlib/inflate.c
-	zlib/inftrees.c
-	zlib/trees.c
-	zlib/uncompr.c
-	zlib/zutil.c
+	${ZLIB_DIR}/adler32.c
+	${ZLIB_DIR}/compress.c
+	${ZLIB_DIR}/crc32.c
+	${ZLIB_DIR}/deflate.c
+	${ZLIB_DIR}/gzclose.c
+	${ZLIB_DIR}/gzlib.c
+    ${ZLIB_DIR}/gzread.c
+    ${ZLIB_DIR}/gzwrite.c
+	${ZLIB_DIR}/infback.c
+	${ZLIB_DIR}/inffast.c
+	${ZLIB_DIR}/inflate.c
+	${ZLIB_DIR}/inftrees.c
+	${ZLIB_DIR}/trees.c
+	${ZLIB_DIR}/uncompr.c
+	${ZLIB_DIR}/zutil.c
 
 	Engine/Engine.cpp
 	Engine/Object.cpp
@@ -206,6 +206,8 @@ target_include_directories(${PROJECT_NAME}
 	PRIVATE 
 		PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/inc/>
 		PUBLIC $<INSTALL_INTERFACE:${CMAKE_SOURCE_DIR}/inc/> 
+		PUBLIC $<BUILD_INTERFACE:${ZLIB_DIR}>
+		PUBLIC $<INSTALL_INTERFACE:${ZLIB_DIR}>
 		PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/dep/>
 		PUBLIC $<INSTALL_INTERFACE:${CMAKE_SOURCE_DIR}/dep/> 
 )

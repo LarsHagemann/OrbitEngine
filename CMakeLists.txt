@@ -17,6 +17,7 @@ endif()
 
 set_option(BUILD_SAMPLES TRUE BOOL "Uncheck this value if you don't want to build the samples.")
 set_option(WITH_DEAR_IMGUI TRUE BOOL "Uncheck to build without ImGui")
+set_option(ZLIB_DIR "" PATH "Path to your zLib folder (Folder with the .h and .cpp files).")
 set_option(PHYSX_ROOT_PATH "" PATH "Path to your NVidia PhysX build (Root folder with physx and physxshared).")
 set_option(PHYSX_LIBRARY_PATH "" PATH "Path to the PhysX bin folder to use (The folder with the built debug/checked/release/profile folders inside).")
 set_option(EIGEN_ROOT_PATH "" PATH "Leave this empty if Eigen is located in the dep/ folder.")
