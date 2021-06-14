@@ -99,7 +99,7 @@ public:
 		_mHandler = AddComponent<MouseComponent>("mouse_controller");
 		_player = GetStatic<orbit::BatchComponent>("Cube")->AddTransform();
 		_player->SetScaling(0.3f);
-		_player->SetTranslation({ 0.f, 1.f, 0.f });
+		_player->SetTranslation({ 0.f, 0.f, .125f });
 		_camera = ThirdPersonCamera::Create();
 		_camera->SetTarget(_player);
 		_torch = AddComponent<TorchComponent>("player_torch", _scene, _player);
