@@ -172,7 +172,7 @@ namespace orbit
 	{
 		if (!IsFenceComplete(fenceValue))
 		{
-			ORBIT_INFO_LEVEL(FormatString("Waiting for fence value %zd.", fenceValue), 20);
+			ORBIT_INFO_LEVEL(FormatString("Waiting for fence value %zd.", fenceValue), 35);
 			ORBIT_THROW_IF_FAILED(
 				_fence->SetEventOnCompletion(fenceValue, _fenceEvent),
 				"Failed to set event on completion."

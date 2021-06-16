@@ -77,6 +77,8 @@ public:
 	}
 };
 
+#include "PxMaterial.h"
+
 // The Player Object
 class OrbWindowObject : public Object
 {
@@ -93,6 +95,7 @@ protected:
 	std::shared_ptr<StateComponent<>> _boostState;
 	PxController* _controller;
 	Vector3f m_movement;
+	float m_colliderHeight = .17f;
 
 	struct PlayerCallback : public PxUserControllerHitReport
 	{
@@ -111,7 +114,7 @@ public:
 	virtual void Init() override
 	{
 		Object::Init();
-		_speed = 0.25f;
+		_speed = 5.f;
 		_mouseSensitivity = 0.001f;
 		_kHandler = AddComponent<KeyboardComponent>("keyboard_controller");
 		_mHandler = AddComponent<MouseComponent>("mouse_controller");
@@ -123,22 +126,21 @@ public:
 		_torch = AddComponent<TorchComponent>("player_torch", _scene, _player);
 		_boostState = AddComponent<StateComponent<>>("boost", _kHandler, _mHandler);
 
-		auto material = Engine::Get()->GetPhysics()->createMaterial(10.f, 10.f, 0.15f);
 
 		PxCapsuleControllerDesc desc;
-		desc.height = .2f;
-		desc.radius = .1f;
-		desc.material = material;
+		desc.height = m_colliderHeight;
+		desc.radius = m_colliderHeight * 0.4f;
+		desc.material = Engine::Get()->GetPhysics()->createMaterial(10.f, 10.f, 0.15f);
 		desc.maxJumpHeight = .4f;
 		desc.position = PxExtendedVec3(0.f, 0.f, 1.f);
 		desc.reportCallback = &m_callback;
 		desc.slopeLimit = 0.0f;
-		desc.stepOffset = 0.015f;
+		desc.stepOffset = m_colliderHeight * 0.33f;
 		desc.upDirection = PxVec3{ 0.f, 0.f, 1.f };
 		desc.volumeGrowth = 1.6f;
-		desc.contactOffset = 0.001f;
+		desc.contactOffset = 0.01f;
 
-		_controller = AddComponent<EntityControllerComponent<>>("player_controller", std::ref(desc))->GetController();
+		_controller = AddComponent<PlayerControllerComponent>("player_controller", std::ref(desc))->GetController();
 
 		_boostState->AddState("default");
 		_boostState->AddState("prepare_boost_w");
@@ -184,23 +186,35 @@ public:
 		if (_kHandler->keydownThisFrame(DIK_ESCAPE))
 			Engine::Get()->GetWindow()->Close();
 		if (_kHandler->keydownThisFrame(DIK_F11))
-			Engine::Get()->GetWindow()->SetFullscreen(Engine::Get()->GetWindow()->IsFullscreen());
+			Engine::Get()->GetWindow()->SetFullscreen(!Engine::Get()->GetWindow()->IsFullscreen());
 		if (_kHandler->keydownThisFrame(DIK_F4))
 			_debugCursor = !_debugCursor;
 
 		auto localUp = _player->LocalUp();
-		_player->SetTranslation(Math<float>::PxToEigen(_controller->getPosition()));
+		_player->SetTranslation(Math<float>::PxToEigen(_controller->getPosition()) + Vector3f::UnitZ() * (m_colliderHeight * 2.3f));
 		_controller->setUpDirection(Math<>::EigenToPx3(localUp));
 
-		m_movement = _player->TransformVector({
+		auto movement = _player->TransformVector({
 			_kHandler->keydown(DIK_A) ? 1.f : (_kHandler->keydown(DIK_D) ? -1.f : 0.f),
-			_kHandler->keydown(DIK_W) ? -1.f : (_kHandler->keydown(DIK_S) ? 1.f : 0.f),
-			_kHandler->keydownThisFrame(DIK_SPACE) ? 3.f * 3.f : (_kHandler->keydown(DIK_LSHIFT) ? 0.f : 0.f)
+			_kHandler->keydown(DIK_W) ? 1.f : (_kHandler->keydown(DIK_S) ? -1.f : 0.f),
+			_kHandler->keydown(DIK_SPACE) ? 1.f : (_kHandler->keydown(DIK_LSHIFT) ? -1.f : 0.f)
 		});
-		m_movement += localUp * -3.f; // gravity
+		//movement += localUp * -4.f; // gravity
 
-		auto tilt = static_cast<float>(_mHandler->mousePositionDelta().y());
-		auto pan = static_cast<float>(-_mHandler->mousePositionDelta().x());
+		m_movement = Math<>::Lerp(m_movement * (1.f - dt.asSeconds()), movement * 15.f, 1.f / 300.f);
+
+		static int spaceCounter = 0;
+
+		if (_kHandler->keydownThisFrame(DIK_SPACE))
+		{
+			//m_movement.z() += 18.f;
+			++spaceCounter;
+		}
+
+		Engine::Get()->GetDebugObject()->ShowText("Space down: %d", spaceCounter);
+
+		auto tilt = static_cast<float>(-_mHandler->mousePositionDelta().y());
+		auto pan = static_cast<float>(_mHandler->mousePositionDelta().x());
 		if (_debugCursor)
 		{
 			tilt = 0.f;
@@ -218,10 +232,12 @@ public:
 
 	virtual void PhysicsUpdate(size_t millis) override
 	{
-		_controller->move(Math<>::EigenToPx3((Vector3f)(m_movement * (1000.f / millis))) * _speed * 0.0001f, 0.001f, 1000.f / millis, PxControllerFilters());
+		_controller->move(Math<>::EigenToPx3(m_movement) * 0.25f, 0.1f, 1000.f / millis, PxControllerFilters());
 	}
 
 };
+
+#include "Engine/Misc/Noise/OpenSimplexNoise.hpp"
 
 // The Environment object
 class SceneObject : public Object
@@ -231,15 +247,28 @@ public:
 	{
 		Object::Init();
 
-		GetStatic<BatchComponent>("Plane")->AddTransform()->SetScaling(0.1f);
-		GetStatic<BatchComponent>("Cone")->AddTransform()->SetScaling(0.1f);
-		GetStatic<BatchComponent>("Cylinder")->AddTransform()->SetScaling(0.1f);
+		//GetStatic<BatchComponent>("Plane")->AddTransform()->SetScaling(0.1f);
+		GetStatic<BatchComponent>("Cylinder.001")->AddTransform()->SetScaling(0.1f);
+		//GetStatic<BatchComponent>("Cylinder")->AddTransform()->SetScaling(0.1f);
 
-		AddComponent<RigidStaticComponent>("rigid_place_body", GetStatic<BatchComponent>("Plane")->GetMesh());
+		auto noise = OpenSimplexNoise(0);
+
+		auto groundMesh = Mesh::CreatePlaneMesh(5, "TreeMaterial", [&](Vector3f& pos) { pos *= 100.f; pos.z() = noise.Evaluate(pos.x() / 10.f, pos.y() / 15.f) * 15.f; });
+		AddComponent<BatchComponent>("ground", groundMesh)->AddTransform();
+		
+		auto body = AddComponent<RigidStaticComponent>("rigid_place_body", GetStatic<BatchComponent>("ground")->GetMesh());
+		body->CookBody(Vector3f::Zero(), Quaternionf::Identity(), MaterialProperties{ .7f, .7f, .1f }, Vector3f{ 1.f, 1.f, 1.f });
 	}
 };
 
 EnginePtr EngineInit();
+
+#include "Engine/PhysX/PxOrbitErrorCallback.hpp"
+
+#include <extensions/PxDefaultAllocator.h>
+#include <pvd/PxPvdTransport.h>
+#include <PxPhysicsVersion.h>
+#include <extensions/PxExtensionsAPI.h>
 
 int main()
 {
@@ -253,7 +282,7 @@ int main()
 	std::cerr.rdbuf(log.rdbuf());
 #endif
 	try {
-		Logger::sInfoLevel = std::numeric_limits<uint32_t>::max();
+		Logger::sInfoLevel = Logger::sInfoLevel_Debug;
 		auto engine = EngineInit();
 
 		engine->Restart();
@@ -306,7 +335,7 @@ EnginePtr EngineInit()
 	scene->LoadOrb("assets/scene.orb", sceneObject);
 	sceneObject->Init();
 
-	scene->AddLight(Light::CreateDirectionalLight(Vector4f{ 15.f, 15.f, 15.f, 1.f }, Vector4f(0.f, -1.f, 0.f, 0.f)));
+	scene->AddLight(Light::CreateDirectionalLight(Vector4f{ 15.f, 15.f, 15.f, 1.f }, Vector4f(0.f, -1.f, 0.f, 1.f)));
 
 	return engine;
 }

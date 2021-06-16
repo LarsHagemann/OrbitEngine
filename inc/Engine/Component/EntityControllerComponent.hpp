@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Component/Component.hpp"
+#include "Engine/PhysX/PhysX.hpp"
 #include "Engine/Engine.hpp"
 
 #include <characterkinematic/PxCapsuleController.h>
@@ -9,7 +10,7 @@ namespace orbit
 
     using namespace physx;
 
-    template<class Controller = PxCapsuleController, class ControllerDesc = PxCapsuleControllerDesc>
+    template<class ControllerDesc = PxCapsuleControllerDesc>
     class EntityControllerComponent : public Component
     {
     protected:
@@ -21,6 +22,11 @@ namespace orbit
             m_controller = Engine::Get()->GetControllerManager()->createController(desc);
             m_controller->setUserData(object.get());
         }
+        ~EntityControllerComponent()
+        {
+            ORBIT_INFO_LEVEL("Releasing EntityControllerComponent", 20);
+            PX_RELEASE(m_controller);
+        }
 
         static std::shared_ptr<EntityControllerComponent> create(ObjectPtr object, const ControllerDesc& desc)
         {
@@ -29,5 +35,7 @@ namespace orbit
 
         PxController* GetController() const { return m_controller; }
     };
+
+    using PlayerControllerComponent = EntityControllerComponent<>;
 
 }

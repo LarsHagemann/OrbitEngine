@@ -25,19 +25,19 @@ namespace orbit
 
 		if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_COLOR_MAP))
 		{
-			//renderer->BindTexture(SLOT_COLOR_MAP, _colorTextureId);
+			renderer->BindTexture(_colorTextureId, SLOT_COLOR_MAP);
 		}
 		if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_NORMAL_MAP))
 		{
-			//renderer->BindTexture(SLOT_NORMAL_MAP, _normalTextureId);
+			renderer->BindTexture(_normalTextureId, SLOT_NORMAL_MAP);
 		}
 		if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_ROUGHNESS_MAP))
 		{
-			//renderer->BindTexture(SLOT_ROUGHNESS_MAP, _roughnessTextureId);
+			renderer->BindTexture(_roughnessTextureId, SLOT_ROUGHNESS_MAP);
 		}
 		if (_cachedData.IsFlagSet(MaterialFlag::F_HAS_OCCLUSION_MAP))
 		{
-			//renderer->BindTexture(SLOT_OCCLUSION_MAP, _occlusionTextureId);
+			renderer->BindTexture(_occlusionTextureId, SLOT_OCCLUSION_MAP);
 		}
 	}
     

@@ -123,9 +123,10 @@ namespace orbit
         auto texture = Engine::Get()->GetTexture(id);
         if (texture)
         {
+            D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle{ texture->GetResource()->GetGPUVirtualAddress() };
             CD3DX12_GPU_DESCRIPTOR_HANDLE tex;
-            
-            //_commandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(textureSlot), tex);
+            tex.InitOffsetted(gpuHandle, textureSlot);            
+            _commandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(textureSlot), tex);
         }
         else
         {

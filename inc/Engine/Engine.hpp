@@ -40,8 +40,8 @@ namespace orbit
 		void PartialUpdate(ObjMap::iterator begin, ObjMap::iterator end);
 	public:
 		static constexpr auto svFOV = Math<float>::PIDIV4;
-		static constexpr auto sNearZ = .01f;
-		static constexpr auto sFarZ = 20.f;
+		static constexpr auto sNearZ = 2.f;
+		static constexpr auto sFarZ = 400.f;
 
 		Engine(std::shared_ptr<WindowBase> window, InitDesc* desc, std::wstring_view);
 		static std::shared_ptr<Engine> Init(

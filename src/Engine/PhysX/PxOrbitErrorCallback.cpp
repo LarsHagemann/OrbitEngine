@@ -47,6 +47,16 @@ namespace orbit
 
         Logger::print(Logger::Severity::S_ERR, FormatString("{PhysX: %s} %s", errorCode, message), file, static_cast<unsigned>(line));
 
+        switch (code)
+        {
+        case PxErrorCode::eINVALID_PARAMETER:
+        case PxErrorCode::eINVALID_OPERATION:
+        case PxErrorCode::eOUT_OF_MEMORY:
+        case PxErrorCode::eABORT:
+        case PxErrorCode::eINTERNAL_ERROR:
+            ORBIT_DEBUG_BREAK;
+        }
+
         if (code == PxErrorCode::eABORT)
             throw std::exception("An unrecoverable error has occurred in Nvidia PhysX.");
     }

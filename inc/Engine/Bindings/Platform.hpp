@@ -35,6 +35,14 @@ namespace orbit
 
 #include <chrono>
 
+#ifndef ORBIT_DEBUG_BREAK
+#ifdef _MSC_VER
+#define ORBIT_DEBUG_BREAK __debugbreak()
+#elif defined __GNUC__ || defined __clang__
+#define ORBIT_DEBUG_BREAK __builtin_trap()
+#endif
+#endif
+
 namespace orbit
 {
 #ifdef ORBIT_WIN

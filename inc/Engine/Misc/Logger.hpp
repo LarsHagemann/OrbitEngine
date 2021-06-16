@@ -21,6 +21,7 @@ namespace orbit
 		constexpr static auto sInfoLevel_All = std::numeric_limits<uint32_t>::max();
 		constexpr static auto sInfoLevel_None = 0U;
 		constexpr static auto sInfoLevel_Important = 10U;
+		constexpr static auto sInfoLevel_Debug = 25U;
 	protected:
 		// @brief: internal helper function for logging
 		static void print(

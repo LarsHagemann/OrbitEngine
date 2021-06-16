@@ -65,7 +65,7 @@ namespace orbit
 		ZeroMemory(&rDesc, sizeof(D3D12_RASTERIZER_DESC));
 		rDesc.AntialiasedLineEnable = true;
 		rDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
-		rDesc.CullMode = D3D12_CULL_MODE_BACK;
+		rDesc.CullMode = D3D12_CULL_MODE_NONE;
 		rDesc.DepthBias = 0;
 		rDesc.DepthBiasClamp = 0.f;
 		rDesc.DepthClipEnable = false;

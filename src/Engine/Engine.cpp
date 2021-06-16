@@ -144,10 +144,10 @@ namespace orbit
 			while(isRunning)
 			{
 				UpdatePhysX();
-
+				
 				for (auto object : _scene->_objects)
 					object.second->PhysicsUpdate(targetPhysicsTime);
-
+				
 				auto elapsed = clock.GetElapsedTime().asMilliseconds();
 				auto correction = targetPhysicsTime - elapsed;
 				if (correction > 0)
@@ -156,6 +156,8 @@ namespace orbit
 				clock.Restart();
 			}
 		});
+
+		pt::SetThreadName(t_physics, L"Nvidia PhysX simulation Loop");
 
 		_frameClock.Restart();
 
@@ -183,7 +185,8 @@ namespace orbit
 			t_physics.join();
 
 		//_workerPool.ForceStopJoin();
-		Cleanup();
+		EngineResources::Cleanup();
+		PhysXController::Cleanup();
 
 		ORBIT_INFO_LEVEL(FormatString("Shutting down."), 5);
 

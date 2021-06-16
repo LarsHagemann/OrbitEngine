@@ -10,6 +10,7 @@
 #include "Engine/Object.hpp"
 #include "Engine/Scene.hpp"
 #include "Engine/Component/KeyboardComponent.hpp"
+#include "Engine/Rendering/Cameras/ThirdPersonCamera.hpp"
 
 using namespace orbit;
 
@@ -29,7 +30,7 @@ public:
 		if (_kHandler->keydownThisFrame(DIK_ESCAPE))
 			Engine::Get()->GetWindow()->Close();
 		if (_kHandler->keydownThisFrame(DIK_F11))
-			Engine::Get()->GetWindow()->SetFullscreen(Engine::Get()->GetWindow()->IsFullscreen());
+			Engine::Get()->GetWindow()->SetFullscreen(!Engine::Get()->GetWindow()->IsFullscreen());
 
 	}
 };
@@ -65,9 +66,9 @@ std::shared_ptr<Engine> EngineInit()
 	auto object = std::make_shared<SimpleWindowObject>();
 	object->Init();
 	scene->AddObject("simpleWindowObject", object);
-
-	//auto camera = ThirdPersonCamera::Create();
-	//scene->SetCamera(camera);
+	
+	auto camera = ThirdPersonCamera::Create();
+	scene->SetCamera(camera);
 
 	return engine;
 }

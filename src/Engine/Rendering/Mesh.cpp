@@ -93,6 +93,43 @@ namespace orbit
 		ReloadBuffer();
 	}
 
+    void Mesh::RecalculateNormals(int vertexPositionOffset,int vertexNormalOffset)
+    {
+        if (vertexNormalOffset < 0)
+            vertexNormalOffset = 12; // Default normal offset is 12 bytes
+        if (vertexPositionOffset < 0)
+            vertexPositionOffset = 0; // Default position offset is 0 bytes
+
+        auto normalAt = [&](size_t index) {
+            return (Vector3f*)((char*)_vertices.GetBuffer().memory + index * _vertices.GetStride() + vertexNormalOffset);
+        };
+        auto positionAt = [&](size_t index) {
+            return *(Vector3f*)((char*)_vertices.GetBuffer().memory + index * _vertices.GetStride() + vertexPositionOffset);
+        };
+
+        for (auto i = 0u; i < _vertices.GetVertexCount(); ++i)
+            *normalAt(i) = Vector3f::Zero();
+
+        for (auto i = 0u; i < _indices.size() - 2; ++i)
+        {
+            auto 
+                v1 = positionAt(_indices.indices.at(i + 0)),
+                v2 = positionAt(_indices.indices.at(i + 1)),
+                v3 = positionAt(_indices.indices.at(i + 2));
+
+            auto normal = (v2 - v1).cross(v3 - v1);
+
+            *normalAt(_indices.indices.at(i + 0)) += normal;
+            *normalAt(_indices.indices.at(i + 1)) += normal;
+            *normalAt(_indices.indices.at(i + 2)) += normal;
+        }
+
+        for (auto i = 0u; i < _vertices.GetVertexCount(); ++i)
+            normalAt(i)->normalize();
+
+        ReloadBuffer();
+    }
+
     VertexBufferView Mesh::GetVertexBufferView() const
     {
         return _vertexBuffer.view;
@@ -108,9 +145,9 @@ namespace orbit
         return _indices.size();
     }
 
-    std::shared_ptr<Mesh> Mesh::CreatePlaneMesh(size_t subdivisions)
+    std::shared_ptr<Mesh> Mesh::CreatePlaneMesh(size_t subdivisions, std::string_view material)
     {
-        return CreatePlaneMesh(subdivisions, [](Vector3f& position) {});
+        return CreatePlaneMesh(subdivisions, material, [](Vector3f& position) {});
     }
 
 }

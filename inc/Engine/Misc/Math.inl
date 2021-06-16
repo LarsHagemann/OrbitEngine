@@ -9,6 +9,10 @@ namespace orbit
                 const Matrix<T, 3, 1>& target,
                 const Matrix<T, 3, 1>& up)
     {
+#if defined (ORBIT_DX11) || defined (ORBIT_DX12)
+        auto result = DirectX::XMMatrixLookAtLH(EigenToXM3(eye), EigenToXM3(target), EigenToXM3(up));
+        return Math<T>::XMToEigen(result);
+#else
         auto zaxis = (target - eye).normalized();
         auto xaxis = up.cross(zaxis).normalized();
         auto yaxis = zaxis.cross(xaxis);
@@ -23,6 +27,7 @@ namespace orbit
         matrix(3, 3) = 1;
 
         return matrix;
+#endif
     }
 
     template<typename T>
@@ -32,6 +37,10 @@ namespace orbit
         T nearZ,
         T farZ)
     {
+#if defined (ORBIT_DX11) || defined (ORBIT_DX12)
+        auto result = DirectX::XMMatrixPerspectiveFovLH(vFOV, aspectRatio, nearZ, farZ);
+        return Math<T>::XMToEigen(result);
+#else
         Matrix<T, 4, 4> matrix = Matrix<T, 4, 4>::Identity();
         float theta = vFOV * 0.5f;
         float range = farZ - nearZ;
@@ -45,19 +54,25 @@ namespace orbit
         matrix(3, 3) = 0;
 
         return matrix;
+#endif
     }
 
     template<typename T>
-    constexpr Matrix<T, 4, 4> Math<T>::OrthogonalProjection(
-        T vFOV,
-        T aspectRatio,
+    constexpr Matrix<T, 4, 4> Math<T>::OrthographicProjection(
+        T viewWidth,
+        T viewHeight,
         T nearZ,
         T farZ
     )
     {
+#if defined (ORBIT_DX11) || defined (ORBIT_DX12)
+        auto result = DirectX::XMMatrixOrthographicLH(viewWidth, viewHeight, nearZ, farZ);
+        return Math<T>::XMToEigen(result);
+#else
         Matrix<T, 4, 4> matrix = Matrix<T, 4, 4>::Zero();
 
         return matrix;
+#endif
     }
 
 }

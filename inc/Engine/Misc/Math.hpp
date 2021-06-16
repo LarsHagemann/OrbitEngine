@@ -1,12 +1,17 @@
 #pragma once 
+#include "Eigen/Dense"
+
 #include <type_traits>
 
+#include <foundation/PxVec2.h>
 #include <foundation/PxVec3.h>
 #include <foundation/PxVec4.h>
 #include <foundation/PxQuat.h>
 #include <characterkinematic/PxExtended.h>
 
-#include "Eigen/Dense"
+#if defined (ORBIT_DX11) || defined (ORBIT_DX12)
+#include <DirectXMath.h>
+#endif
 
 namespace orbit
 {
@@ -36,9 +41,9 @@ namespace orbit
             T aspectRatio,
             T nearZ,
             T farZ);
-        static constexpr Matrix<T, 4, 4> OrthogonalProjection(
-            T vFOV,
-            T aspectRatio,
+        static constexpr Matrix<T, 4, 4> OrthographicProjection(
+            T viewWidth,
+            T viewHeight,
             T nearZ,
             T farZ
         );
@@ -76,7 +81,6 @@ namespace orbit
         {
             return Quaternionf(AngleAxisf(quat.getAngle(), PxToEigen(quat.getBasisVector0())));
         }
-        template<typename T>
         static PxVec2 EigenToPx2(Vector<T, 2> vec)
         {
             return PxVec2{
@@ -84,7 +88,6 @@ namespace orbit
                 static_cast<float>(vec.y())
             };
         }
-        template<typename T>
         static PxVec3 EigenToPx3(Vector<T, 3> vec)
         {
             return PxVec3{
@@ -93,7 +96,6 @@ namespace orbit
                 static_cast<float>(vec.z())
             };
         }
-        template<typename T>
         static PxVec4 EigenToPx4(Vector<T, 4> vec)
         {
             return PxVec4{
@@ -112,6 +114,36 @@ namespace orbit
                 quat.w()
             };
         }
+
+        static Vector<T, 3> Lerp(const Vector<T, 3>& in0, const Vector<T, 3>& in1, float delta)
+        {
+            return Vector<T, 3>{
+                in0.x() * (1 - delta) + delta * in1.x(),
+                in0.y() * (1 - delta) + delta * in1.y(),
+                in0.z() * (1 - delta) + delta * in1.z()
+            };
+        }
+
+#if defined (ORBIT_DX11) || defined (ORBIT_DX12)
+        static Matrix<T, 4, 4> XMToEigen(DirectX::XMMATRIX matrix)
+        {
+            // Faster way to initialize Eigen matrix from
+            // XMMATRIX?
+            Matrix<T, 4, 4> result;
+            result << 
+                matrix.r[0].m128_f32[0], matrix.r[0].m128_f32[1], matrix.r[0].m128_f32[2],matrix.r[0].m128_f32[3],
+                matrix.r[1].m128_f32[0], matrix.r[1].m128_f32[1], matrix.r[1].m128_f32[2],matrix.r[1].m128_f32[3],
+                matrix.r[2].m128_f32[0], matrix.r[2].m128_f32[1], matrix.r[2].m128_f32[2],matrix.r[2].m128_f32[3],
+                matrix.r[3].m128_f32[0], matrix.r[3].m128_f32[1], matrix.r[3].m128_f32[2],matrix.r[3].m128_f32[3];
+            return result;
+        }
+
+        static DirectX::XMVECTOR EigenToXM3(Vector<T, 3> vector)
+        {
+            DirectX::XMFLOAT3 intermediate = { vector.x(), vector.y(), vector.z() };
+            return DirectX::XMLoadFloat3(&intermediate);
+        }
+#endif
     };
 } // namespace orbit
 

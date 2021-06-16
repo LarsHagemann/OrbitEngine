@@ -8,6 +8,7 @@
 #include <PxScene.h>
 #include <cooking/PxCooking.h>
 
+#include "PhysX.hpp"
 #include "PxOrbitErrorCallback.hpp"
 
 namespace orbit
@@ -38,6 +39,8 @@ namespace orbit
         PxCooking* GetCooking() const { return m_cooking; }
         PxScene* GetPhysXScene() const { return m_scene; }
         PxControllerManager* GetControllerManager() const { return m_controllerManager; }
+
+        void Cleanup();
 
         void UpdatePhysX();
     };
