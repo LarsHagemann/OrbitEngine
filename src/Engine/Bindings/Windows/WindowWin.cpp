@@ -5,6 +5,8 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
 
+#define WM_ORBIT_FULLSCREEN (WM_USER + 0x0001)
+
 namespace orbit
 {
 	LRESULT Window::static_window_callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -204,10 +206,55 @@ namespace orbit
 			// Don't beep when we alt-enter.
 			return MAKELRESULT(0, MNC_CLOSE);
 
-			// Catch this message so to prevent the window from becoming too small.
+			// Catch this message to prevent the window from becoming too small.
 		case WM_GETMINMAXINFO:
 			((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
 			((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
+			return 0;
+		case WM_ORBIT_FULLSCREEN:
+			_resizeNecessary = true;
+			if (_fullscreen)
+			{
+				// Toggle fullscreen on
+				::GetWindowRect(_handle, &_windowRect);
+
+				UINT windowStyle = WS_OVERLAPPEDWINDOW & ~(WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+				::SetWindowLongPtrW(_handle, GWL_STYLE, windowStyle);
+
+				HMONITOR hMonitor = ::MonitorFromWindow(_handle, MONITOR_DEFAULTTONEAREST);
+				MONITORINFOEX monitorInfo = {};
+				monitorInfo.cbSize = sizeof(MONITORINFOEX);
+				::GetMonitorInfo(hMonitor, &monitorInfo);
+
+				::SetWindowPos(
+					_handle,
+					HWND_TOP,
+					monitorInfo.rcMonitor.left,
+					monitorInfo.rcMonitor.top,
+					monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
+					monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
+					SWP_FRAMECHANGED | SWP_NOACTIVATE
+				);
+
+				::ShowWindow(_handle, SW_MAXIMIZE);
+			}
+			else
+			{
+				// recover from fullscreen mode
+				::SetWindowLong(_handle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+
+				::SetWindowPos(
+					_handle,
+					HWND_NOTOPMOST,
+					_windowRect.left,
+					_windowRect.top,
+					_windowRect.right - _windowRect.left,
+					_windowRect.bottom - _windowRect.top,
+					SWP_FRAMECHANGED | SWP_NOACTIVATE
+				);
+
+				::ShowWindow(_handle, SW_NORMAL);
+			}
 			return 0;
 		}
 
@@ -229,8 +276,9 @@ namespace orbit
 		if (_fullscreen == fullscreen) return;
 
 		_fullscreen = fullscreen;
-
-		
+		// Signal the message handler in the main thread
+		// to change into fullscreen
+		SendNotifyMessage(_handle, WM_ORBIT_FULLSCREEN, 0, 0);
 	}
 
 	void Window::HandleEvents()

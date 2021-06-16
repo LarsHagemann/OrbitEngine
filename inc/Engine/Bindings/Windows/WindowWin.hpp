@@ -21,6 +21,8 @@ namespace orbit
 		LRESULT CALLBACK window_callback(UINT, WPARAM, LPARAM);
 		// @internal
 		bool _scheduleClose;
+		// @internal (for recovering from fullscreen)
+		RECT _windowRect;
 	public:
 		// @constructor: creates a new Win32 Window
 		// @param dimensions: dimensions of the window
