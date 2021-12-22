@@ -1,89 +1,43 @@
-cmake_minimum_required(VERSION "3.12.4")
-project(Orbit)
-set(Orbit_VERSION 0.0.1)
+cmake_minimum_required(VERSION 3.20)
+project(OrbitEngine)
 
-include(GenerateExportHeader)
 include(CMakeHelper.txt)
 
-# Change this part so that it works with Linux
-if (NOT (UNIX))
-	file(TO_CMAKE_PATH "$ENV{TMP}" ENV_TMP)
-	get_filename_component(ORBIT_APPDATA "../../Roaming/Treelab/OrbitEngine/"
-						REALPATH BASE_DIR "${ENV_TMP}")
-else()
-	set(ORBIT_APPDATA "/usr/.orbit/")
-	file(MAKE_DIRECTORY ${ORBIT_APPDATA})
-endif()
-
 set_option(BUILD_SAMPLES TRUE BOOL "Uncheck this value if you don't want to build the samples.")
-set_option(WITH_DEAR_IMGUI TRUE BOOL "Uncheck to build without ImGui")
-set_option(ZLIB_DIR "" PATH "Path to your zLib folder (Folder with the .h and .cpp files).")
-set_option(PHYSX_ROOT_PATH "" PATH "Path to your NVidia PhysX build (Root folder with physx and physxshared).")
-set_option(PHYSX_LIBRARY_PATH "" PATH "Path to the PhysX bin folder to use (The folder with the built debug/checked/release/profile folders inside).")
-set_option(EIGEN_ROOT_PATH "" PATH "Leave this empty if Eigen is located in the dep/ folder.")
-set_option(IMGUI_ROOT_PATH "" PATH "Leave this empty if ImGui sources and headers are located in the dep/ folder.")
-set_option(ORBIT_RENDERER "DX12" STRING "Select the renderer you want to use (DX12, DX11 or OpenGL)")
-set_option(TARGET_PLATFORM "win32" STRING "Select the platform you want to develop for (win32)")
-set_property(CACHE ORBIT_RENDERER PROPERTY STRINGS DX12)
-set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS win32)
+set_option(EIGEN_ROOT_PATH "" PATH "Set the path to Eigen.")
+set_option(PHYSX_ROOT_PATH "" PATH "Set the path to Nvidia Physx")
+set_option(PHYSX_LIBRARY_PATH "" PATH "Set the path to the Nvidia Physx libraries that you have build")
+set_option(IMGUI_ROOT_PATH "" PATH "Set the path to ImGui.")
+set_option(ZLIB_ROOT_PATH "" PATH "Set the path to zlib.")
+set_option(ORBIT_OS "Windows" STRING "The OS you want to develop for (Windows or Unix)")
+set_option(ORBIT_RENDERER "" STRING "The backend you want to develop for (DX11, DX12 or OpenGL)")
 
-if ("${PHYSX_ROOT_PATH}" STREQUAL "")
-	message(FATAL_ERROR "Unable to find NVidia Physx built. Please set the PHYSX_ROOT_PATH variable.")
-endif()
-if ("${PHYSX_LIBRARY_PATH}" STREQUAL "")
-	message(FATAL_ERROR "Unable to find NVidia Physx built. Please set the PHYSX_LIBRARY_PATH variable.")
-endif()
-
-if (NOT (EXISTS ${ORBIT_APPDATA}/__general))
-	file(MAKE_DIRECTORY ${ORBIT_APPDATA})
-	file(COPY ${CMAKE_SOURCE_DIR}/projects/__general DESTINATION ${ORBIT_APPDATA})
-	file(COPY ${CMAKE_SOURCE_DIR}/scripts/create_project.bat DESTINATION ${ORBIT_APPDATA})
-endif()
-
-set(ORBIT_RENDER_ENGINE "ORBIT_DX12")
-if ("${ORBIT_RENDERER}" STREQUAL "DX12")
-	set(ORBIT_RENDER_ENGINE "ORBIT_DX12")
-elseif ("${ORBIT_RENDERER}" STREQUAL "OpenGL")
-	set(ORBIT_RENDER_ENGINE "ORBIT_OPENGL")
-elseif ("${ORBIT_RENDERER}" STREQUAL "DX11")
-	set(ORBIT_RENDER_ENGINE "ORBIT_DX11")
-else()
-	message(FATAL_ERROR "Invalid render engine selected. Choose one of DX12, OpenGL, DX11.")
-endif()
-
-if (UNIX AND NOT("${ORBIT_RENDERER}" STREQUAL "OpenGL"))
-	message(FATAL_ERROR "Invalid render engine selected. On Unix systems only OpenGL is allowed.")
-endif()
-
+# Enforce C++ >= 17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if ("${ORBIT_RENDERER}" STREQUAL "OpenGL")
-	set(CMAKE_FIND_DEBUG_MODE True)
-	find_package(GLUT REQUIRED)
-	set(CMAKE_FIND_DEBUG_MODE False)
-
-	include_directories(${GLUT_INCLUDE_DIRS})
+if ("${ORBIT_OS}" STREQUAL "Windows")
+	set(ORBIT_SYSTEM "ORBIT_WINDOWS")
+elseif("${ORBIT_OS}" STREQUAL "Unix")
+	set(ORBIT_SYSTEM "ORBIT_UNIX")
+else()
+	message(WARNING "ORBIT_OS not set correctly (choose Windows or Unix). Compilation will fail.")
 endif()
 
-
-add_subdirectory(src)
-add_subdirectory(converter)
-if (BUILD_SAMPLES)
-	add_subdirectory(samples)
+set(ORBIT_RENDER_ENGINE "ORBIT_DX11")
+if ("${ORBIT_RENDERER}" STREQUAL "DX12")
+	set(ORBIT_RENDER_ENGINE "ORBIT_DIRECTX_12")
+elseif ("${ORBIT_RENDERER}" STREQUAL "OpenGL")
+	set(ORBIT_RENDER_ENGINE "ORBIT_OPENGL")
+elseif ("${ORBIT_RENDERER}" STREQUAL "DX11")
+	set(ORBIT_RENDER_ENGINE "ORBIT_DIRECTX_11")
+else()
+	message(WARNING "ORBIT_RENDERER not set correctly (choose DX11, DX12 or OpenGL). Compilation will fail.")
 endif()
 
-install(TARGETS
-        ${PROJECT_NAME}
-    EXPORT ${PROJECT_NAME}Config
-    LIBRARY DESTINATION src
-	PUBLIC_HEADER DESTINATION ${CMAKE_SOURCE_DIR}/inc
-	INCLUDES DESTINATION ${CMAKE_SOURCE_DIR}/inc
-)
-set_target_properties(${PROJECT_NAME} PROPERTIES ORBIT_RENDER_ENGINE ${ORBIT_RENDER_ENGINE})
-export(TARGETS
-        ${PROJECT_NAME}
-    NAMESPACE Orbit::
-    FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-)
-export (PACKAGE ${PROJECT_NAME})
+add_subdirectory(src/)
+add_subdirectory(converter/src/)
+
+if (${BUILD_SAMPLES})
+	add_subdirectory(samples/)
+endif()
