@@ -1,0 +1,75 @@
+# raw orb file tool
+read {
+	"textures/default.jpg" as TEXTURE("textures/default");
+	"../src/shader/code/default.hlsl" as VERTEX_SHADER_CODE("shader/vertex/default", "vs_5_0", "vs_default") compile;
+	"../src/shader/code/default.hlsl" as PIXEL_SHADER_CODE("shader/pixel/default", "ps_5_0", "ps_default") compile;
+	#"../src/shader/code/default.hlsl" as VERTEX_SHADER_CODE("shader/vertex/default_x12", "vs_5_0", "vs_default") compile;
+	#"../src/shader/code/default.hlsl" as PIXEL_SHADER_CODE("shader/pixel/default_x12", "ps_5_0", "ps_default") compile;
+	#"../src/shader/code/default_vertex.glsl" as VERTEX_SHADER_CODE("shader/vertex/default_gl", "glsl") compile;
+	#"../src/shader/code/default_pixel.glsl" as PIXEL_SHADER_CODE("shader/pixel/default_gl", "glsl") compile;
+};
+new MATERIAL as "materials/default" {
+	DIFFUSE_COLOR as (1.0, 1.0, 0.0, 1.0);
+	SPECULAR_COLOR as (1.0, 1.0, 0.0, 1.0);
+	ROUGHNESS as 0.8;
+};
+new MATERIAL as "materials/default_debug" {
+	DIFFUSE_COLOR as (0.0, 0.0, 0.0, 0.0);
+	SPECULAR_COLOR as (0.5, 0.5, 0.5, 1.0);
+	ROUGHNESS as 0.8;
+	DIFFUSE_TEXTURE as "textures/default";
+};
+new INPUT_LAYOUT as "input_layouts/default" {
+	{ "POSITION", FLOAT3, VERTEX_DATA  , 0, 0 },
+	{ "NORMAL"  , FLOAT3, VERTEX_DATA  , 0, 0 },
+	{ "TANGENT" , FLOAT3, VERTEX_DATA  , 0, 0 },
+	{ "TEXCOORD", FLOAT2, VERTEX_DATA  , 0, 0 },
+	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 0, 1 },
+	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 1, 1 },
+	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 2, 1 },
+	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 3, 1 }
+};
+new RASTERIZER_STATE as "rasterizer_states/default" {
+	FILLMODE as SOLID;
+	CULLMODE as BACK;
+};
+new RASTERIZER_STATE as "rasterizer_states/default_wireframe" {
+	FILLMODE as WIREFRAME;
+	CULLMODE as NONE;
+};
+new PIPELINE_STATE as "pipeline_states/default" {
+	VERTEX_SHADER as "shader/vertex/default";
+	PIXEL_SHADER as "shader/pixel/default";
+	INPUT_LAYOUT as "input_layouts/default";
+	RASTERIZER_STATE as "rasterizer_states/default";
+};
+new BLEND_STATE as "blend_states/default" {
+#	BLEND_ENABLE as FALSE;
+};
+new BLEND_STATE as "blend_states/alpha_blend" {
+#	BLEND_ENABLE as TRUE;
+#	SRC_BLEND as BLEND_ONE;
+# 	DEST_BLEND as BLEND_INV_SRC_ALPHA;
+# 	SRC_BLEND_ALPHA as BLEND_ONE;
+# 	DEST_BLEND_ALPHA as BLEND_INV_SRC_ALPHA;
+# 	BLEND_OP as BLEND_OP_ADD;
+# 	BLEND_OP_ALPHA as BLEND_OP_ADD;
+};
+new PIPELINE_STATE as "pipeline_states/default_debug" {
+	VERTEX_SHADER as "shader/vertex/default";
+	PIXEL_SHADER as "shader/pixel/default";
+	INPUT_LAYOUT as "input_layouts/default";
+	RASTERIZER_STATE as "rasterizer_states/default_wireframe";
+};
+#new SAMPLER_STATE as "sampler/min_mag_mip_linear_clamp" {
+#	FILTER as FILTER_MIN_MAG_MIP_LINEAR;
+#	ADDRESS_X1 as TEXTURE_CLAMP;
+#	ADDRESS_X2 as TEXTURE_CLAMP;
+#	ADDRESS_X3 as TEXTURE_CLAMP;
+#};
+#new SAMPLER_STATE as "sampler/min_mag_mip_linear_anisotropic" {
+#	FILTER as FILTER_MIN_MAG_MIP_ANISOTROPIC;
+#	ADDRESS_X1 as TEXTURE_CLAMP;
+#	ADDRESS_X2 as TEXTURE_CLAMP;
+#	ADDRESS_X3 as TEXTURE_CLAMP;
+#};

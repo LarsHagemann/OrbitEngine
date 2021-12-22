@@ -1,35 +1,43 @@
-cmake_minimum_required(VERSION "3.12.4")
-project(Orbit)
+cmake_minimum_required(VERSION 3.20)
+project(OrbitEngine)
 
 include(CMakeHelper.txt)
 
-file(TO_CMAKE_PATH "$ENV{TMP}" ENV_TMP)
-get_filename_component(ORBIT_APPDATA "../../Roaming/Treelab/OrbitEngine/"
-                       REALPATH BASE_DIR "${ENV_TMP}")
-
 set_option(BUILD_SAMPLES TRUE BOOL "Uncheck this value if you don't want to build the samples.")
-set_option(WITH_DEAR_IMGUI TRUE BOOL "Uncheck to build without ImGui")
-set_option(PHYSX_ROOT_PATH "" PATH "Path to your NVidia PhysX build (Root folder with physx and physxshared).")
-set_option(PHYSX_LIBRARY_PATH "" PATH "Path to the PhysX bin folder to use (The folder with the built debug/checked/release/profile folders inside).")
-set_option(EIGEN_ROOT_PATH "" PATH "Leave this empty if Eigen is located in the dep/ folder.")
-set_option(IMGUI_ROOT_PATH "" PATH "Leave this empty if ImGui sources and headers are located in the dep/ folder.")
+set_option(EIGEN_ROOT_PATH "" PATH "Set the path to Eigen.")
+set_option(PHYSX_ROOT_PATH "" PATH "Set the path to Nvidia Physx")
+set_option(PHYSX_LIBRARY_PATH "" PATH "Set the path to the Nvidia Physx libraries that you have build")
+set_option(IMGUI_ROOT_PATH "" PATH "Set the path to ImGui.")
+set_option(ZLIB_ROOT_PATH "" PATH "Set the path to zlib.")
+set_option(ORBIT_OS "Windows" STRING "The OS you want to develop for (Windows or Unix)")
+set_option(ORBIT_RENDERER "" STRING "The backend you want to develop for (DX11, DX12 or OpenGL)")
 
-if ("${PHYSX_ROOT_PATH}" STREQUAL "")
-	message(FATAL_ERROR "Unable to find NVidia Physx built. Please set the PHYSX_ROOT_PATH variable.")
-endif()
-if ("${PHYSX_LIBRARY_PATH}" STREQUAL "")
-	message(FATAL_ERROR "Unable to find NVidia Physx built. Please set the PHYSX_LIBRARY_PATH variable.")
-endif()
-
-file(MAKE_DIRECTORY ${ORBIT_APPDATA}/__general/)
-file(COPY ${CMAKE_SOURCE_DIR}/shader DESTINATION ${ORBIT_APPDATA}/__general/)
-# copy shaders into the appdata path
-
-
+# Enforce C++ >= 17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_subdirectory(src)
-if (BUILD_SAMPLES)
-	add_subdirectory(samples)
+if ("${ORBIT_OS}" STREQUAL "Windows")
+	set(ORBIT_SYSTEM "ORBIT_WINDOWS")
+elseif("${ORBIT_OS}" STREQUAL "Unix")
+	set(ORBIT_SYSTEM "ORBIT_UNIX")
+else()
+	message(WARNING "ORBIT_OS not set correctly (choose Windows or Unix). Compilation will fail.")
+endif()
+
+set(ORBIT_RENDER_ENGINE "ORBIT_DX11")
+if ("${ORBIT_RENDERER}" STREQUAL "DX12")
+	set(ORBIT_RENDER_ENGINE "ORBIT_DIRECTX_12")
+elseif ("${ORBIT_RENDERER}" STREQUAL "OpenGL")
+	set(ORBIT_RENDER_ENGINE "ORBIT_OPENGL")
+elseif ("${ORBIT_RENDERER}" STREQUAL "DX11")
+	set(ORBIT_RENDER_ENGINE "ORBIT_DIRECTX_11")
+else()
+	message(WARNING "ORBIT_RENDERER not set correctly (choose DX11, DX12 or OpenGL). Compilation will fail.")
+endif()
+
+add_subdirectory(src/)
+add_subdirectory(converter/src/)
+
+if (${BUILD_SAMPLES})
+	add_subdirectory(samples/)
 endif()
