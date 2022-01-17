@@ -4,13 +4,15 @@
 namespace orbit
 {
 
+    class ParticleSystem;
+
     class Particle
     {
     private:
-        // @member: position/rotation/scaling of this particle
-        Transform m_transform;
+        const ParticleSystem& m_system;
+        Matrix4f* m_transform;
     public:
-        
+        Particle(const ParticleSystem& system, Matrix4f* transform);
     };
 
 }

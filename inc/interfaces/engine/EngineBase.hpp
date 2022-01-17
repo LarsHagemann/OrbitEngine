@@ -7,9 +7,8 @@
 
 #include "interfaces/rendering/Renderer.hpp"
 
-#include <vector>
-#include <unordered_map>
 #include <string>
+#include <random>
 
 namespace orbit
 {
@@ -20,6 +19,7 @@ namespace orbit
         Clock m_frameClock;
         Time m_lastFrametime;
         bool m_vsyncEnabled = false;
+        std::mt19937 m_randomEngine;
     protected:
         uint32_t m_numThreads = 0;
         std::shared_ptr<IRenderer> m_renderer;
@@ -36,6 +36,11 @@ namespace orbit
         bool IsVsynced() const { return m_vsyncEnabled; }
 
         std::shared_ptr<IRenderer> Renderer() const { return m_renderer; }
+        template<class Type, class Distribution>
+        Type NextRandomValue(const Distribution& dist)
+        {
+            return dist(m_randomEngine);
+        }
     };
 
 }
