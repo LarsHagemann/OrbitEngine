@@ -99,7 +99,7 @@ new PIPELINE_STATE as "pipeline_states/solid_color" {
 	VERTEX_SHADER as "shader/vertex/solid_color";
 	PIXEL_SHADER as "shader/pixel/solid_color";
 	INPUT_LAYOUT as "input_layouts/solid_color";
-	RASTERIZER_STATE as "rasterizer_states/default";
+	RASTERIZER_STATE as "rasterizer_states/no_culling";
 	BLEND_STATE as "blend_states/default";
 	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 4);
 	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 5);

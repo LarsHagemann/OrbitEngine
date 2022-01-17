@@ -233,11 +233,11 @@ namespace orbit
             buffer.UpdateBuffer();
 
             Submesh sMesh;
-            sMesh.pipelineStateId = ENGINE->RMGetIdFromName("pipeline_states/solid_color_line");
+            sMesh.pipelineStateId = ENGINE->RMGetIdFromName("pipeline_states/solid_color_lines");
             sMesh.indexCount = 0;
             sMesh.startIndex = 0;
             sMesh.startVertex = 0;
-            sMesh.vertexCount = rb.getNbTriangles() * 2;
+            sMesh.vertexCount = rb.getNbLines() * 2;
             sMesh.materialId = 0;
 
             Mesh<ColorVertex> mesh;
