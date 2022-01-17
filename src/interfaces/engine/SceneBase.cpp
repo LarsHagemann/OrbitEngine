@@ -99,6 +99,16 @@ namespace orbit
         return it->second;
     }
 
+    GObjectPtr ISceneBase::RemoveObject(const std::string& identifier)
+    {
+        auto it = m_objectsMap.find(identifier);
+        if (it == m_objectsMap.end())
+            return nullptr;
+        
+        m_objectsMap.erase(it);
+        return it->second;
+    }
+
     void ISceneBase::RemoveLight(Light* light)
     {
         auto index = (*m_sceneBuffer->GetPointerToObject<3>()) - light;

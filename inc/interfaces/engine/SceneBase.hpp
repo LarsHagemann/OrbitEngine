@@ -47,6 +47,9 @@ namespace orbit
         // @method: Tries to find an object by its identifier.
         // @return: nullptr if the object could not be found
         GObjectPtr FindObject(const std::string& identifier);
+        // @method: Removes an object from the scene
+        // @return: The removed Game Object
+        GObjectPtr RemoveObject(const std::string& identifier);
         // @method: Sets the scene's camera
         void SetCamera(CameraPtr camera) { m_camera = camera; }
         // @return: Returns the scene's camera
