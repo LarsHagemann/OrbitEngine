@@ -6,7 +6,6 @@
 
 float2 correctTextureY(float2 texcoords)
 {
-	return texcoords;
 	return float2(texcoords.x, 1.f - texcoords.y);
 }
 
@@ -27,13 +26,18 @@ float4 transformNormal(float4 inNormal, float3x3 normalTransform)
 	return float4(normalize(mul(inNormal.xyz, normalTransform)), 0.f);
 }
 
-float4 getVertexNormal(float2 uv, float4 inNormal, float4 inTangent)
+bool isMaterialFlagSet(int flag)
 {
 #ifdef ORBIT_DIRECTX_11
-	if (isMaterialFlagSet(material.flags, FLAG_HAS_NORMAL_MAP))
+	return isMaterialFlagSetImpl(material.flags, flag);
 #else
-	if (isMaterialFlagSet(PerMeshBuffer.material.flags, FLAG_HAS_NORMAL_MAP))
+	return isMaterialFlagSetImpl(PerMeshBuffer.material.flags, flag);
 #endif
+}
+
+float4 getVertexNormal(float2 uv, float4 inNormal, float4 inTangent)
+{
+	if (isMaterialFlagSet(FLAG_HAS_NORMAL_MAP))
 	{
 		float4 T = normalize(inTangent - dot(inTangent, inNormal) * inNormal);
 		float4 N = inNormal;
@@ -47,23 +51,17 @@ float4 getVertexNormal(float2 uv, float4 inNormal, float4 inTangent)
 
 float4 getVertexOcclusion(float2 uv)
 {
-#ifdef ORBIT_DIRECTX_11
-	if (isMaterialFlagSet(material.flags, FLAG_HAS_OCCLUSION_MAP))
-#else
-	if (isMaterialFlagSet(PerMeshBuffer.material.flags, FLAG_HAS_OCCLUSION_MAP))
-#endif
+	if (isMaterialFlagSet(FLAG_HAS_OCCLUSION_MAP))
 		return occlusionMap.Sample(MinMagMipLinearWrap, uv);
+	
 	return float4(1.f, 1.f, 1.f, 1.f);
 }
 
 float4 getVertexColor(float2 uv)
 {
-#ifdef ORBIT_DIRECTX_11
-	if (isMaterialFlagSet(material.flags, FLAG_HAS_COLOR_MAP))
-#else
-	if (isMaterialFlagSet(PerMeshBuffer.material.flags, FLAG_HAS_COLOR_MAP))
-#endif
-		return colorMap.Sample(MinMagMipLinearWrap, uv);
+	if (isMaterialFlagSet(FLAG_HAS_COLOR_MAP))
+		return colorMap.Sample(MinMagMipAnisotropicClamp, uv);
+
 #ifdef ORBIT_DIRECTX_11
 	return material.diffuseAlbedo;
 #else
@@ -73,14 +71,15 @@ float4 getVertexColor(float2 uv)
 
 float4 getVertexRoughness(float2 uv)
 {
+	if (isMaterialFlagSet(FLAG_HAS_ROUGHNESS_MAP))
+		return roughnessMap.Sample(MinMagMipLinearWrap, uv);
+
 #ifdef ORBIT_DIRECTX_11
 	float r = material.roughness;
-	if (isMaterialFlagSet(material.flags, FLAG_HAS_ROUGHNESS_MAP))
 #else
 	float r = PerMeshBuffer.material.roughness;
-	if (isMaterialFlagSet(PerMeshBuffer.material.flags, FLAG_HAS_ROUGHNESS_MAP))
 #endif
-		return roughnessMap.Sample(MinMagMipLinearWrap, uv);
+	
 	return float4(r,r,r,r);
 }
 

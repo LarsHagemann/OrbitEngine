@@ -65,9 +65,9 @@ namespace orbit
                 std::for_each(begin, end, [&](GObjectPtr object) {
                     if (object->IsLoaded() && object->IsActive())
                     {
+                        object->Draw();
                         object->Update(dt);
                         object->PhysicsUpdate(dt.asMilliseconds());
-                        object->Draw();
                     }
                 });
             //}, begin, end));

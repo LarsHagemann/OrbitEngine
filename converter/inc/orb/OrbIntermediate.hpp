@@ -16,6 +16,8 @@
 #include "implementation/rendering/Light.hpp"
 #include "implementation/rendering/Submesh.hpp"
 #include "implementation/rendering/MaterialFlags.hpp"
+#include "implementation/misc/BlendInfo.hpp"
+#include "implementation/misc/SamplerInfo.hpp"
 
 namespace orbtool
 {
@@ -30,9 +32,14 @@ namespace orbtool
     using CullMode = orbit::CullMode;
     using FillMode = orbit::FillMode;
     using Light = orbit::Light;
-    using LightType = orbit::LightType;    
+    using LightType = orbit::LightType;
     using SubMesh = orbit::Submesh;
     using MaterialFlag = orbit::MaterialFlag;
+    using EBlendOp = orbit::EBlendOperation;
+    using EBlend = orbit::EBlend;
+    using EChannel = orbit::EChannel;
+    using EFilter = orbit::ESamplerFilter;
+    using EAddress = orbit::ETextureAddress;
 
     struct OrbMaterial
     {
@@ -111,14 +118,15 @@ namespace orbtool
 
     struct OrbPipelineState
     {
-        std::string vShaderId;
-        std::string pShaderId;
-        std::string hShaderId;
-        std::string dShaderId;
-        std::string gShaderId;
-        std::string iLayoutId;
-        std::string rsStateId;
-        std::string bsStateId;
+        std::string vShaderId; // vertex shader id
+        std::string pShaderId; // pixel shader id
+        std::string hShaderId; // hull shader id
+        std::string dShaderId; // domain shader id
+        std::string gShaderId; // geometry shader id
+        std::string iLayoutId; // input layout id
+        std::string rsStateId; // rasterizer state id
+        std::string bsStateId; // blend state id
+        std::unordered_map<uint32_t, std::string> sStateIds; // sampler states
     };
 
     struct OrbRasterizerState
@@ -129,7 +137,25 @@ namespace orbtool
 
     struct OrbBlendState
     {
+        float blendFactor[4] = { 0.f,0.f,0.f,0.f };
 
+        bool blendEnabled;
+        bool alphaToCoverageEnabled;
+        EBlendOp blendOperation;
+        EBlendOp alphaBlendOperation;
+        EBlend srcBlend;
+        EBlend srcAlphaBlend;
+        EBlend destBlend;
+        EBlend destAlphaBlend;
+        int8_t channelMask;
+    };
+
+    struct OrbSamplerState
+    {
+        EFilter filter;
+        EAddress addressX1;
+        EAddress addressX2;
+        EAddress addressX3;
     };
 
     struct OrbObject
@@ -144,7 +170,8 @@ namespace orbtool
             OrbPipelineState, 
             OrbShaderBinary, 
             OrbRasterizerState,
-            OrbBlendState> value;
+            OrbBlendState,
+            OrbSamplerState> value;
     };
 
     class OrbIntermediate

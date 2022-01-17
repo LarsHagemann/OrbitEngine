@@ -34,4 +34,11 @@ namespace orbit
         m_isLoaded = false;
     }
 
+    ResourceId UnLoadable::ReadReferenceId(std::ifstream* stream)
+    {
+        int64_t reference = 0u;
+        stream->read((char*)&reference, sizeof(ResourceId));
+        return GetId() + reference;
+    }
+
 }

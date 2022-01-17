@@ -244,4 +244,16 @@ namespace orbtool
         return token;
     }
 
+    bool Reader::ExpectBoolean()
+    {
+        auto value = Expect(TokenType::TOKEN_LITERAL).lexeme;
+        if (value == "TRUE")
+            return true;
+        else if (value == "FALSE")
+            return false;
+        
+        Error("Expected boolean ('TRUE' or 'FALSE'), got '%s'.", value.c_str());
+        return false;
+    }
+
 }

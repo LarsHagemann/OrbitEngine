@@ -30,6 +30,7 @@ namespace orbtool
         case ResourceType::SPLINE: return "Spline";
         case ResourceType::RASTERIZER_STATE: return "Rasterizer State";
         case ResourceType::BLEND_STATE: return "Blend State";
+        case ResourceType::SAMPLER_STATE: return "Sampler State";
 
         case ResourceType::CUSTOM: return "Custom";
         default: return "Unknown"; 
@@ -224,6 +225,18 @@ namespace orbtool
             printf_s("  - %*s: %lld\n", alloc, "Input Layout", il_offset);
             printf_s("  - %*s: %lld\n", alloc, "Rasterizer State", rs_offset);
             printf_s("  - %*s: %lld\n", alloc, "Blend State", bs_offset);
+            uint8_t numSampler = 0;
+            file.read((char*)&numSampler, 1);
+            for (auto i = 0u; i < numSampler; ++i)
+            {
+                uint32_t slot = 0;
+                int64_t  sOffset = 0;
+
+                file.read((char*)&slot, sizeof(uint32_t));
+                file.read((char*)&sOffset, sizeof(int64_t));
+
+                printf_s("  - %*s: %lld at slot %d\n", alloc, "Sampler", sOffset, slot);
+            }
             break;
         }
         case ResourceType::SHADER_CODE:
@@ -308,7 +321,75 @@ namespace orbtool
             break;
         }
         case ResourceType::BLEND_STATE: {
-
+            bool 
+                alphaToCoverage,
+                blendEnabled;
+            file.read((char*)&alphaToCoverage, 1);
+            file.read((char*)&blendEnabled, 1);
+            printf_s("  - %*s: %s\n", alloc, "AlphaToCoverage", alphaToCoverage ? "true" : "false");
+            printf_s("  - %*s: %s\n", alloc, "Blend Enabled", blendEnabled ? "true" : "false");
+            if (blendEnabled)
+            {
+                /*
+                output.write((const char*)&state.alphaToCoverageEnabled, 1);
+                output.write((const char*)&state.blendEnabled, 1);
+                if (state.blendEnabled)
+                {
+                    output.write((const char*)state.blendFactor, 4 * sizeof(float));
+                    output.write((const char*)&state.channelMask, 1);
+                */
+                float factor[4];
+                EBlendOp
+                    blendOp,
+                    alphaBlendOp;
+                EBlend
+                    src,
+                    srcAlpha,
+                    dest,
+                    destAlpha;
+                uint8_t channels;
+                file.read((char*)factor, 4 * sizeof(float));
+                file.read((char*)&channels, 1);
+                file.read((char*)&blendOp, 1);
+                file.read((char*)&alphaBlendOp, 1);
+                file.read((char*)&src, 1);
+                file.read((char*)&srcAlpha, 1);
+                file.read((char*)&dest, 1);
+                file.read((char*)&destAlpha, 1);
+                printf_s("  - %*s: %f, %f, %f, %f\n", alloc, "BlendFactor", factor[0],factor[1],factor[2],factor[3]);
+                printf_s("  - %*s: %s\n", alloc, "BlendOp", orbit::EBlendOperationToString(blendOp));
+                printf_s("  - %*s: %s\n", alloc, "AlphaBlendOp", orbit::EBlendOperationToString(alphaBlendOp));
+                printf_s("  - %*s: %s\n", alloc, "SourceBlend", orbit::EBlendToString(src));
+                printf_s("  - %*s: %s\n", alloc, "SourceAlphaBlend", orbit::EBlendToString(srcAlpha));
+                printf_s("  - %*s: %s\n", alloc, "DestBlend", orbit::EBlendToString(dest));
+                printf_s("  - %*s: %s\n", alloc, "DestAlphaBlend", orbit::EBlendToString(destAlpha));
+                printf_s("  - %*s: ", alloc, "Channels");
+                if ((channels & 1) == 1)
+                    printf_s("RED, ");
+                if ((channels & 2) == 2)
+                    printf_s("GREEN, ");
+                if ((channels & 4) == 4)
+                    printf_s("BLUE, ");
+                if ((channels & 8) == 8)
+                    printf_s("ALPHA");
+                printf_s("\n");
+            }
+            break;
+        }
+        case ResourceType::SAMPLER_STATE: {
+            EFilter filter;
+            EAddress 
+                addressx1,
+                addressx2,
+                addressx3;
+            file.read((char*)&filter, 1);
+            file.read((char*)&addressx1, 1);
+            file.read((char*)&addressx2, 1);
+            file.read((char*)&addressx3, 1);
+            printf_s("  - %*s: %s\n", alloc, "Filter", orbit::ESamplerFilterToString(filter));
+            printf_s("  - %*s: %s\n", alloc, "Address X0", orbit::ETextureAddressToString(addressx1));
+            printf_s("  - %*s: %s\n", alloc, "Address X1", orbit::ETextureAddressToString(addressx2));
+            printf_s("  - %*s: %s\n", alloc, "Address X2", orbit::ETextureAddressToString(addressx3));
             break;
         }
         case ResourceType::RASTERIZER_STATE: {
@@ -316,8 +397,6 @@ namespace orbtool
             FillMode fillmode;
             file.read((char*)&cullmode, sizeof(CullMode));
             file.read((char*)&fillmode, sizeof(FillMode));
-            printf_s("%d\n", cullmode);
-            printf_s("%d\n", fillmode);
             printf_s("  - %*s: %s\n", alloc, "Cull Mode", orbit::CullModeToString(cullmode));
             printf_s("  - %*s: %s\n", alloc, "Fill Mode", orbit::FillModeToString(fillmode));
             break;
@@ -459,6 +538,14 @@ namespace orbtool
                 output.write((const char*)&ilId, sizeof(int64_t));
                 output.write((const char*)&rsId, sizeof(int64_t));
                 output.write((const char*)&bsId, sizeof(int64_t));
+                uint8_t size = static_cast<uint8_t>(state.sStateIds.size());
+                output.write((const char*)&size, 1);
+                for (const auto&[slot, sampler] : state.sStateIds)
+                {
+                    auto samplerId = orb.GetOffsetFromName(sampler, i);
+                    output.write((const char*)&slot, sizeof(uint32_t));
+                    output.write((const char*)&samplerId, sizeof(int64_t));
+                }
             }
                 break;
             case ResourceType::SHADER_BINARY: {
@@ -556,22 +643,10 @@ namespace orbtool
                 }
             }
                 break;
-            case ResourceType::SPLINE: {
-
-            }
-                break;
-            case ResourceType::CUSTOM: {
-
-            }
-                break;
             case ResourceType::RASTERIZER_STATE: {
                 const auto& rState = orb.GetObject<OrbRasterizerState>(i);
-                output.read((char*)&rState.cull_mode, sizeof(CullMode));
-                output.read((char*)&rState.fill_mode, sizeof(FillMode));
-                break;
-            }
-            case ResourceType::BLEND_STATE: {
-
+                output.write((char*)&rState.cull_mode, sizeof(CullMode));
+                output.write((char*)&rState.fill_mode, sizeof(FillMode));
                 break;
             }
             case ResourceType::TEXTURE: {
@@ -597,6 +672,31 @@ namespace orbtool
                 output.write(path.data(), pathLen);
             }
                 break;
+            case ResourceType::BLEND_STATE: {
+                const auto& state = orb.GetObject<OrbBlendState>(i);
+                output.write((const char*)&state.alphaToCoverageEnabled, 1);
+                output.write((const char*)&state.blendEnabled, 1);
+                if (state.blendEnabled)
+                {
+                    output.write((const char*)state.blendFactor, 4 * sizeof(float));
+                    output.write((const char*)&state.channelMask, 1);
+                    output.write((const char*)&state.blendOperation, 1);
+                    output.write((const char*)&state.alphaBlendOperation, 1);
+                    output.write((const char*)&state.srcBlend, 1);
+                    output.write((const char*)&state.srcAlphaBlend, 1);
+                    output.write((const char*)&state.destBlend, 1);
+                    output.write((const char*)&state.destAlphaBlend, 1);
+                }
+                break;
+            }
+            case ResourceType::SAMPLER_STATE: {
+                const auto& state = orb.GetObject<OrbSamplerState>(i);
+                output.write((const char*)&state.filter, 1);
+                output.write((const char*)&state.addressX1, 1);
+                output.write((const char*)&state.addressX2, 1);
+                output.write((const char*)&state.addressX3, 1);
+                break;
+            }
             default:
                 ORBIT_THROW("Cannot serialize object type %s", ResourceTypeToString(type));
                 break;

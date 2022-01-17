@@ -61,6 +61,7 @@ namespace orbtool
         static const char* TokenTypeToString(TokenType type);
         Token Expect(TokenType type);
         Token ExpectLiteral(const std::string& literal);
+        bool ExpectBoolean();
         bool MatchLiteral(const std::string& literal);
         bool Match(TokenType type);
         Token CurrentToken() const { return m_cToken; }

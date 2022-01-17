@@ -1,8 +1,11 @@
 #pragma once
-#include "implementation/Common.hpp"
+#include <memory>
+#include <Eigen/Dense>
 
 namespace orbit
 {
+
+	using namespace Eigen;
 
     // @brief: the type of light.
 	enum class LightType

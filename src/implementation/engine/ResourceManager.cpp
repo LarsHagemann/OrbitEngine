@@ -132,6 +132,19 @@ namespace orbit
 
     void ResourceManager::RMDrawDebug() const
     {
+        static uint32_t numFrames = 0;
+        static uint32_t fps = 0;
+        static Clock c;
+
+        numFrames++;
+
+        if (c.GetElapsedTime().asSeconds() > 1.f)
+        {
+            fps = numFrames;
+            numFrames = 0;
+            c.Restart();
+        }
+
         ImGuiIO& io = ImGui::GetIO();
 		ImGuiWindowFlags window_flags = 
             ImGuiWindowFlags_AlwaysAutoResize |
@@ -147,6 +160,7 @@ namespace orbit
         );
 		ImGui::SetNextWindowBgAlpha(0.35f);
 		ImGui::Begin("Resources", nullptr, window_flags);
+        ImGui::Text("FPS: %d", fps);
         for (const auto& resource : m_resourceNames)
         {
             if (ImGui::TreeNode(resource.first.c_str()))

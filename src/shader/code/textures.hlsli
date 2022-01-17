@@ -8,7 +8,6 @@
 // 	- Roughness
 // 	- Ambient Occlusion
 
-// In the future texture t0 will be the depth texture
 Texture2D depthTexture : register(t0);
 Texture2D colorMap : register(t1);
 Texture2D normalMap : register(t2);

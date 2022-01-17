@@ -17,6 +17,7 @@ namespace orbit
     protected:
         virtual bool LoadImpl(std::ifstream* stream) = 0;
         virtual void UnloadImpl() = 0;
+        ResourceId ReadReferenceId(std::ifstream* stream);
     public:
         // @method: Loads a resource (from file, from memory, ...)
         virtual bool Load();

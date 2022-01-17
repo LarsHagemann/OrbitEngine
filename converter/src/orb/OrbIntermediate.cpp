@@ -23,6 +23,7 @@ namespace orbtool
 		case 6: return ResourceType::SHADER_BINARY;
 		case 7: return ResourceType::RASTERIZER_STATE;
 		case 8: return ResourceType::BLEND_STATE;
+		case 9: return ResourceType::SAMPLER_STATE;
 		}
 
 		return (ResourceType)std::numeric_limits<uint32_t>::max();

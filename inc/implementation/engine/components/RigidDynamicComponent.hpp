@@ -37,6 +37,8 @@ namespace orbit
 
         void CookBody(MaterialProperties material_p, Vector3f meshScale, size_t vertexPositionOffset);
         unsigned AddActor(std::shared_ptr<Transform> transform);
+
+        PxRigidDynamic* GetRigidDynamic(unsigned id) const { return m_bodies.at(id).get(); }
     };
 
 }

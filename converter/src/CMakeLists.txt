@@ -123,7 +123,7 @@ else()
 	message(WARNING "EIGEN_ROOT_PATH not set. Compilation will fail")
 endif()
 
-target_compile_definitions(orbtool PUBLIC ORBIT_RENDER_ENGINE="${ORBIT_RENDER_ENGINE}")
+target_compile_definitions(orbtool PUBLIC ORBIT_RENDER_ENGINE="${ORBIT_RENDER_ENGINE}" ORBTOOL_CONV)
 
 if ("${ORBIT_RENDER_ENGINE}" STREQUAL "ORBIT_DIRECTX_11" OR "${ORBIT_RENDER_ENGINE}" STREQUAL "ORBIT_DIRECTX_12")
 	target_link_libraries(orbtool PRIVATE "d3dcompiler.lib")

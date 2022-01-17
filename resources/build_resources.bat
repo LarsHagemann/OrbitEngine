@@ -1,0 +1,1 @@
+orbtool -w --e DefaultResources.rorb -o DefaultResources.orb

@@ -1,1 +1,2 @@
 add_subdirectory(simpleSample/)
+add_subdirectory(spaceShooterSample/)

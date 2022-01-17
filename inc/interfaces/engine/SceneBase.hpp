@@ -34,8 +34,8 @@ namespace orbit
         uint32_t                                                                   m_numLights = 0u;
         uint32_t                                                                   m_numDisabledLights = 0u;
     public:
-        bool Load();
-        void Unload();
+        virtual bool Load();
+        virtual void Unload();
         // @method: Called whenever this scene is entered
         virtual void OnEnter() = 0;
         // @method: Called whenever this scene is left

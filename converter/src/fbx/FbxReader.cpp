@@ -348,11 +348,11 @@ namespace orbtool
 		for (auto i = 0u; i < mx; ++i)
 		{
 			auto uv = bakedUVs[itd ? indices[i] : i];
-			if (geometry->tangents.mit == MappingInformationType::MAPPING_BY_VERTEX)
+			if (geometry->uvs.mit == MappingInformationType::MAPPING_BY_VERTEX)
 				ApplyUV(i, uv);
-			else if (geometry->tangents.mit == MappingInformationType::MAPPING_BY_POLYGON_VERTEX)
+			else if (geometry->uvs.mit == MappingInformationType::MAPPING_BY_POLYGON_VERTEX)
 				ApplyUV(mesh->indices[i], uv);
-			else if (geometry->tangents.mit == MappingInformationType::MAPPING_BY_POLYGON)
+			else if (geometry->uvs.mit == MappingInformationType::MAPPING_BY_POLYGON)
 			{
 				ApplyUV(mesh->indices[i + 0ll], uv);
 				ApplyUV(mesh->indices[i + 1ll], uv);

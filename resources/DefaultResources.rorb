@@ -37,39 +37,44 @@ new RASTERIZER_STATE as "rasterizer_states/default_wireframe" {
 	FILLMODE as WIREFRAME;
 	CULLMODE as NONE;
 };
+new BLEND_STATE as "blend_states/default" {
+	BLEND_ENABLE as FALSE;
+};
+new BLEND_STATE as "blend_states/alpha_blend" {
+	BLEND_ENABLE as TRUE;
+
+	SRC_BLEND as ONE;
+ 	DEST_BLEND as INV_SRC_ALPHA;
+ 	SRC_BLEND_ALPHA as ONE;
+ 	DEST_BLEND_ALPHA as INV_SRC_ALPHA;
+ 	BLEND_OP as ADD;
+ 	ALPHA_BLEND_OP as ADD;
+};
+new SAMPLER_STATE as "sampler/min_mag_mip_linear_clamp" {
+	FILTER as MIN_MAG_MIP_LINEAR;
+	ADDRESS_X1 as CLAMP;
+	ADDRESS_X2 as CLAMP;
+	ADDRESS_X3 as CLAMP;
+};
+new SAMPLER_STATE as "sampler/min_mag_mip_linear_anisotropic" {
+	FILTER as ANISOTROPIC;
+	ADDRESS_X1 as CLAMP;
+	ADDRESS_X2 as CLAMP;
+	ADDRESS_X3 as CLAMP;
+};
 new PIPELINE_STATE as "pipeline_states/default" {
 	VERTEX_SHADER as "shader/vertex/default";
 	PIXEL_SHADER as "shader/pixel/default";
 	INPUT_LAYOUT as "input_layouts/default";
 	RASTERIZER_STATE as "rasterizer_states/default";
-};
-new BLEND_STATE as "blend_states/default" {
-#	BLEND_ENABLE as FALSE;
-};
-new BLEND_STATE as "blend_states/alpha_blend" {
-#	BLEND_ENABLE as TRUE;
-#	SRC_BLEND as BLEND_ONE;
-# 	DEST_BLEND as BLEND_INV_SRC_ALPHA;
-# 	SRC_BLEND_ALPHA as BLEND_ONE;
-# 	DEST_BLEND_ALPHA as BLEND_INV_SRC_ALPHA;
-# 	BLEND_OP as BLEND_OP_ADD;
-# 	BLEND_OP_ALPHA as BLEND_OP_ADD;
+	BLEND_STATE as "blend_states/default";
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 4);
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 5);
 };
 new PIPELINE_STATE as "pipeline_states/default_debug" {
 	VERTEX_SHADER as "shader/vertex/default";
 	PIXEL_SHADER as "shader/pixel/default";
 	INPUT_LAYOUT as "input_layouts/default";
-	RASTERIZER_STATE as "rasterizer_states/default_wireframe";
+	RASTERIZER_STATE as "blend_states/default";
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 4);
 };
-#new SAMPLER_STATE as "sampler/min_mag_mip_linear_clamp" {
-#	FILTER as FILTER_MIN_MAG_MIP_LINEAR;
-#	ADDRESS_X1 as TEXTURE_CLAMP;
-#	ADDRESS_X2 as TEXTURE_CLAMP;
-#	ADDRESS_X3 as TEXTURE_CLAMP;
-#};
-#new SAMPLER_STATE as "sampler/min_mag_mip_linear_anisotropic" {
-#	FILTER as FILTER_MIN_MAG_MIP_ANISOTROPIC;
-#	ADDRESS_X1 as TEXTURE_CLAMP;
-#	ADDRESS_X2 as TEXTURE_CLAMP;
-#	ADDRESS_X3 as TEXTURE_CLAMP;
-#};

@@ -1,5 +1,6 @@
 #include "implementation/engine/PhysxEngine.hpp"
 #include "implementation/misc/Logger.hpp"
+#include "implementation/Debug.hpp"
 
 #include <extensions/PxDefaultAllocator.h>
 #include <extensions/PxDefaultCpuDispatcher.h>

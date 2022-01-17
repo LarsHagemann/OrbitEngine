@@ -14,7 +14,7 @@ struct Material
 #define FLAG_HAS_OCCLUSION_MAP (1 << 2)
 #define FLAG_HAS_ROUGHNESS_MAP (1 << 3)
 
-bool isMaterialFlagSet(uint flags, uint flag)
+bool isMaterialFlagSetImpl(uint flags, uint flag)
 {
 	return (flags & flag) == flag;
 }

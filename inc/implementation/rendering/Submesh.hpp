@@ -1,8 +1,10 @@
 #pragma once
-#include "implementation/Common.hpp"
+#include <cstdint>
 
 namespace orbit
 {
+
+    using ResourceId = uint64_t;
 
     struct Submesh
     {

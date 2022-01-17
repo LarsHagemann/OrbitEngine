@@ -20,7 +20,6 @@ namespace orbit
 
     RigidStaticComponent::~RigidStaticComponent()
     {
-        ORBIT_INFO_LEVEL(ORBIT_LEVEL_DEBUG, "Releasing RigidStaticComponent");
         std::vector<PxMaterial*> materials;
         materials.resize(m_shape->getNbMaterials());
         m_shape->getMaterials(materials.data(), materials.size());

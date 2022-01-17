@@ -28,6 +28,8 @@ source_group(
 	implementation/backends/DirectX11/DirectX11_HullShader.cpp
 	implementation/backends/DirectX11/DirectX11_InputLayout.cpp
 	implementation/backends/DirectX11/DirectX11_Texture.cpp
+	implementation/backends/DirectX11/DirectX11_BlendState.cpp
+	implementation/backends/DirectX11/DirectX11_SamplerState.cpp
 )
 
 source_group(
@@ -76,6 +78,7 @@ source_group(
 	implementation/rendering/Mesh.cpp
 	implementation/rendering/Light.cpp
 	implementation/rendering/ThirdPersonCamera.cpp
+	implementation/rendering/ParticleSystem.cpp
 )
 
 source_group(
@@ -86,6 +89,7 @@ source_group(
 	interfaces/rendering/Camera.cpp
 	interfaces/rendering/Shader.cpp
 	interfaces/rendering/Renderer.cpp
+	interfaces/rendering/BlendState.cpp
 )
 
 source_group(
@@ -142,6 +146,8 @@ set(ORBIT_LIB_SOURCE
 	implementation/backends/DirectX11/DirectX11_HullShader.cpp
 	implementation/backends/DirectX11/DirectX11_InputLayout.cpp
 	implementation/backends/DirectX11/DirectX11_Texture.cpp
+	implementation/backends/DirectX11/DirectX11_BlendState.cpp
+	implementation/backends/DirectX11/DirectX11_SamplerState.cpp
     
     implementation/backends/Windows/Windows_Window.cpp
 
@@ -170,12 +176,14 @@ set(ORBIT_LIB_SOURCE
 	implementation/rendering/Mesh.cpp
 	implementation/rendering/Light.cpp
 	implementation/rendering/ThirdPersonCamera.cpp
-
+	implementation/rendering/ParticleSystem.cpp
+	
 	interfaces/rendering/Material.cpp
 	interfaces/rendering/PipelineState.cpp
 	interfaces/rendering/Camera.cpp
 	interfaces/rendering/Shader.cpp
 	interfaces/rendering/Renderer.cpp
+	interfaces/rendering/BlendState.cpp
 
 	interfaces/engine/SceneBase.cpp
 	interfaces/engine/EngineBase.cpp

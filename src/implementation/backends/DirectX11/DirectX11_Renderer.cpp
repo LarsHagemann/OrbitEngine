@@ -10,9 +10,16 @@ namespace orbit
 
     void DirectX11Renderer::Draw(const Submesh& submesh, uint32_t instanceCount) const
     {
-        // bind material...
-        ENGINE->RMLoadResource<PipelineState>(submesh.pipelineStateId)->Bind();
-        ENGINE->RMLoadResource<MaterialBase>(submesh.materialId)->Bind(1);
+        if (submesh.pipelineStateId != m_currentPipelineState)
+        {
+            m_currentPipelineState = submesh.pipelineStateId;
+            ENGINE->RMLoadResource<PipelineState>(submesh.pipelineStateId)->Bind();
+        }
+        if (submesh.materialId != m_currentMaterial)
+        {
+            m_currentMaterial = submesh.materialId;
+            ENGINE->RMLoadResource<MaterialBase>(submesh.materialId)->Bind(1);
+        }
 
         if (submesh.indexCount > 0)
             ENGINE->Context()->DrawIndexedInstanced(submesh.indexCount, instanceCount, submesh.startIndex, submesh.startVertex, 0);

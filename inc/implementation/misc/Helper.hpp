@@ -1,10 +1,13 @@
 #pragma once
 #include <random>
 #include <string>
-#include "implementation/Common.hpp"
+#include <type_traits>
+//#include "implementation/Common.hpp"
 
 namespace orbit
 {
+
+    using Index = size_t;
 
     template<typename Source, typename Destination>
     using copy_const_t = std::conditional_t<

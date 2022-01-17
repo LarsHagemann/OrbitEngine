@@ -5,14 +5,10 @@
 #include <memory>
 #include <Eigen/Dense>
 
+#ifndef ORBTOOL_CONV
 #include <foundation/PxVec3.h>
 #include <characterkinematic/PxExtended.h>
 #include <foundation/PxQuat.h>
-
-#if defined _MSC_VER
-
-#define ORBIT_DEBUG_BREAK __debugbreak()
-
 #endif
 
 #if defined _DEBUG
@@ -107,8 +103,13 @@ namespace orbit
 #endif
   
     using namespace Eigen;
-    using namespace physx;
     namespace fs = std::filesystem;
+
+#ifndef ORBTOOL_CONV
+
+    using namespace physx;
+
+#endif
 
     // Objects in Orbit are identified by their unique-ID. 
     using ResourceId = uint64_t;
@@ -200,6 +201,8 @@ namespace orbit
             return m;
         }
 
+#ifndef ORBTOOL_CONV
+
         static constexpr PxVec3 EigenToPx3(const Vector3<T>& in)
         {
             return PxVec3(
@@ -246,6 +249,7 @@ namespace orbit
                 static_cast<float>(in.w())
             );
         }
+#endif
 
     };
 

@@ -12,7 +12,6 @@ namespace orbit
     public:
         HRESULT CreateShader(const char* binary, size_t binarySize) override;
         void Bind() const override;
-        void UnloadImpl() override {}
         DirectX11GeometryShader() :
             DirectX11Shader("gs_5_0")
         {}

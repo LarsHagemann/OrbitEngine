@@ -20,15 +20,11 @@ namespace orbit
         stream->read((char*)m_buffer->GetPointerToObject<1>(), sizeof(Vector4f));
         stream->read((char*)m_buffer->GetPointerToObject<2>(), sizeof(float));
         stream->read((char*)m_buffer->GetPointerToObject<3>(), sizeof(MaterialFlags));
-        stream->read((char*)&m_albedoTexture, sizeof(ResourceId));
-        stream->read((char*)&m_normalTexture, sizeof(ResourceId));
-        stream->read((char*)&m_roughnessTexture, sizeof(ResourceId));
-        stream->read((char*)&m_occlusionTexture, sizeof(ResourceId));
         
-        m_albedoTexture    += GetId();
-        m_normalTexture    += GetId();
-        m_roughnessTexture += GetId();
-        m_occlusionTexture += GetId();
+        m_albedoTexture = ReadReferenceId(stream);
+        m_normalTexture = ReadReferenceId(stream);
+        m_roughnessTexture = ReadReferenceId(stream);
+        m_occlusionTexture = ReadReferenceId(stream);
 
         *m_buffer->GetPointerToObject<3>() = 
             (m_albedoTexture != GetId() ? static_cast<uint32_t>(MaterialFlag::FLAG_HAS_ALBEDO_TEXTURE) : 0) |

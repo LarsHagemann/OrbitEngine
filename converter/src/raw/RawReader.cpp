@@ -168,6 +168,8 @@ namespace orbtool
             m_orb->AppendObject(name, Read_Material());
         else if (resourceType == "BLEND_STATE")
             m_orb->AppendObject(name, Read_BlendState());
+        else if (resourceType == "SAMPLER_STATE")
+            m_orb->AppendObject(name, Read_SamplerState());
         else
         {
             Error("Expected Resource identifier got '%s'", resourceType.c_str());
@@ -278,9 +280,21 @@ namespace orbtool
                 }
                 else if (objectType == "BLEND_STATE")
                 {
-                    //m_orb->AppendObject(name, Read_BlendState());
+                    m_orb->AppendObject(name, Read_BlendState());
                     state.bsStateId = name;
                 }
+                else if (objectType == "SAMPLER_STATE")
+                {
+                    auto sState = Read_SamplerState();
+                    ExpectLiteral("with");
+                    ExpectLiteral("SLOT_INDEX");
+                    auto slotIndex = std::stoi(Expect(TokenType::TOKEN_NUMBER).lexeme);
+
+                    state.sStateIds.emplace(slotIndex, name);
+                    m_orb->AppendObject(name, sState);
+                }
+                else
+                    Error("Invalid object type '%s'", name.c_str());
             }
             else
             {
@@ -300,6 +314,15 @@ namespace orbtool
                     state.rsStateId = Expect(TokenType::TOKEN_STRING).lexeme;
                 else if (objectType == "BLEND_STATE")
                     state.bsStateId = Expect(TokenType::TOKEN_STRING).lexeme;
+                else if (objectType == "SAMPLER_STATE")
+                {
+                    Expect(TokenType::TOKEN_LPAREN);
+                    auto stateId = Expect(TokenType::TOKEN_STRING).lexeme;
+                    Expect(TokenType::TOKEN_COMMA);
+                    auto samplerStateIndex = std::stoi(Expect(TokenType::TOKEN_NUMBER).lexeme);
+                    Expect(TokenType::TOKEN_RPAREN);
+                    state.sStateIds.emplace(samplerStateIndex, stateId);
+                }
                 else
                     Error("Unknown pipeline state type '%s'", objectType.c_str());
             }
@@ -311,10 +334,168 @@ namespace orbtool
     OrbBlendState RawReader::Read_BlendState()
     {
         OrbBlendState state;
+        state.channelMask = static_cast<int8_t>(EChannel::CHANNEL_ALL);
+
+        auto read_blend_operation = [&]() -> EBlendOp {
+            auto op = Expect(TokenType::TOKEN_LITERAL).lexeme;
+            if (op == "ADD")
+                return EBlendOp::BLEND_ADD;
+            else if (op == "SUBTRACT")
+                return EBlendOp::BLEND_SUBTRACT;
+            else if (op == "REV_SUBTRACT")
+                return EBlendOp::BLEND_RSUBTRACT;
+            else if (op == "MIN")
+                return EBlendOp::BLEND_MIN;
+            else if (op == "MAX")
+                return EBlendOp::BLEND_MAX;
+            else
+            {
+                Error("Unknown blend operation: '%s'.", op.c_str());
+                return EBlendOp::BLEND_ADD;
+            }
+        };
+        auto read_blend = [&]() -> EBlend {
+            auto b = Expect(TokenType::TOKEN_LITERAL).lexeme;
+            if (b == "ZERO")
+                return EBlend::BLEND_ZERO;
+            else if (b == "ONE")
+                return EBlend::BLEND_ONE;
+            else if (b == "SRC_ALPHA")
+                return EBlend::BLEND_SRC_ALPHA;
+            else if (b == "INV_SRC_ALPHA")
+                return EBlend::BLEND_INV_SRC_ALPHA;
+            else if (b == "SRC_COLOR")
+                return EBlend::BLEND_SRC_COLOR;
+            else if (b == "INV_SRC_COLOR")
+                return EBlend::BLEND_INV_SRC_COLOR;
+            else if (b == "DEST_ALPHA")
+                return EBlend::BLEND_DEST_ALPHA;
+            else if (b == "INV_DEST_ALPHA")
+                return EBlend::BLEND_INV_DEST_ALPHA;
+            else if (b == "DEST_COLOR")
+                return EBlend::BLEND_DEST_COLOR;
+            else if (b == "INV_DEST_COLOR")
+                return EBlend::BLEND_INV_DEST_COLOR;
+            else if (b == "SRC_ALPHA_SAT")
+                return EBlend::BLEND_SRC_ALPHA_SAT;
+            else if (b == "BLEND_FACTOR")
+                return EBlend::BLEND_BLEND_FACTOR;
+            else if (b == "INV_BLEND_FACTOR")
+                return EBlend::BLEND_INV_BLEND_FACTOR;
+            else 
+            {
+                Error("Expected blend source, got '%s'.", b.c_str());
+                return EBlend::BLEND_SRC_ALPHA;
+            }            
+        };
+
         while(!Match(TokenType::TOKEN_RCURLY))
         {
+            auto identifier = Expect(TokenType::TOKEN_LITERAL).lexeme;
+            ExpectLiteral("as");
 
+            if (identifier == "BLEND_ENABLE")
+                state.blendEnabled = ExpectBoolean();
+            else if (identifier == "ALPHA_TO_COVERAGE")
+                state.alphaToCoverageEnabled = ExpectBoolean();
+            else if (identifier == "BLEND_OP")
+                state.blendOperation = read_blend_operation();
+            else if (identifier == "ALPHA_BLEND_OP")
+                state.alphaBlendOperation = read_blend_operation();
+            else if (identifier == "SRC_BLEND")
+                state.srcBlend = read_blend();
+            else if (identifier == "SRC_BLEND_ALPHA")
+                state.srcAlphaBlend = read_blend();
+            else if (identifier == "DEST_BLEND")
+                state.destBlend = read_blend();
+            else if (identifier == "DEST_BLEND_ALPHA")
+                state.destAlphaBlend = read_blend();
+            else if (identifier == "CHANNEL_MASK")
+            {
+                int8_t mask = 0;
+                do {
+                    auto m = Expect(TokenType::TOKEN_LITERAL).lexeme;
+                    if (m == "ALL")
+                        mask |= static_cast<int8_t>(EChannel::CHANNEL_ALL);
+                    else if (m == "RED")
+                        mask |= static_cast<int8_t>(EChannel::CHANNEL_RED);
+                    else if (m == "GREEN")
+                        mask |= static_cast<int8_t>(EChannel::CHANNEL_GREEN);
+                    else if (m == "BLUE")
+                        mask |= static_cast<int8_t>(EChannel::CHANNEL_BLUE);
+                    else if (m == "ALPHA")
+                        mask |= static_cast<int8_t>(EChannel::CHANNEL_ALPHA);
+                    else
+                        Error("Invalid channel name: '%s'.", m.c_str());
+                } while(MatchLiteral("or"));
+                state.channelMask = mask;
+            }
+            else
+            {
+                Error("Unknown blend state property: '%s'.", identifier.c_str());
+            }
+            Expect(TokenType::TOKEN_SEMICOLON);
         }
+        return state;
+    }
+
+    OrbSamplerState RawReader::Read_SamplerState()
+    {
+        OrbSamplerState state;
+        auto read_filter = [&]() -> EFilter {
+            auto filter = Expect(TokenType::TOKEN_LITERAL).lexeme;
+            if (filter == "MIN_MAG_MIP_POINT")
+                return EFilter::MIN_MAG_MIP_POINT;
+            else if (filter == "MIN_MAG_POINT_MIP_LINEAR")
+                return EFilter::MIN_MAG_POINT_MIP_LINEAR;
+            else if (filter == "MIN_POINT_MAG_LINEAR_MIP_POINT")
+                return EFilter::MIN_POINT_MAG_LINEAR_MIP_POINT;
+            else if (filter == "MIN_POINT_MAG_MIP_LINEAR")
+                return EFilter::MIN_POINT_MAG_MIP_LINEAR;
+            else if (filter == "MIN_LINEAR_MAG_MIP_POINT")
+                return EFilter::MIN_LINEAR_MAG_MIP_POINT;
+            else if (filter == "MIN_LINEAR_MAG_POINT_MIP_LINEAR")
+                return EFilter::MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+            else if (filter == "MIN_MAG_LINEAR_MIP_POINT")
+                return EFilter::MIN_MAG_LINEAR_MIP_POINT;
+            else if (filter == "MIN_MAG_MIP_LINEAR")
+                return EFilter::MIN_MAG_MIP_LINEAR;
+            else if (filter == "ANISOTROPIC")
+                return EFilter::ANISOTROPIC;
+
+            Error("Invalid filter: %s\n", filter.c_str());
+            return EFilter::MIN_MAG_MIP_POINT;
+        };
+        auto read_address = [&]() -> EAddress {
+            auto address = Expect(TokenType::TOKEN_LITERAL).lexeme;
+            if (address == "WRAP")
+                return EAddress::WRAP;
+            else if (address == "CLAMP")
+                return EAddress::CLAMP;
+            else if (address == "BORDER")
+                return EAddress::BORDER;
+            else if (address == "MIRROR")
+                return EAddress::MIRROR;
+            
+            Error("Invalid address mode: %s\n", address.c_str());
+            return EAddress::WRAP;
+        };
+        while(!Match(TokenType::TOKEN_RCURLY))
+        {
+            auto property = Expect(TokenType::TOKEN_LITERAL).lexeme;
+            ExpectLiteral("as");
+            if (property == "FILTER")
+                state.filter = read_filter();
+            else if (property == "ADDRESS_X1")
+                state.addressX1 = read_address();
+            else if (property == "ADDRESS_X2")
+                state.addressX2 = read_address();
+            else if (property == "ADDRESS_X3")
+                state.addressX3 = read_address();                        
+
+            Expect(TokenType::TOKEN_SEMICOLON);
+        }
+
         return state;
     }
 
@@ -345,8 +526,6 @@ namespace orbtool
                 material.specular = read_color();
             else if (identifier == "ROUGHNESS")
                 material.roughness = strtod(Expect(TokenType::TOKEN_NUMBER).lexeme.c_str(), nullptr);
-            //else if (identifier == "SPECULAR_EXPONENT")
-            //    material.specularExponent = strtod(Expect(TokenType::TOKEN_NUMBER).lexeme.c_str(), nullptr);
             else if (identifier == "DIFFUSE_TEXTURE")
                 material.diffuseTextureId = Expect(TokenType::TOKEN_STRING).lexeme;
             else if (identifier == "NORMAL_MAP")
@@ -355,6 +534,8 @@ namespace orbtool
                 material.roughnessMapId = Expect(TokenType::TOKEN_STRING).lexeme;
             else if (identifier == "OCCLUSION_MAP")
                 material.occlusionMapId = Expect(TokenType::TOKEN_STRING).lexeme;
+            else 
+                Error("Unknown material property '%s'", identifier.c_str());
 
             Expect(TokenType::TOKEN_SEMICOLON);
         }

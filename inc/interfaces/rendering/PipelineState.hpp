@@ -18,6 +18,7 @@ namespace orbit
         ResourceId m_blendStateId;
         ResourceId m_rasterizerStateId;
         ResourceId m_rootSignatureId;
+        std::unordered_map<uint32_t, ResourceId> m_samplerStateIds; 
     public:
         virtual void Bind() const override;
         bool LoadImpl(std::ifstream* stream) override;

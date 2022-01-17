@@ -7,6 +7,9 @@ namespace orbit
 
     class DirectX11Renderer : public IRenderer
     {
+    private:
+        mutable ResourceId m_currentPipelineState;
+        mutable ResourceId m_currentMaterial;
     protected:
         void BindTextureImpl(ResourceId id, uint32_t slot) const override;
         void BindMaterialImpl(ResourceId id) const override;

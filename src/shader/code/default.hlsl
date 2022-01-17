@@ -3,6 +3,8 @@
 #include "io.hlsli"
 #include "textures.hlsli"
 
+#define ALPHA_THRESHOLD 0.05f
+
 [RootSignature(OrbitDefaultRS)]
 vsout0 vs_default(vsin0_inst input)
 {
@@ -33,8 +35,13 @@ float4 ps_default(psin0 input) : SV_TARGET
 #else
 	float4 view = -float4(normalize((PerFrameBuffer.scene.camera - input.c_world).xyz), 0.f);
 #endif
+
 	float4 vertexColor = getVertexColor(input.texcoords);
+
 	float sW = vertexColor.w;
+	if (sW < ALPHA_THRESHOLD)
+		discard;
+
 	float4 normal = getVertexNormal(input.texcoords, input.normal, input.tangent);
 	float4 roughness = getVertexRoughness(input.texcoords);
 	color *= accumulateLight(

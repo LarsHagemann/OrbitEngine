@@ -17,6 +17,7 @@ namespace orbit
         TEXTURE_REFERENCE    = 8,
         RASTERIZER_STATE     = 9,
         BLEND_STATE          = 10,
+        SAMPLER_STATE        = 11,
 
         CUSTOM               = 1 << 7,
 

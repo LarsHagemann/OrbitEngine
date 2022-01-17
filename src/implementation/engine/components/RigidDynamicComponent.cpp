@@ -38,8 +38,11 @@ namespace orbit
     {
         for (auto& [id, body] : m_bodies)
         {
-            m_transforms[id]->SetTranslation(orbit::Math<float>::PxToEigen(body->getGlobalPose().p));
-            m_transforms[id]->SetRotation(orbit::Math<float>::PxToEigen(body->getGlobalPose().q));
+            if (!body->isSleeping())
+            {
+                m_transforms[id]->SetTranslation(orbit::Math<float>::PxToEigen(body->getGlobalPose().p));
+                m_transforms[id]->SetRotation(orbit::Math<float>::PxToEigen(body->getGlobalPose().q));
+            }
         }
     }
 

@@ -21,6 +21,7 @@ namespace orbtool
         void Read_ShaderCode(const fs::path& path, ShaderType shader_type);
         void Read_Shader(const fs::path& path, ShaderType shader_type);
         OrbBlendState Read_BlendState();
+        OrbSamplerState Read_SamplerState();
         OrbInputLayout Read_InputLayout();
         OrbPipelineState Read_PipelineState();
         OrbRasterizerState Read_RasterizerState();

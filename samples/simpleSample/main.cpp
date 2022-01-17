@@ -53,7 +53,7 @@ public:
 		m_kCom = AddComponent<orbit::KeyboardComponent>("keyboard");
 		m_mCom = AddComponent<orbit::MouseComponent>("mouse");
 		auto s = AddComponent<orbit::StateComponent<>>("state", m_kCom, m_mCom);
-		m_batch  = AddComponent<orbit::StaticBatchComponent>("batch" , ENGINE->RMGetIdFromName("Player"));
+		m_batch  = AddComponent<orbit::StaticBatchComponent>("batch" , ENGINE->RMGetIdFromName("TexturedPlayer"));
 		auto bc2 = AddComponent<orbit::StaticBatchComponent>("batch2", ENGINE->RMGetIdFromName("Sphere"));
 		auto bc3 = AddComponent<orbit::StaticBatchComponent>("batch3", ENGINE->RMGetIdFromName("Plane"));
 		auto body0 = AddComponent<orbit::RigidStaticComponent>("body0", ENGINE->RMGetIdFromName("Sphere"));
@@ -114,8 +114,8 @@ public:
 			ENGINE->Window()->Close();
 
 		auto speed = m_speed;
-		if (m_kCom->keydown(orbit::KeyCode::KEY_LSHIFT))
-			speed *= 0.25f;
+		//if (m_kCom->keydown(orbit::KeyCode::KEY_LSHIFT))
+		//	speed *= 0.25f;
 
 		Eigen::Vector3f move = Eigen::Vector3f::Zero();
 
@@ -127,12 +127,18 @@ public:
 			move.x() = 1.f;
 		if (m_kCom->keydown(orbit::KeyCode::KEY_D))
 			move.x() = -1.f;
+		if (m_kCom->keydown(orbit::KeyCode::KEY_LSHIFT))
+			move.z() = -1.f;
+		if (m_kCom->keydown(orbit::KeyCode::KEY_SPACE))
+			move.z() = 1.f;
 
 		move = m_player->TransformVector(move);
 		move.normalize();
 		
 		m_controller->move(orbit::Math<float>::EigenToPx3(move * speed), 0.1f, dt.asSeconds(), physx::PxControllerFilters{});
 		m_player->SetTranslation(orbit::Math<float>::PxToEigen(m_controller->getFootPosition()));
+
+		//ORBIT_LOG("x: %f", m_player->GetCombinedTranslation().x());
 
 		if (m_mCom->buttonDown(orbit::MouseComponent::MouseButton::Left) && m_mCom->mouseMoved())
 		{
@@ -171,6 +177,7 @@ int main()
 		ENGINE->Init(window, desc);
 		//ENGINE->EnableVSync(true);
 		ENGINE->RMParseFile("torus.orb");
+		ENGINE->RMParseFile("player.orb");
 		auto scene = std::make_shared<MyScene>();
 		ENGINE->RegisterScene("my_scene", scene);
 		ENGINE->EnterScene("my_scene");
