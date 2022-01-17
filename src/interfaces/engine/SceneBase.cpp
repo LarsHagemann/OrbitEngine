@@ -79,6 +79,7 @@ namespace orbit
 
     bool ISceneBase::AddObject(const std::string& identifier, GObjectPtr object)
     {
+        object->SetIdentifier(identifier);
         auto it = m_objectsMap.find(identifier);
         if (it != m_objectsMap.end())
             return false;
