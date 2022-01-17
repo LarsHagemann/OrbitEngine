@@ -41,7 +41,7 @@ void SpaceShip::Init()
     desc.maxJumpHeight = 1.5f;
     desc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING;
     desc.slopeLimit = .01f;
-    desc.position = { 0.f, -1.3f, 0.f };
+    desc.position = { 0.f, 0.f, 0.f };
     desc.reportCallback = &m_hitCallback;
 
     m_controller = std::unique_ptr<physx::PxController, orbit::PxDelete<physx::PxController>>(ENGINE->GetControllerManager()->createController(desc));
@@ -90,7 +90,7 @@ void SpaceShip::Update(const orbit::Time& dt)
 
     m_controller->setUpDirection(orbit::Math<float>::EigenToPx3(m_player->LocalUp()));
 	m_controller->move(orbit::Math<float>::EigenToPx3(move * speed), 0.1f, dt.asSeconds(), physx::PxControllerFilters{});
-	m_player->SetTranslation(orbit::Math<float>::PxToEigen(m_controller->getFootPosition()));
+	m_player->SetTranslation(orbit::Math<float>::PxToEigen(m_controller->getPosition()));
 
     auto pos = m_player->GetCombinedTranslation();
     Eigen::Vector3f leftJetPos  = pos + m_player->TransformVector({ 0.29f, -3.07f, 0.35f });

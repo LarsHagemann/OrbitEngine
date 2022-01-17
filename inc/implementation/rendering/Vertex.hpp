@@ -14,4 +14,10 @@ namespace orbit
 		Vector2f uv;
     };
 
+    struct ColorVertex
+    {
+        Vector3f position;
+        Vector4f color;
+    };
+
 }

@@ -323,6 +323,22 @@ namespace orbtool
                     Expect(TokenType::TOKEN_RPAREN);
                     state.sStateIds.emplace(samplerStateIndex, stateId);
                 }
+                else if (objectType == "PRIMITIVE_TYPE")
+                {
+                    auto type = Expect(TokenType::TOKEN_LITERAL).lexeme;
+                    if (type == "TRIANGLES")
+                        state.primitiveType = EPrimitiveType::TRIANGLES;
+                    else if (type == "TRIANGLE_STRIP")
+                        state.primitiveType = EPrimitiveType::TRIANGLE_STRIP;
+                    else if (type == "TRIANGLE_FAN")
+                        state.primitiveType = EPrimitiveType::TRIANGLE_FAN;
+                    else if (type == "LINES")
+                        state.primitiveType = EPrimitiveType::LINES;
+                    else if (type == "POINTS")
+                        state.primitiveType = EPrimitiveType::POINTS;
+                    else 
+                        Error("Invalid primitive type: %s", type.c_str());
+                }
                 else
                     Error("Unknown pipeline state type '%s'", objectType.c_str());
             }

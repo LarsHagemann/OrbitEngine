@@ -173,7 +173,6 @@ set(ORBIT_LIB_SOURCE
 	implementation/misc/pch.cpp
 	implementation/misc/WICTextureLoader.cpp
 
-	implementation/rendering/Mesh.cpp
 	implementation/rendering/Light.cpp
 	implementation/rendering/ThirdPersonCamera.cpp
 	implementation/rendering/ParticleSystem.cpp

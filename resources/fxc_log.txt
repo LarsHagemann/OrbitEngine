@@ -1,11 +1,4 @@
 Microsoft (R) Direct3D Shader Compiler 10.1
 Copyright (C) 2013 Microsoft. All rights reserved.
 
-C:\Users\Lars\source\repos\OrbitEngine2\OrbitEngine\src\shader\code\helper.hlsli(55,54): warning X4000: use of potentially uninitialized variable (getVertexOcclusion)
-C:\Users\Lars\source\repos\OrbitEngine2\OrbitEngine\src\shader\code\helper.hlsli(63,56): warning X4000: use of potentially uninitialized variable (getVertexColor)
-C:\Users\Lars\source\repos\OrbitEngine2\OrbitEngine\src\shader\code\helper.hlsli(48,2): warning X4000: use of potentially uninitialized variable (getVertexNormal)
-C:\Users\Lars\source\repos\OrbitEngine2\OrbitEngine\src\shader\code\helper.hlsli(75,54): warning X4000: use of potentially uninitialized variable (getVertexRoughness)
-C:\Users\Lars\source\repos\OrbitEngine2\OrbitEngine\src\shader\code\helper.hlsli(130,2): warning X4000: use of potentially uninitialized variable (lightDistance)
-C:\Users\Lars\source\repos\OrbitEngine2\OrbitEngine\src\shader\code\helper.hlsli(140,2): warning X4000: use of potentially uninitialized variable (calculateAttenuation)
-
 compilation object save succeeded; see C:\Users\Lars\source\repos\OrbitEngine2\OrbitEngine\src\shader\code\default.fxc-tmp

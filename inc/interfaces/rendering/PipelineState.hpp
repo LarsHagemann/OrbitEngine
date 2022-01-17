@@ -21,7 +21,7 @@ namespace orbit
         std::unordered_map<uint32_t, ResourceId> m_samplerStateIds; 
     public:
         virtual void Bind() const override;
-        bool LoadImpl(std::ifstream* stream) override;
+        virtual bool LoadImpl(std::ifstream* stream) override;
         void UnloadImpl() override;
     };
 

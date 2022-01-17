@@ -6,7 +6,7 @@ namespace orbit
     BatchComponent::BatchComponent(GameObject* object, ResourceId meshId) :
         Renderable(object)
     {
-        m_mesh = std::make_shared<Mesh>();
+        m_mesh = std::make_shared<Mesh<Vertex>>();
         m_mesh->SetId(meshId);
         m_mesh->Load();
     }

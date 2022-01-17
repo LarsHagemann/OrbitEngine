@@ -1,7 +1,6 @@
 #pragma once
 #include "implementation/misc/Transform.hpp"
 
-
 namespace orbit
 {
 

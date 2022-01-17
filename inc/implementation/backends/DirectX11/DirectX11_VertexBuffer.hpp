@@ -1,14 +1,15 @@
 #pragma once
 #ifdef ORBIT_DIRECTX_11
 #include "implementation/Common.hpp"
+#include "implementation/misc/Logger.hpp"
 
 #include "interfaces/rendering/VertexBuffer.hpp"
 
 namespace orbit
 {
 
-    template<typename Vertex>
-    class DirectX11VertexBuffer : public IVertexBufferBase<ComPtr<ID3D11Buffer>, Vertex>
+    template<typename VertexType>
+    class DirectX11VertexBuffer : public IVertexBufferBase<ComPtr<ID3D11Buffer>, VertexType>
     {
     public:
         void UpdateBuffer() override
@@ -18,7 +19,7 @@ namespace orbit
             desc.Usage = D3D11_USAGE_DEFAULT;
             desc.ByteWidth = GetBufferSize();
             desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-            desc.StructureByteStride = sizeof(Vertex);
+            desc.StructureByteStride = sizeof(VertexType);
 
             D3D11_SUBRESOURCE_DATA vertexData;
             ZeroMemory(&vertexData, sizeof(D3D11_SUBRESOURCE_DATA));
