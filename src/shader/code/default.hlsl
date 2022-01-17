@@ -19,7 +19,6 @@ vsout0 vs_default(vsin0_inst input)
 	float3x3 nTransform = calculateNormalTransformation(worldMatrix);
 	output.c_world   = mul(pos, worldMatrix);
 	output.c_screen  = mul(pos, transform);
-	//output.normal    = normalize(mul(float4(input.normal, 0), worldMatrix));
 	output.normal    = float4(normalize(mul(input.normal, nTransform)), 0);
 	output.texcoords = correctTextureY(input.texcoords);
 	output.tangent   = mul(float4(input.tangent, 0), worldMatrix);
@@ -54,4 +53,28 @@ float4 ps_default(psin0 input) : SV_TARGET
 	);
 	color.w = sW;
 	return color;
+}
+
+[RootSignature(OrbitDefaultRS)]
+vsout1 vs_solid_color(vsin1_inst input)
+{
+	vsout1 output = (vsout1)0;
+	float4 pos = float4(input.pos, 1.f);
+	matrix worldMatrix = instancedWorldMatrix(input);
+#ifdef ORBIT_DIRECTX_11
+	matrix transform = mul(mul(worldMatrix, viewMatrix), projectionMatrix);
+#else
+	matrix transform = mul(mul(worldMatrix, PerFrameBuffer.viewMatrix), PerFrameBuffer.projectionMatrix);
+#endif
+	float3x3 nTransform = calculateNormalTransformation(worldMatrix);
+	output.c_world   = mul(pos, worldMatrix);
+	output.c_screen  = mul(pos, transform);
+	output.color = input.color;
+	return output;
+}
+
+[RootSignature(OrbitDefaultRS)]
+float4 ps_solid_color(psin1 input) : SV_TARGET
+{		
+	return input.color;
 }

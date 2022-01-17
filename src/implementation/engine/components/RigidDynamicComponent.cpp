@@ -13,7 +13,7 @@ namespace orbit
     RigidDynamicComponent::RigidDynamicComponent(GameObject* boundObject, ResourceId meshId) :
         Physically(boundObject)
     {
-        m_mesh = std::make_shared<Mesh>();
+        m_mesh = std::make_shared<Mesh<Vertex>>();
         m_mesh->SetId(meshId);
         m_mesh->Load();
     }

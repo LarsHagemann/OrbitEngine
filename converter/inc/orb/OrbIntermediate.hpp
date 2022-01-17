@@ -11,13 +11,13 @@
 #include "implementation/misc/ShaderType.hpp"
 #include "implementation/misc/FormatType.hpp"
 #include "implementation/misc/InputLayoutDataType.hpp"
-#include "implementation/misc/FillMode.hpp"
-#include "implementation/misc/CullMode.hpp"
+#include "implementation/misc/RasterizerInfo.hpp"
 #include "implementation/rendering/Light.hpp"
 #include "implementation/rendering/Submesh.hpp"
 #include "implementation/rendering/MaterialFlags.hpp"
 #include "implementation/misc/BlendInfo.hpp"
 #include "implementation/misc/SamplerInfo.hpp"
+#include "implementation/misc/PrimitiveType.hpp"
 
 namespace orbtool
 {
@@ -40,6 +40,7 @@ namespace orbtool
     using EChannel = orbit::EChannel;
     using EFilter = orbit::ESamplerFilter;
     using EAddress = orbit::ETextureAddress;
+    using EPrimitiveType = orbit::EPrimitiveType;
 
     struct OrbMaterial
     {
@@ -127,6 +128,7 @@ namespace orbtool
         std::string rsStateId; // rasterizer state id
         std::string bsStateId; // blend state id
         std::unordered_map<uint32_t, std::string> sStateIds; // sampler states
+        EPrimitiveType primitiveType = EPrimitiveType::TRIANGLES;
     };
 
     struct OrbRasterizerState

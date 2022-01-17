@@ -30,6 +30,7 @@ source_group(
 	implementation/backends/DirectX11/DirectX11_Texture.cpp
 	implementation/backends/DirectX11/DirectX11_BlendState.cpp
 	implementation/backends/DirectX11/DirectX11_SamplerState.cpp
+	implementation/backends/DirectX11/DirectX11_RasterizerState.cpp
 )
 
 source_group(
@@ -148,6 +149,7 @@ set(ORBIT_LIB_SOURCE
 	implementation/backends/DirectX11/DirectX11_Texture.cpp
 	implementation/backends/DirectX11/DirectX11_BlendState.cpp
 	implementation/backends/DirectX11/DirectX11_SamplerState.cpp
+	implementation/backends/DirectX11/DirectX11_RasterizerState.cpp
     
     implementation/backends/Windows/Windows_Window.cpp
 
@@ -173,7 +175,6 @@ set(ORBIT_LIB_SOURCE
 	implementation/misc/pch.cpp
 	implementation/misc/WICTextureLoader.cpp
 
-	implementation/rendering/Mesh.cpp
 	implementation/rendering/Light.cpp
 	implementation/rendering/ThirdPersonCamera.cpp
 	implementation/rendering/ParticleSystem.cpp

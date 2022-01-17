@@ -97,6 +97,20 @@ matrix instancedWorldMatrix(vsin0_inst input)
 	return wM;
 }
 
+// INPUT:
+// 	input: the input data for the instanced buffer
+// OUTPUT:
+// 	the world matrix of the current instance
+matrix instancedWorldMatrix(vsin1_inst input)
+{
+	matrix wM;
+    wM._m00_m10_m20_m30 = input.vRowX.xyzw;
+    wM._m01_m11_m21_m31 = input.vRowY.xyzw;
+    wM._m02_m12_m22_m32 = input.vRowZ.xyzw;
+    wM._m03_m13_m23_m33 = input.vRowW.xyzw;
+	return wM;
+}
+
 // calculates the light's distance vector depending on its type
 // INPUT: 
 // 	inPos: the pixel's world position

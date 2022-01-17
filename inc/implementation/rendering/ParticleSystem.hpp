@@ -18,7 +18,8 @@ namespace orbit
         
     public:
         ParticleSystem(const ParticleSystemDesc& desc);
-        
+        void Start();
+        void Stop();
     };
     
 }

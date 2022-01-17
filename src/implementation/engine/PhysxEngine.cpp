@@ -1,4 +1,7 @@
 #include "implementation/engine/PhysxEngine.hpp"
+#include "implementation/backends/impl/VertexBufferImpl.hpp"
+#include "implementation/rendering/Mesh.hpp"
+#include "implementation/rendering/Vertex.hpp"
 #include "implementation/misc/Logger.hpp"
 #include "implementation/Debug.hpp"
 
@@ -148,6 +151,12 @@ namespace orbit
             PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS | 
             PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES | 
             PxPvdSceneFlag::eTRANSMIT_CONTACTS);
+        
+        m_scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
+        //m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_AABBS, 2.f);
+        //m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 2.f);
+        m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eACTOR_AXES, 4.f);
+        //m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eBODY_LIN_VELOCITY, 2.f);
 #endif
 
         // Initialize controller manager
@@ -184,10 +193,117 @@ namespace orbit
         PX_RELEASE(m_foundation);
     }
 
+    union ColorConversion
+    {
+        uint32_t int32;
+        struct SInt8
+        {
+            uint8_t int8_0;
+            uint8_t int8_1;
+            uint8_t int8_2;
+            uint8_t int8_3;
+        } int8;
+    };
+
     void PhysxEngine::UpdatePhysX()
     {
         m_scene->simulate(1000.f / m_updatesPerSecond);
         m_scene->fetchResults(true);
+#ifdef _DEBUG
+        const PxRenderBuffer& rb = m_scene->getRenderBuffer();
+        if (rb.getNbLines() > 0)
+        {
+            VertexBuffer<ColorVertex> buffer;
+            buffer.ResizeBuffer(rb.getNbLines() * 2);
+            ColorConversion converter;
+            for (auto i = 0u; i < rb.getNbLines(); ++i)
+            {
+                const auto& line = rb.getLines()[i];
+                converter.int32 = line.color0;
+                buffer.SetVertex(i * 2 + 0, ColorVertex{
+                    Math<float>::PxToEigen(line.pos0),
+                    Vector4f{ converter.int8.int8_0 / 255.f, converter.int8.int8_1 / 255.f, converter.int8.int8_2 / 255.f, converter.int8.int8_3 / 255.f }
+                    });
+                converter.int32 = line.color1;
+                buffer.SetVertex(i * 2 + 1, ColorVertex{
+                    Math<float>::PxToEigen(line.pos1),
+                    Vector4f{ converter.int8.int8_0 / 255.f, converter.int8.int8_1 / 255.f, converter.int8.int8_2 / 255.f, converter.int8.int8_3 / 255.f }
+                    });
+            }
+            buffer.UpdateBuffer();
+
+            Submesh sMesh;
+            sMesh.pipelineStateId = ENGINE->RMGetIdFromName("pipeline_states/solid_color_lines");
+            sMesh.indexCount = 0;
+            sMesh.startIndex = 0;
+            sMesh.startVertex = 0;
+            sMesh.vertexCount = rb.getNbLines() * 2;
+            sMesh.materialId = 0;
+
+            Mesh<ColorVertex> mesh;
+            mesh.SetVertexBuffer(buffer);
+            mesh.AddSubmesh(sMesh);
+
+            VertexBuffer<Matrix4f> transformBuffer;
+            transformBuffer.ResizeBuffer(1);
+            transformBuffer.SetVertex(0, Transform().LocalToWorldMatrix());
+
+            transformBuffer.UpdateBuffer();
+            transformBuffer.Bind(1, sizeof(Matrix4f), 0);
+
+            mesh.Bind();
+            mesh.Draw(1);
+        }
+        if (rb.getNbTriangles() > 0)
+        {
+            VertexBuffer<ColorVertex> buffer;
+            buffer.ResizeBuffer(rb.getNbTriangles() * 3);
+            ColorConversion converter;
+            for (auto i = 0u; i < rb.getNbTriangles(); ++i)
+            {
+                const auto& tri = rb.getTriangles()[i];
+                converter.int32 = tri.color0;
+                buffer.SetVertex(i * 3 + 0, ColorVertex{ 
+                    Math<float>::PxToEigen(tri.pos0), 
+                    Vector4f{ converter.int8.int8_0 / 255.f, converter.int8.int8_1 / 255.f, converter.int8.int8_2 / 255.f, converter.int8.int8_3 / 255.f } 
+                });
+                converter.int32 = tri.color1;
+                buffer.SetVertex(i * 3 + 1, ColorVertex{ 
+                    Math<float>::PxToEigen(tri.pos1), 
+                    Vector4f{ converter.int8.int8_0 / 255.f, converter.int8.int8_1 / 255.f, converter.int8.int8_2 / 255.f, converter.int8.int8_3 / 255.f } 
+                });
+                converter.int32 = tri.color2;
+                buffer.SetVertex(i * 3 + 2, ColorVertex{ 
+                    Math<float>::PxToEigen(tri.pos2), 
+                    Vector4f{ converter.int8.int8_0 / 255.f, converter.int8.int8_1 / 255.f, converter.int8.int8_2 / 255.f, converter.int8.int8_3 / 255.f } 
+                });
+            }
+            buffer.UpdateBuffer();
+
+            Submesh sMesh;
+            sMesh.pipelineStateId = ENGINE->RMGetIdFromName("pipeline_states/solid_color");
+            sMesh.indexCount = 0;
+            sMesh.startIndex = 0;
+            sMesh.startVertex = 0;
+            sMesh.vertexCount = rb.getNbTriangles() * 3;
+            sMesh.materialId = 0;
+
+
+            Mesh<ColorVertex> mesh;
+            mesh.SetVertexBuffer(buffer);
+            mesh.AddSubmesh(sMesh);
+
+            VertexBuffer<Matrix4f> transformBuffer;
+            transformBuffer.ResizeBuffer(1);
+            transformBuffer.SetVertex(0, Transform().LocalToWorldMatrix());
+
+            transformBuffer.UpdateBuffer();
+            transformBuffer.Bind(1, sizeof(Matrix4f), 0);
+
+            mesh.Bind();
+            mesh.Draw(1);            
+        }
+#endif
     }
 
 PxOrbitErrorCallback PhysxEngine::gErrorCallback;

@@ -11,6 +11,7 @@ namespace orbit
     private:
         D3D11_PRIMITIVE_TOPOLOGY m_topology;
     public:
+        bool LoadImpl(std::ifstream* stream) override;
         void Bind() const override;
     };
 

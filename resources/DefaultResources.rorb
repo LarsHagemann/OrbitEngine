@@ -1,8 +1,13 @@
 # raw orb file tool
 read {
 	"textures/default.jpg" as TEXTURE("textures/default");
+
 	"../src/shader/code/default.hlsl" as VERTEX_SHADER_CODE("shader/vertex/default", "vs_5_0", "vs_default") compile;
 	"../src/shader/code/default.hlsl" as PIXEL_SHADER_CODE("shader/pixel/default", "ps_5_0", "ps_default") compile;
+	
+	"../src/shader/code/default.hlsl" as VERTEX_SHADER_CODE("shader/vertex/solid_color", "vs_5_0", "vs_solid_color") compile;
+	"../src/shader/code/default.hlsl" as PIXEL_SHADER_CODE("shader/pixel/solid_color", "ps_5_0", "ps_solid_color") compile;
+	
 	#"../src/shader/code/default.hlsl" as VERTEX_SHADER_CODE("shader/vertex/default_x12", "vs_5_0", "vs_default") compile;
 	#"../src/shader/code/default.hlsl" as PIXEL_SHADER_CODE("shader/pixel/default_x12", "ps_5_0", "ps_default") compile;
 	#"../src/shader/code/default_vertex.glsl" as VERTEX_SHADER_CODE("shader/vertex/default_gl", "glsl") compile;
@@ -29,9 +34,21 @@ new INPUT_LAYOUT as "input_layouts/default" {
 	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 2, 1 },
 	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 3, 1 }
 };
+new INPUT_LAYOUT as "input_layouts/solid_color" {
+	{ "POSITION", FLOAT3, VERTEX_DATA  , 0, 0 },
+	{ "COLOR"   , FLOAT4, VERTEX_DATA  , 0, 0 },
+	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 0, 1 },
+	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 1, 1 },
+	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 2, 1 },
+	{ "WORLDROW", FLOAT4, INSTANCE_DATA, 3, 1 }
+};
 new RASTERIZER_STATE as "rasterizer_states/default" {
 	FILLMODE as SOLID;
 	CULLMODE as BACK;
+};
+new RASTERIZER_STATE as "rasterizer_states/no_culling" {
+	FILLMODE as SOLID;
+	CULLMODE as NONE;
 };
 new RASTERIZER_STATE as "rasterizer_states/default_wireframe" {
 	FILLMODE as WIREFRAME;
@@ -77,4 +94,23 @@ new PIPELINE_STATE as "pipeline_states/default_debug" {
 	INPUT_LAYOUT as "input_layouts/default";
 	RASTERIZER_STATE as "blend_states/default";
 	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 4);
+};
+new PIPELINE_STATE as "pipeline_states/solid_color" {
+	VERTEX_SHADER as "shader/vertex/solid_color";
+	PIXEL_SHADER as "shader/pixel/solid_color";
+	INPUT_LAYOUT as "input_layouts/solid_color";
+	RASTERIZER_STATE as "rasterizer_states/no_culling";
+	BLEND_STATE as "blend_states/default";
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 4);
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 5);
+};
+new PIPELINE_STATE as "pipeline_states/solid_color_lines" {
+	VERTEX_SHADER as "shader/vertex/solid_color";
+	PIXEL_SHADER as "shader/pixel/solid_color";
+	INPUT_LAYOUT as "input_layouts/solid_color";
+	RASTERIZER_STATE as "rasterizer_states/no_culling";
+	BLEND_STATE as "blend_states/default";
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 4);
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 5);
+	PRIMITIVE_TYPE as LINES;
 };

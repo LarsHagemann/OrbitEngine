@@ -11,3 +11,4 @@
 #include "implementation/backends/impl/VertexShaderImpl.hpp"
 #include "implementation/backends/impl/WindowImpl.hpp"
 #include "implementation/backends/impl/SamplerStateImpl.hpp"
+#include "implementation/backends/impl/RasterizerStateImpl.hpp"

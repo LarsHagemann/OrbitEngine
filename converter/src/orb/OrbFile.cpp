@@ -200,6 +200,7 @@ namespace orbtool
             break;
         }
         case ResourceType::PIPELINE_STATE: {
+            EPrimitiveType type = EPrimitiveType::TRIANGLES;
             int64_t
                 vs_offset = 0u,
                 ps_offset = 0u,
@@ -209,6 +210,7 @@ namespace orbtool
                 il_offset = 0u,
                 rs_offset = 0u,
                 bs_offset = 0u;
+            file.read((char*)&type, 1);
             file.read((char*)&vs_offset, sizeof(int64_t));
             file.read((char*)&ps_offset, sizeof(int64_t));
             file.read((char*)&gs_offset, sizeof(int64_t));
@@ -217,6 +219,7 @@ namespace orbtool
             file.read((char*)&il_offset, sizeof(int64_t));
             file.read((char*)&rs_offset, sizeof(int64_t));
             file.read((char*)&bs_offset, sizeof(int64_t));
+            printf_s("  - %*s: %s\n", alloc, "Primitive type", orbit::EPrimitiveTypeToString(type));
             printf_s("  - %*s: %lld\n", alloc, "Vertex Shader", vs_offset);
             printf_s("  - %*s: %lld\n", alloc, "Pixel Shader", ps_offset);
             printf_s("  - %*s: %lld\n", alloc, "Geometry Shader", gs_offset);
@@ -530,6 +533,7 @@ namespace orbtool
                 auto ilId = orb.GetOffsetFromName(state.iLayoutId, i);
                 auto rsId = orb.GetOffsetFromName(state.rsStateId, i);
                 auto bsId = orb.GetOffsetFromName(state.bsStateId, i);
+                output.write((const char*)&state.primitiveType, 1);
                 output.write((const char*)&vsId, sizeof(int64_t));
                 output.write((const char*)&psId, sizeof(int64_t));
                 output.write((const char*)&gsId, sizeof(int64_t));

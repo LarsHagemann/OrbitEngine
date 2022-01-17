@@ -1,6 +1,7 @@
 #pragma once
 #include "interfaces/engine/GameComponent.hpp"
 #include "implementation/rendering/Mesh.hpp"
+#include "implementation/rendering/Vertex.hpp"
 
 #include <PxActor.h>
 #include <PxShape.h>
@@ -23,7 +24,7 @@ namespace orbit
         PxTriangleMeshGeometry m_geometry;
         std::unique_ptr<PxShape, PxDelete<PxShape>> m_shape;
 
-        std::shared_ptr<Mesh> m_mesh;
+        std::shared_ptr<Mesh<Vertex>> m_mesh;
         unsigned m_nextId;
     public:
         RigidDynamicComponent(GameObject* boundObject, ResourceId meshId);

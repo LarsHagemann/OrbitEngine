@@ -16,6 +16,8 @@ namespace orbit
     {
     protected:
         friend class EngineBase;
+        // @member: identifier in the scene
+        std::string m_identifier;
         // @member: true if this object is active
         bool m_isActive = true;
         // @member: set of components of this game object
@@ -40,6 +42,11 @@ namespace orbit
         // @method: Updates the active state of this object
         // @param activeState: the new active state of the object (true means the object is active)
         void Activate(bool activeState = true) { m_isActive = activeState; }
+
+        // @method: Sets the objects identifier
+        // @param identifier: The object's identifier
+        // @internal
+        void SetIdentifier(const std::string& identifier) { m_identifier = identifier; }
 
         // @method: Adds a component to this object
         template<typename Component, typename...Params>
