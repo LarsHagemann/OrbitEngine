@@ -14,6 +14,10 @@ namespace orbit
 
     class ParticleSystem : public GameObject
     {
+    private:
+        
+    public:
+        ParticleSystem(const ParticleSystemDesc& desc);
         
     };
     
