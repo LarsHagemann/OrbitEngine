@@ -1,6 +1,7 @@
 # Orbit Engine
 The Orbit Game Engine is targetted to be a platform independent game engine for Game Development. 
 The Engine is protected by the MIT license and can thus be used by anyone who likes to do so. 
+Documentation on how to build Orbit can be found [here](docs/build.md).
 
 ## Feature list:
   - DirectX 11 Renderer
