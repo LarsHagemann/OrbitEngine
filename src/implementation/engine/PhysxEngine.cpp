@@ -151,12 +151,6 @@ namespace orbit
             PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS | 
             PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES | 
             PxPvdSceneFlag::eTRANSMIT_CONTACTS);
-        
-        m_scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
-        //m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_AABBS, 2.f);
-        //m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 2.f);
-        m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eACTOR_AXES, 4.f);
-        //m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eBODY_LIN_VELOCITY, 2.f);
 #endif
 
         // Initialize controller manager

@@ -53,7 +53,7 @@ inline void* operator new(std::size_t size)
 	auto alloc = malloc(size);
     auto fLen = strlen(monitor_file);
     char* file = (char*)malloc(fLen);
-    std::memcpy(file, monitor_file, fLen);
+    memcpy(file, monitor_file, fLen);
 	monitor_allocation(alloc, size, file, monitor_line);
 	return alloc;
 }
