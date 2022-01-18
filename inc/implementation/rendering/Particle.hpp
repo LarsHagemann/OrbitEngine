@@ -21,6 +21,8 @@ namespace orbit
     class Particle
     {
     private:
+        friend ParticleSystem;
+
         const ParticleSystem* m_system;
         Matrix4f* m_transform;
         PxRigidDynamic* m_body;

@@ -58,16 +58,24 @@ namespace orbit
     void ParticleSystem::Update(const Time& dt)
     {
         GameObject::Update(dt);
+        for (auto particle : m_scheduledForRemoval)
+        {
+            m_particles.erase(particle);
+            ENGINE->GetPhysXScene()->removeActor(*particle->m_body);
+            particle->m_body->release();
+            delete particle;
+            particle = nullptr;
+        }
+        m_scheduledForRemoval.clear();
+
+        for (auto particle : m_particles)
+        {
+            // Update particles
+            particle->Update(dt);
+        }
+
         if (m_running)
         {
-            for (auto particle : m_scheduledForRemoval)
-            {
-                m_particles.erase(particle);
-                delete particle;
-                particle = nullptr;
-            }
-            m_scheduledForRemoval.clear();
-
             m_elapsedAccumulated += dt.asSeconds();
             while (m_elapsedAccumulated >= m_timePerParticle && !m_freeTransforms.empty())
             {
@@ -98,10 +106,9 @@ namespace orbit
                 m_elapsedAccumulated -= m_timePerParticle;
             }
 
-            for (auto particle : m_particles)
+            if (!m_cyclic && m_elapsed.GetElapsedTime().asMilliseconds() >= m_duration)
             {
-                // Update particles
-                particle->Update(dt);
+                Stop();
             }
         }
     }
@@ -159,6 +166,8 @@ namespace orbit
         m_velocityDistribution = desc.velocityDistribution;
         m_lifetimeDistribution  = desc.lifetimeDistribution;
         m_directionFunc = desc.directionFunc;
+        m_cyclic = desc.cyclic;
+        m_duration = desc.durationInMilliseconds;
         Vector3f (*m_directionFunc)();
         std::iota(m_freeTransforms.begin(), m_freeTransforms.end(), 0);
     }

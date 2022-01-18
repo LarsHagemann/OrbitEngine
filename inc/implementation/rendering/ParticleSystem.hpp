@@ -75,7 +75,10 @@ namespace orbit
         float (*m_lifetimeDistribution)();
         Vector3f (*m_directionFunc)();
 
+        Clock m_elapsed;
+        uint32_t m_duration;
         bool m_running;
+        bool m_cyclic;
         ResourceId m_particleMesh = 0;
     private:
         friend class Particle;
