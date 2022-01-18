@@ -116,14 +116,17 @@ namespace orbit
     void ParticleSystem::Draw() const
     {
         GameObject::Draw();
+        if (m_running || !m_particles.empty())
+        {
 
-        m_transforms->UpdateBuffer();
-        m_transforms->Bind(1, sizeof(Matrix4f), 0);
+            m_transforms->UpdateBuffer();
+            m_transforms->Bind(1, sizeof(Matrix4f), 0);
 
-        auto mesh = ENGINE->RMLoadResource<Mesh<Vertex>>(m_particleMesh);
+            auto mesh = ENGINE->RMLoadResource<Mesh<Vertex>>(m_particleMesh);
 
-        mesh->Bind();
-        mesh->Draw(m_transforms->NumVertices());
+            mesh->Bind();
+            mesh->Draw(m_transforms->NumVertices());
+        }
     }
 
     bool ParticleSystem::LoadImpl(std::ifstream* stream)
