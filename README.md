@@ -1,10 +1,23 @@
-# Orbit Game Engine
-Orbit is a DirectX 12 based Game Engine (In future versions, OpenGL might be supported as well). 
-Orbit is inspired by an early 2020 DirectX 11 engine, that has been developed by Treelab and now translated to DirectX 12.
-Orbit supports easy environment creation, object manipulation and rendering. Orbit uses [.orb](https://github.com/LarsHagemann/OrbitFileFormat/) files to read geometry and animation data, therefor,
-a converter is currently in development (At the moment it only supports FBX files; See [Converter](converter/)).
-Orbit comes with several samples in the [Samples](samples/) directory.
+# Orbit Engine
+The Orbit Game Engine is targetted to be a platform independent game engine for Game Development. 
+The Engine is protected by the MIT license and can thus be used by anyone who likes to do so. 
 
-# Building
-Information on building and usage of the engine can be found in the [Docs](docs/) directory. 
+## Feature list:
+  - DirectX 11 Renderer
+  - Particle Systems
+  - Engine specific file format for materials, models, lights, etc...
+  - A converter tool to convert fbx and obj (and wavefront material libraries) to the engine internal format.
 
+## Planned:
+  - Documentation :)
+  - DirectX 12 Renderer
+  - OpenGL Renderer
+  - Unix Support
+  - Skeletal animations
+  - Audio
+  - DAE support by the converter
+  - See the [issues](https://github.com/LarsHagemann/OrbitEngine/issues) tab on github for more planned features.
+
+## Known bugs:
+  - PhysX crashes at the end of a game
+  - Bugs can be submitted under the [issues](https://github.com/LarsHagemann/OrbitEngine/issues) tab on github.
