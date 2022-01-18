@@ -38,8 +38,8 @@ namespace orbit
         PxDelete(const PxDelete<_Ty2>&) noexcept {}
 
         void operator()(_Ty* _Ptr) const noexcept /* strengthened */ { // delete a pointer
-            if (_Ptr)
-                _Ptr->release();
+            //if (_Ptr)
+            //    _Ptr->release();
             _Ptr = nullptr;
         }
     };

@@ -3,7 +3,7 @@
 
 #include "SpaceScene.hpp"
 
-#undef new
+//#undef new
 
 int main()
 {
@@ -23,6 +23,8 @@ int main()
 		ENGINE->EnterScene("SpaceScene");
 
 		ENGINE->Run();
+
+		//ENGINE->Device()->
 		ENGINE->Shutdown();
 	}
 
