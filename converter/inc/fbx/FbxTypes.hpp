@@ -4,6 +4,7 @@
 #include <memory>
 #include <filesystem>
 #include <unordered_map>
+#include <set>
 #include <Eigen/Dense>
 
 #include "implementation/rendering/MaterialFlags.hpp"

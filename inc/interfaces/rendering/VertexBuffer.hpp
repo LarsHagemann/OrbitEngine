@@ -21,6 +21,7 @@ namespace orbit
         uint32_t GetBufferSize() const { return NumVertices() * sizeof(Vertex); }
         BufferType GetBuffer() const { return m_buffer; }
         const std::vector<Vertex>& GetVertices() const { return m_vertices; }
+        std::vector<Vertex>& GetVertices() { return m_vertices; }
         void ResizeBuffer(uint32_t numElements) { m_vertices.resize(numElements); }
         void SetVertex(uint32_t index, const Vertex& vertex) { m_vertices[index] = vertex; }
         void SetVertices(std::vector<Vertex>&& vertices) { m_vertices = std::move(vertices); }

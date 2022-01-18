@@ -2,6 +2,7 @@
 #include <string>
 #include <cstdint>
 #include <variant>
+#include <set>
 #include <unordered_map>
 
 #include <Eigen/Dense>
@@ -176,13 +177,24 @@ namespace orbtool
             OrbSamplerState> value;
     };
 
+    static bool operator==(const OrbObject& a, const OrbObject& b)
+    {
+        return a.name == b.name;
+    }
+
+    static bool operator<(const OrbObject& a, const OrbObject& b)
+    {
+        return a.name < b.name;
+    }
+
     class OrbIntermediate
     {
     private:
         //friend class OrbFile;
-        std::vector<OrbObject> m_objects;
-        std::unordered_map<std::string, uint32_t> m_objectIndices;
+        mutable std::vector<OrbObject> m_objects;
+        mutable std::unordered_map<std::string, uint32_t> m_objectIndices;
     public:
+        void MakeUnique() const;
         uint32_t NumObjects() const { return m_objects.size(); }
         ResourceType GetObjectType(uint32_t objectIndex) const;
         std::string GetObjectName(uint32_t objectIndex) const { return m_objects.at(objectIndex).name; }

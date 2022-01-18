@@ -416,6 +416,8 @@ namespace orbtool
     {
         if (target.empty() && !m_filepath.empty())
             return WriteIntermediate(orb, m_filepath);
+        
+        orb.MakeUnique();
 
         auto outputExists = fs::exists(target);
         if (!outputExists)

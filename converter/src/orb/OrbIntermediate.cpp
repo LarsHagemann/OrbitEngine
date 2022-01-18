@@ -38,4 +38,14 @@ namespace orbtool
 		return it->second - static_cast<int64_t>(offsetId);
 	}
 
+	void OrbIntermediate::MakeUnique() const
+	{
+		std::set<OrbObject> s(m_objects.begin(), m_objects.end());
+		m_objects.assign(s.begin(), s.end());
+		m_objectIndices.clear();
+		auto idx = 0u;
+		for (const auto& object : m_objects)
+			m_objectIndices.emplace(object.name, idx++);
+	}
+
 }
