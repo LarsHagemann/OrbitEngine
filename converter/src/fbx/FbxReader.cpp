@@ -481,7 +481,25 @@ namespace orbtool
 			fbx_mat.type = FBXType::TYPE_MATERIAL;
 			GetFBXMaterial(&fbx_mat, materialNode);
 
-			data->nodes.emplace(fbx_mat.id, std::make_shared<FBXMaterial>(std::move(fbx_mat)));
+			std::shared_ptr<FBXMaterial> m;
+			for (auto node : data->nodes)
+			{
+				if (node.second->type == FBXType::TYPE_MATERIAL)
+				{
+					printf_s("TEST0\n");
+					auto mat = std::static_pointer_cast<FBXMaterial>(node.second);
+					if (mat->name == fbx_mat.name)
+					{
+						m = mat;
+						printf_s("%lld, %lld\n", mat->id, fbx_mat.id);
+						break;
+					}
+				}
+			}
+			if (!m)
+				m = std::make_shared<FBXMaterial>(std::move(fbx_mat));
+
+			data->nodes.emplace(fbx_mat.id, m);
 		}
     }
 
@@ -563,8 +581,24 @@ namespace orbtool
 
 			if (auto filenameNode = textureNode->FindChild("FileName"); filenameNode != nullptr)
 				texture.filepath = std::get<std::string>(filenameNode->properties[0]);
+
+			std::shared_ptr<FBXTexture> t;
+			for (auto node : data->nodes)
+			{
+				if (node.second->type == FBXType::TYPE_TEXTURE)
+				{
+					auto tex = std::static_pointer_cast<FBXTexture>(node.second);
+					if (tex->filepath == texture.filepath)
+					{
+						t = tex;
+						break;
+					}
+				}
+			}
+			if (!t)
+				t = std::make_shared<FBXTexture>(std::move(texture));
 			
-			data->nodes.emplace(texture.id, std::make_shared<FBXTexture>(std::move(texture)));
+			data->nodes.emplace(texture.id, t);
 		}
     }
 

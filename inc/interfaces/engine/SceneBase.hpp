@@ -47,6 +47,9 @@ namespace orbit
         // @method: Tries to find an object by its identifier.
         // @return: nullptr if the object could not be found
         GObjectPtr FindObject(const std::string& identifier);
+        // @method: Removes an object from the scene
+        // @return: The removed Game Object
+        GObjectPtr RemoveObject(const std::string& identifier);
         // @method: Sets the scene's camera
         void SetCamera(CameraPtr camera) { m_camera = camera; }
         // @return: Returns the scene's camera
@@ -57,6 +60,26 @@ namespace orbit
         Light* AddLight(LightPtr light);
         // @brief: Removes a light from the scene
         void RemoveLight(Light* ptr);
+
+        template<typename GameObjectType>
+        SPtr<GameObjectType> FindObjectT(const std::string& identifier)
+        {
+            auto object = FindObject(identifier);
+            if (object == nullptr)
+                return nullptr;
+            
+            try {
+                return
+#ifdef _DEBUG
+                    std::dynamic_pointer_cast<GameObjectType>(object);
+#else
+                    std::static_pointer_cast<GameObjectType>(object);
+#endif
+            }
+            catch(...) {
+                return nullptr;
+            }
+        }
     };
 
     // A Scene that doesn't unload its resources when left. This might

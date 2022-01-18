@@ -24,7 +24,7 @@ namespace orbit
 {
 
     class MaterialBase;
-    class Mesh;
+    //class Mesh;
 
     class ResourceManager 
     {

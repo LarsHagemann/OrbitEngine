@@ -142,7 +142,10 @@ namespace orbit
     {
     public:
         static constexpr T PI     = static_cast<T>(3.141592653589793238462643383279);
-        static constexpr T PIDIV4 = static_cast<T>(PI / 4.);
+        static constexpr T PIDIV4 = static_cast<T>(PI * .25);
+        static constexpr T PIDIV2 = static_cast<T>(PI * .5);
+        static constexpr T TWO_PI = static_cast<T>(PI * 2.);
+        
         static constexpr T AlignUp(const T& in, const T& alignment)
         {
             static_assert(std::is_integral<T>::value && "Math<T>::AlignUp() T must be integral type.");

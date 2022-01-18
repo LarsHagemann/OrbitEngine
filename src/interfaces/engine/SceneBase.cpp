@@ -79,10 +79,14 @@ namespace orbit
 
     bool ISceneBase::AddObject(const std::string& identifier, GObjectPtr object)
     {
+        object->SetIdentifier(identifier);
         auto it = m_objectsMap.find(identifier);
         if (it != m_objectsMap.end())
+        {
+            ORBIT_ERROR("Object with identifier '%s' does already exist!", identifier.c_str());
             return false;
-        
+        }
+
         m_objectsVector.emplace_back(object);
         m_objectsMap.emplace(identifier, object);
         object->Init();
@@ -95,6 +99,16 @@ namespace orbit
         if (it == m_objectsMap.end())
             return nullptr;
         
+        return it->second;
+    }
+
+    GObjectPtr ISceneBase::RemoveObject(const std::string& identifier)
+    {
+        auto it = m_objectsMap.find(identifier);
+        if (it == m_objectsMap.end())
+            return nullptr;
+        
+        m_objectsMap.erase(it);
         return it->second;
     }
 

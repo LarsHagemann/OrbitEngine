@@ -15,7 +15,7 @@ namespace orbit
             m_currentPipelineState = submesh.pipelineStateId;
             ENGINE->RMLoadResource<PipelineState>(submesh.pipelineStateId)->Bind();
         }
-        if (submesh.materialId != m_currentMaterial)
+        if (submesh.materialId != m_currentMaterial && submesh.materialId != 0)
         {
             m_currentMaterial = submesh.materialId;
             ENGINE->RMLoadResource<MaterialBase>(submesh.materialId)->Bind(1);

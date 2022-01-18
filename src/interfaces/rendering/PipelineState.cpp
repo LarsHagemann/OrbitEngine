@@ -24,8 +24,8 @@ namespace orbit
             if (samplerId != GetId())
                 ENGINE->RMLoadResource<SamplerState>(samplerId)->Bind(slot);
         }
-        //if (m_rasterizerStateId != GetId())
-        //    ENGINE->RMLoadResource<RasterizerState>(m_rasterizerStateId)->Bind();
+        if (m_rasterizerStateId != GetId())
+            ENGINE->RMLoadResource<RasterizerState>(m_rasterizerStateId)->Bind();
         //if (m_rootSignatureId != GetId())
         //    ENGINE->RMLoadResource<RootSignature>(m_rootSignatureId)->Bind();
         if (m_inputLayoutId != GetId())
