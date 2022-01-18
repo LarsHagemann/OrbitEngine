@@ -23,8 +23,6 @@ int main()
 		ENGINE->EnterScene("SpaceScene");
 
 		ENGINE->Run();
-
-		//ENGINE->Device()->
 		ENGINE->Shutdown();
 	}
 
