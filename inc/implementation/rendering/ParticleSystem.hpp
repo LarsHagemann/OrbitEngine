@@ -4,22 +4,27 @@
 
 #include "implementation/engine/GameObject.hpp"
 #include "implementation/backends/impl/VertexBufferImpl.hpp"
+#include "implementation/rendering/Particle.hpp"
+#include "implementation/rendering/Mesh.hpp"
+#include "implementation/rendering/Vertex.hpp"
 
 namespace orbit
 {
 
-    namespace PSDirectionFunctions
+    class PSDirectionFunctions
     {
-        extern Vector3f randomOnUnitSphere();
-    }
+    public:
+        static Vector3f randomOnUnitSphere();
+    };
 
-    namespace PSVelocityDistribution
+    class PSVelocityDistribution
     {
-        extern float constant1();
-        extern float random();
-    }
+    public:
+        static float constant1();
+        static float random();
+    };
 
-    namespace PSLifetimeDistribution = PSVelocityDistribution;
+    using PSLifetimeDistribution = PSVelocityDistribution;
 
     struct ParticleSystemDesc
     {
@@ -33,7 +38,7 @@ namespace orbit
         float (*velocityDistribution)() = PSVelocityDistribution::constant1;
         // @brief: scales the velocity up or down
         // @default: 10 meters per second
-        float velocityScale = 10.f;
+        float velocityScale = .01f;
         // @brief: distribution for the lifetime of a particle.
         //  Must return values between 0.f and 1.f
         // @default: always return 1
@@ -50,19 +55,41 @@ namespace orbit
         // @brief: Duration of the particle effect. Only if cyclic=false
         // @default: 5 seconds
         uint32_t durationInMilliseconds = 5000;
+        // @brief: The mesh to be rendered as particles
+        ResourceId particleMesh;
     };
 
     class ParticleSystem : public GameObject
     {
     private:
-        VertexBuffer<Matrix4f> m_transforms;
+        UPtr<VertexBuffer<Matrix4f>> m_transforms;
+        std::unordered_set<Particle*> m_particles;
+        mutable std::vector<Particle*> m_scheduledForRemoval;
+        mutable std::vector<size_t> m_freeTransforms;
+
+        float m_elapsedAccumulated;
+        float m_timePerParticle;
+        float m_particleLifetimeScale;
+        float m_velocityScale;
+        float (*m_velocityDistribution)();
+        float (*m_lifetimeDistribution)();
+        Vector3f (*m_directionFunc)();
+
+        bool m_running;
+        ResourceId m_particleMesh = 0;
     private:
         friend class Particle;
-        void RemoveParticle(Particle* particle) const;
+        void RemoveParticle(Particle* particle, size_t id) const;
     public:
         ParticleSystem(const ParticleSystemDesc& desc);
         void Start();
         void Stop();
+        virtual bool LoadImpl(std::ifstream* stream) override;
+        virtual void UnloadImpl() override;
+        void Init() override {}
+        void LoadFromDesc(const ParticleSystemDesc& desc);
+        virtual void Update(const Time& dt) override;
+        virtual void Draw() const override;
     };
     
 }

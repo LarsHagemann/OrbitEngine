@@ -60,6 +60,26 @@ namespace orbit
         Light* AddLight(LightPtr light);
         // @brief: Removes a light from the scene
         void RemoveLight(Light* ptr);
+
+        template<typename GameObjectType>
+        SPtr<GameObjectType> FindObjectT(const std::string& identifier)
+        {
+            auto object = FindObject(identifier);
+            if (object == nullptr)
+                return nullptr;
+            
+            try {
+                return
+#ifdef _DEBUG
+                    std::dynamic_pointer_cast<GameObjectType>(object);
+#else
+                    std::static_pointer_cast<GameObjectType>(object);
+#endif
+            }
+            catch(...) {
+                return nullptr;
+            }
+        }
     };
 
     // A Scene that doesn't unload its resources when left. This might

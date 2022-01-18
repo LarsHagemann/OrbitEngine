@@ -80,6 +80,7 @@ source_group(
 	implementation/rendering/Light.cpp
 	implementation/rendering/ThirdPersonCamera.cpp
 	implementation/rendering/ParticleSystem.cpp
+	implementation/rendering/Particle.cpp
 )
 
 source_group(
@@ -178,6 +179,7 @@ set(ORBIT_LIB_SOURCE
 	implementation/rendering/Light.cpp
 	implementation/rendering/ThirdPersonCamera.cpp
 	implementation/rendering/ParticleSystem.cpp
+	implementation/rendering/Particle.cpp
 	
 	interfaces/rendering/Material.cpp
 	interfaces/rendering/PipelineState.cpp

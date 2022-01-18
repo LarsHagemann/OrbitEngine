@@ -13,7 +13,7 @@ namespace orbit
     private:
         // @member: true if the object has been loaded
         bool m_isLoaded = false;
-        ResourceId m_id;
+        ResourceId m_id = 0;
     protected:
         virtual bool LoadImpl(std::ifstream* stream) = 0;
         virtual void UnloadImpl() = 0;

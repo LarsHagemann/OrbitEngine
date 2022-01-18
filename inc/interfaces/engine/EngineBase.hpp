@@ -37,7 +37,7 @@ namespace orbit
 
         std::shared_ptr<IRenderer> Renderer() const { return m_renderer; }
         template<class Type, class Distribution>
-        Type NextRandomValue(const Distribution& dist)
+        Type NextRandomValue(Distribution& dist)
         {
             return dist(m_randomEngine);
         }
