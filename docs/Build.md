@@ -26,7 +26,7 @@ Now that we've chosen all the necessary settings, we can generate our project fi
 For ImGUI you don't need to do anything specific. Just clone or download the github repository. 
 
 # Eigen
-Eigen doesn't need to be build either. Just clone or download the necessary files and you are good to go.
+Eigen doesn't need to be built either. Just clone or download the necessary files and you are good to go.
 
 # Zlib
 Same story as with ImGUI and Eigen. Just clone the [repository](https://github.com/madler/zlib) or download the code from the zlib website. 
