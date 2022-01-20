@@ -79,6 +79,7 @@ source_group(
 	implementation/rendering/Mesh.cpp
 	implementation/rendering/Light.cpp
 	implementation/rendering/ThirdPersonCamera.cpp
+	implementation/rendering/ArcBallCamera.cpp
 	implementation/rendering/ParticleSystem.cpp
 	implementation/rendering/Particle.cpp
 )
@@ -178,6 +179,7 @@ set(ORBIT_LIB_SOURCE
 
 	implementation/rendering/Light.cpp
 	implementation/rendering/ThirdPersonCamera.cpp
+	implementation/rendering/ArcBallCamera.cpp
 	implementation/rendering/ParticleSystem.cpp
 	implementation/rendering/Particle.cpp
 	

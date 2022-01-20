@@ -83,6 +83,7 @@ static void shutdown_monitoring()
 
 #include <Windows.h>
 #include <wrl/client.h> 
+#include <DirectXMath.h>
 
 namespace orbit
 {
@@ -93,8 +94,6 @@ namespace orbit
 }
 
 #endif
-
-#include <DirectXMath.h>
 
 namespace orbit
 {

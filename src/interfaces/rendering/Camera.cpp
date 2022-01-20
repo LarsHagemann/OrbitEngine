@@ -7,7 +7,7 @@ namespace orbit
 {
 
 	ICamera::ICamera() :
-		_transform(std::make_shared<Transform>())
+		m_transform(std::make_shared<Transform>())
 	{
 	}
 
@@ -16,14 +16,14 @@ namespace orbit
 		ORBIT_INFO_LEVEL(ORBIT_LEVEL_MISC, "Recalculating projection matrix.");
 
 		auto size = Engine::Get()->Window()->GetDimensions();
-		_projection = (m_projectionHook)
+		m_projection = (m_projectionHook)
 			? m_projectionHook()
 			: Math<float>::Perspective(Math<float>::PIDIV4, static_cast<float>(size.x()) / size.y(), 0.1f, 10.f);
 	}
 
 	Matrix4f ICamera::GetViewProjectionMatrix() const
 	{
-		return GetViewMatrix() * _projection;
+		return GetViewMatrix() * m_projection;
 	}
 
 	void ICamera::SetProjectionHook(std::function<Matrix4f()>&& hook) 
