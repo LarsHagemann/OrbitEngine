@@ -26,6 +26,13 @@ vsout0 vs_default(vsin0_inst input)
 }
 
 [RootSignature(OrbitDefaultRS)]
+float4 ps_material_color(psin0 input) : SV_TARGET
+{
+	float4 color = getVertexColor(input.texcoords);
+	return color;
+}
+
+[RootSignature(OrbitDefaultRS)]
 float4 ps_default(psin0 input) : SV_TARGET
 {		
 	float4 color = getVertexOcclusion(input.texcoords);
@@ -66,8 +73,6 @@ vsout1 vs_solid_color(vsin1_inst input)
 #else
 	matrix transform = mul(mul(worldMatrix, PerFrameBuffer.viewMatrix), PerFrameBuffer.projectionMatrix);
 #endif
-	float3x3 nTransform = calculateNormalTransformation(worldMatrix);
-	output.c_world   = mul(pos, worldMatrix);
 	output.c_screen  = mul(pos, transform);
 	output.color = input.color;
 	return output;

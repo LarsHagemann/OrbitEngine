@@ -486,7 +486,6 @@ namespace orbtool
 			{
 				if (node.second->type == FBXType::TYPE_MATERIAL)
 				{
-					printf_s("TEST0\n");
 					auto mat = std::static_pointer_cast<FBXMaterial>(node.second);
 					if (mat->name == fbx_mat.name)
 					{

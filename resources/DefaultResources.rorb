@@ -7,6 +7,8 @@ read {
 	
 	"../src/shader/code/default.hlsl" as VERTEX_SHADER_CODE("shader/vertex/solid_color", "vs_5_0", "vs_solid_color") compile;
 	"../src/shader/code/default.hlsl" as PIXEL_SHADER_CODE("shader/pixel/solid_color", "ps_5_0", "ps_solid_color") compile;
+
+	"../src/shader/code/default.hlsl" as PIXEL_SHADER_CODE("shader/pixel/material_color", "ps_5_0", "ps_material_color") compile;
 	
 	#"../src/shader/code/default.hlsl" as VERTEX_SHADER_CODE("shader/vertex/default_x12", "vs_5_0", "vs_default") compile;
 	#"../src/shader/code/default.hlsl" as PIXEL_SHADER_CODE("shader/pixel/default_x12", "ps_5_0", "ps_default") compile;
@@ -94,6 +96,24 @@ new PIPELINE_STATE as "pipeline_states/default_debug" {
 	INPUT_LAYOUT as "input_layouts/default";
 	RASTERIZER_STATE as "blend_states/default";
 	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 4);
+};
+new PIPELINE_STATE as "pipeline_states/material_color" {
+	VERTEX_SHADER as "shader/vertex/default";
+	PIXEL_SHADER as "shader/pixel/material_color";
+	INPUT_LAYOUT as "input_layouts/default";
+	RASTERIZER_STATE as "rasterizer_states/default";
+	BLEND_STATE as "blend_states/default";
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 4);
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 5);
+};
+new PIPELINE_STATE as "pipeline_states/per_vertex" {
+	VERTEX_SHADER as "shader/vertex/per_vertex";
+	PIXEL_SHADER as "shader/pixel/solid_color";
+	INPUT_LAYOUT as "input_layouts/default";
+	RASTERIZER_STATE as "rasterizer_states/default";
+	BLEND_STATE as "blend_states/default";
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 4);
+	SAMPLER_STATE as ("sampler/min_mag_mip_linear_anisotropic", 5);
 };
 new PIPELINE_STATE as "pipeline_states/solid_color" {
 	VERTEX_SHADER as "shader/vertex/solid_color";

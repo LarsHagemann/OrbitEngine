@@ -38,7 +38,6 @@ struct vsin1_inst
 struct psin1
 {
 	float4 c_screen  : SV_POSITION;
-	float4 c_world	 : POSITION;
 	float4 color     : COLOR;
 };
 

@@ -31,7 +31,7 @@ void ViewerUI::OpenFileDialogue()
 
 void ViewerUI::Init()
 {
-
+    m_propertyLoaded = true;
 }
 
 void ViewerUI::Update(const orbit::Time& dt)
@@ -63,9 +63,10 @@ void ViewerUI::Update(const orbit::Time& dt)
         ImVec2{ io.DisplaySize.x / 2.f, 0.75f * io.DisplaySize.y }
     );
     ImGui::SetNextWindowBgAlpha(1.f);
+    const auto& entities = m_parser.GetEntities();
     if (ImGui::Begin("Entities", nullptr, window_flags))
     {
-        const auto& entities = m_parser.GetEntities();
+        ImGui::BeginChild("EntityContainer");
         if (ImGui::TreeNode("Geometries"))
         {
             for (const auto& header : entities)
@@ -103,9 +104,18 @@ void ViewerUI::Update(const orbit::Time& dt)
         }
         if (ImGui::TreeNode("Misc"))
         {
+            for (const auto& header : entities)
+            {
+                if (header.type != orbit::ResourceType::TEXTURE &&
+                    header.type != orbit::ResourceType::TEXTURE_REFERENCE &&
+                    header.type != orbit::ResourceType::MATERIAL && 
+                    header.type != orbit::ResourceType::MESH)
+                    LoadMisc(header.name);
+            }
             
             ImGui::TreePop();
         }
+        ImGui::EndChild();
         ImGui::End();
     }
     ImGui::SetNextWindowPos(ImVec2{ 0.f, 0.75f * io.DisplaySize.y + 20.f }, ImGuiCond_Always);
@@ -115,9 +125,22 @@ void ViewerUI::Update(const orbit::Time& dt)
     );
     if (ImGui::Begin("Properties", nullptr, window_flags))
     {
-
+        for (const auto& header : entities)
+        {
+            if (header.name == m_property)
+            {
+                ImGui::Text("%s : %s", m_property.c_str(), orbit::ResourceTypeToString(header.type));
+                PropertyView(header);
+                break;
+            }
+        }
         ImGui::End();
     }
+}
+
+void ViewerUI::PropertyView(const orbit::ResourceHeader& header)
+{
+
 }
 
 void ViewerUI::LoadGeometry(const std::string& id)
@@ -161,6 +184,20 @@ void ViewerUI::LoadTexture(const std::string& id)
             m_loaded = id;
             auto view = ENGINE->GetCurrentScene()->FindObjectT<O3DView>("3DView");
             view->LoadTexture(id);
+        }
+    }
+}
+
+void ViewerUI::LoadMisc(const std::string& id)
+{
+    if (m_property == id)
+        ImGui::Text(id.c_str());
+    else
+    {
+        if (ImGui::Button(id.c_str()))
+        {
+            m_propertyLoaded = false;
+            m_property = id;
         }
     }
 }

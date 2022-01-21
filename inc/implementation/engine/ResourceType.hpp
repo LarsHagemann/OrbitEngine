@@ -24,4 +24,24 @@ namespace orbit
         UNDEFINED            = 255
     };
 
+    static const char* ResourceTypeToString(ResourceType type)
+    {
+        switch (type)
+        {
+        case ResourceType::MATERIAL: return "MATERIAL";
+        case ResourceType::MESH: return "MESH";
+        case ResourceType::INPUT_LAYOUT: return "INPUT_LAYOUT";
+        case ResourceType::PIPELINE_STATE: return "PIPELINE_STATE";
+        case ResourceType::SHADER_BINARY: return "SHADER_BINARY";
+        case ResourceType::SHADER_CODE: return "SHADER_CODE";
+        case ResourceType::SPLINE: return "SPLINE";
+        case ResourceType::TEXTURE: return "TEXTURE";
+        case ResourceType::TEXTURE_REFERENCE: return "TEXTURE_REFERENCE";
+        case ResourceType::SAMPLER_STATE: return "SAMPLER_STATE";
+        case ResourceType::CUSTOM: return "CUSTOM";
+        case ResourceType::UNDEFINED: return "UNDEFINED";        
+        default: return "Invalid";
+        }
+    }
+
 }

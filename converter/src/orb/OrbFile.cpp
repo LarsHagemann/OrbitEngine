@@ -333,14 +333,6 @@ namespace orbtool
             printf_s("  - %*s: %s\n", alloc, "Blend Enabled", blendEnabled ? "true" : "false");
             if (blendEnabled)
             {
-                /*
-                output.write((const char*)&state.alphaToCoverageEnabled, 1);
-                output.write((const char*)&state.blendEnabled, 1);
-                if (state.blendEnabled)
-                {
-                    output.write((const char*)state.blendFactor, 4 * sizeof(float));
-                    output.write((const char*)&state.channelMask, 1);
-                */
                 float factor[4];
                 EBlendOp
                     blendOp,
@@ -599,7 +591,7 @@ namespace orbtool
                         );
                         if (fs::exists("fxc_log.txt"))
                             fs::remove("fxc_log.txt");
-                        ORBIT_LOG("Compiling file: %s", shader.shader_code.generic_string().c_str());
+                        ORBIT_LOG("Compiling file: %s [%s]", shader.shader_code.generic_string().c_str(), orb.GetObjectName(i).c_str());
                         auto result = system(command);
                         if (result != 0)
                             ORBIT_THROW("Compilation failed. For more details look at 'fxc_log.txt'");

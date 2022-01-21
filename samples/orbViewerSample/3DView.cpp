@@ -14,13 +14,17 @@ void O3DView::Init()
     m_mouse = AddComponent<orbit::MouseComponent>("mouse");
     m_batch = AddComponent<orbit::StaticBatchComponent>("batch", 0);
     m_batch->AddTransform(std::make_shared<orbit::Transform>());
+
+    auto b2 = AddComponent<orbit::StaticBatchComponent>("batch__arrow", ENGINE->RMGetIdFromName("OrbViewer__Arrows"));
+    b2->GetMesh()->GetSubmesh(0).pipelineStateId = ENGINE->RMGetIdFromName("pipeline_states/material_color");
+    b2->AddTransform(std::make_shared<orbit::Transform>());
 }
 
 void O3DView::Update(const orbit::Time& dt)
 {
     orbit::GameObject::Update(dt);
 
-    if (m_mouse->buttonDown(orbit::MouseComponent::MouseButton::Left))
+    if (m_mouse->buttonDown(orbit::MouseComponent::MouseButton::Middle))
     {
         if (m_mouse->mouseMoved())
         {

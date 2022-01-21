@@ -9,11 +9,15 @@ class ViewerUI : public orbit::GameObject
 private:
     FileParser m_parser;
     std::string m_loaded;
+    bool m_propertyLoaded;
+    std::string m_property;
 private:
     void OpenFileDialogue();
     void LoadGeometry(const std::string& id);
     void LoadMaterial(const std::string& id);
     void LoadTexture(const std::string& id);
+    void LoadMisc(const std::string& id);
+    void PropertyView(const orbit::ResourceHeader& header);
 public:
     bool LoadImpl(std::ifstream*) override { return true; }
 	void UnloadImpl() override {}
