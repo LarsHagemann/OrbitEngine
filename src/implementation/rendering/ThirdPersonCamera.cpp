@@ -19,7 +19,7 @@ namespace orbit
 
 		auto up = _target->LocalUp();
 
-		_transform->SetTranslation(eye);
+		m_transform->SetTranslation(eye);
 
 		return Math<float>::LookAt(eye, target, up);
 	}

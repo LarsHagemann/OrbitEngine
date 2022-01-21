@@ -8,10 +8,10 @@ namespace orbit
 	{
 	protected:
 		// @member: transform of the camera (its position and rotation)
-		TransformPtr _transform;
+		TransformPtr m_transform;
 		// @member: projection matrix initialized by calling RecalculateProjectionMatrix()
 		// @see: ICamera::RecalculateProjectionMatrix()
-		Matrix4f _projection;
+		Matrix4f m_projection;
 		// @member: if you want to use something else, than the default projection matrix, than
 		// 	you can set this member via SetProjectionHook();
 		std::function<Matrix4f()> m_projectionHook;
@@ -41,9 +41,9 @@ namespace orbit
 		// @method: returns the combined view-projection matrix
 		Matrix4f GetViewProjectionMatrix() const;
 		// @method: returns the projection matrix 
-		Matrix4f GetProjectionMatrix() const { return _projection; }
+		Matrix4f GetProjectionMatrix() const { return m_projection; }
 		// @method: returns the camera's transform
-		TransformPtr GetTransform() const { return _transform; }
+		TransformPtr GetTransform() const { return m_transform; }
 	};
 
 	using CameraPtr = std::shared_ptr<ICamera>;

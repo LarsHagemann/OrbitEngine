@@ -46,6 +46,10 @@ void SpaceShip::Init()
 
     m_controller = std::unique_ptr<physx::PxController, orbit::PxDelete<physx::PxController>>(ENGINE->GetControllerManager()->createController(desc));
     m_controller->setUpDirection(physx::PxVec3{ 0.f, 1.f, 0.f });
+    auto actor = m_controller->getActor(); // get the actor
+	physx::PxShape* shapes[1]; // There is only one shape in this controller
+	actor->getShapes(shapes,1,0); // get that shape
+	m_controllerShape = shapes[0];
 }
 
 void SpaceShip::Update(const orbit::Time& dt)
@@ -74,9 +78,6 @@ void SpaceShip::Update(const orbit::Time& dt)
     {
         m_horizontalSteeringForce += 0.2f;
     }
-
-    if (m_kCom->keydown(orbit::KeyCode::KEY_SPACE))
-        speed *= 2.f;
 
     m_horizontalSteeringForce = std::clamp(m_horizontalSteeringForce, -m_maxSteeringForce, m_maxSteeringForce);
     m_verticalSteeringForce = std::clamp(m_verticalSteeringForce, -m_maxSteeringForce, m_maxSteeringForce);

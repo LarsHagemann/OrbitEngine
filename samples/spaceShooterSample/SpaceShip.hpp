@@ -31,6 +31,7 @@ private:
 	std::shared_ptr<orbit::ThirdPersonCamera> m_camera;
 	std::shared_ptr<orbit::StaticBatchComponent> m_batch;
 	std::unique_ptr<physx::PxController, orbit::PxDelete<physx::PxController>> m_controller;
+	physx::PxShape* m_controllerShape;
 
 	float m_speed = 1.7f;
 	float m_horizontalSteeringForce = 0.f;

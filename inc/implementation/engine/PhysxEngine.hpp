@@ -9,6 +9,7 @@
 #include <cooking/PxCooking.h>
 
 #include <type_traits>
+#include <memory>
 
 namespace orbit
 {
@@ -43,6 +44,9 @@ namespace orbit
             _Ptr = nullptr;
         }
     };
+
+    template<typename PxT>
+    using PxUPtr = std::unique_ptr<PxT, PxDelete<PxT>>;
 
     class PxOrbitErrorCallback : public PxErrorCallback
     {
