@@ -40,5 +40,10 @@ namespace orbit
         stream->read((char*)&reference, sizeof(ResourceId));
         return GetId() + reference;
     }
+    
+    bool UnLoadable::IsValidId(ResourceId id) const
+    {
+        return id != GetId() && id != 0;
+    }
 
 }

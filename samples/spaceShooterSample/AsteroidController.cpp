@@ -3,7 +3,7 @@
 
 void AsteroidController::Init()
 {
-    m_batch  = AddComponent<orbit::StaticBatchComponent>("batch" , ENGINE->RMGetIdFromName("Asteroid"));
+    m_batch  = AddComponent<orbit::StaticBatchComponent>("batch", ENGINE->RMGetIdFromName("Asteroid"));
 	m_body   = AddComponent<orbit::RigidDynamicComponent>("body", ENGINE->RMGetIdFromName("Asteroid"));
 	m_body->CookBody(orbit::MaterialProperties::DefaultMaterial(), { 3.f, 3.f, 3.f }, 0);
 

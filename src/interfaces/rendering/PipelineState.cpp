@@ -7,28 +7,28 @@ namespace orbit
 
     void IPipelineState::Bind() const
     {
-        if (m_vertexShaderId != GetId())
+        if (IsValidId(m_vertexShaderId))
             ENGINE->RMLoadResource<VertexShader>(m_vertexShaderId)->Bind();
-        if (m_pixelShaderId != GetId())
+        if (IsValidId(m_pixelShaderId))
             ENGINE->RMLoadResource<PixelShader>(m_pixelShaderId)->Bind();
-        if (m_geometryShaderId != GetId())
+        if (IsValidId(m_geometryShaderId))
             ENGINE->RMLoadResource<GeometryShader>(m_geometryShaderId)->Bind();
-        if (m_domainShaderId != GetId())
+        if (IsValidId(m_domainShaderId))
             ENGINE->RMLoadResource<DomainShader>(m_domainShaderId)->Bind();
-        if (m_hullShaderId != GetId())
+        if (IsValidId(m_hullShaderId))
             ENGINE->RMLoadResource<HullShader>(m_hullShaderId)->Bind();
-        //if (m_blendStateId != GetId())
+        //if (IsValidId(m_blendStateId))
         //    ENGINE->RMLoadResource<BlendState>(m_blendStateId)->Bind();
         for (const auto&[slot,samplerId] : m_samplerStateIds)
         {
-            if (samplerId != GetId())
+            if (IsValidId(samplerId))
                 ENGINE->RMLoadResource<SamplerState>(samplerId)->Bind(slot);
         }
-        if (m_rasterizerStateId != GetId())
+        if (IsValidId(m_rasterizerStateId))
             ENGINE->RMLoadResource<RasterizerState>(m_rasterizerStateId)->Bind();
-        //if (m_rootSignatureId != GetId())
+        //if (IsValidId(m_rootSignatureId))
         //    ENGINE->RMLoadResource<RootSignature>(m_rootSignatureId)->Bind();
-        if (m_inputLayoutId != GetId())
+        if (IsValidId(m_inputLayoutId))
             ENGINE->RMLoadResource<InputLayout>(m_inputLayoutId)->Bind();
     }
 

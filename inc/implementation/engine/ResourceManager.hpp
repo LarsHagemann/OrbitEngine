@@ -42,16 +42,17 @@ namespace orbit
         static constexpr Version sVersion = Version{ 0, 0, 1 };
         mutable ResourceId m_currentId = 1u;
     protected:
-        void                  RMInit();
+        void                     RMInit();
     public:
-        ResourceId            RMGetNextResourceId() const { return m_currentId++; }
-        ResourceId            RMGetIdFromName(const std::string& name) const;
-        bool                  RMParseFile(const fs::path& path);
-        bool                  RMGetStream(ResourceId id, std::ifstream* stream) const;
-        bool                  RMRegisterResourceName(const std::string& name, ResourceId id);
-        ResourceType          RMGetResourceType(ResourceId id) const;
+        static constexpr Version RMGetVersion() { return sVersion; }
+        ResourceId               RMGetNextResourceId() const { return m_currentId++; }
+        ResourceId               RMGetIdFromName(const std::string& name) const;
+        bool                     RMParseFile(const fs::path& path);
+        bool                     RMGetStream(ResourceId id, std::ifstream* stream) const;
+        bool                     RMRegisterResourceName(const std::string& name, ResourceId id);
+        ResourceType             RMGetResourceType(ResourceId id) const;
         template<typename ResourceType>
-        SPtr<ResourceType> RMLoadResource(ResourceId id)
+        SPtr<ResourceType>       RMLoadResource(ResourceId id)
         {
             auto rIt = m_resources.find(id);
             if (rIt == m_resources.end()) {

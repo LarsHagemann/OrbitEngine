@@ -18,7 +18,7 @@ namespace orbit
 		auto size = Engine::Get()->Window()->GetDimensions();
 		m_projection = (m_projectionHook)
 			? m_projectionHook()
-			: Math<float>::Perspective(Math<float>::PIDIV4, static_cast<float>(size.x()) / size.y(), 0.1f, 10.f);
+			: Math<float>::Perspective(Math<float>::PIDIV4, static_cast<float>(size.x()) / size.y(), 0.1f, 100.f);
 	}
 
 	Matrix4f ICamera::GetViewProjectionMatrix() const

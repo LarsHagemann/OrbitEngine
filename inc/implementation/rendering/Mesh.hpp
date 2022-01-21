@@ -18,6 +18,10 @@ namespace orbit
         std::vector<Submesh> m_submeshes;
         ResourceId m_id;
     public:
+        size_t NumSubmeshes() const { return m_submeshes.size(); }
+        const Submesh& GetSubmesh(size_t index) const { return m_submeshes[index]; }
+        Submesh& GetSubmesh(size_t index) { return m_submeshes[index]; }
+
         virtual void Bind() const override
         {
             if (m_indexBuffer)
